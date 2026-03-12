@@ -70,13 +70,21 @@ def create_default_branches() -> dict[str, PromptBranch]:
     return {b.name: PromptBranch(b) for b in branches}
 
 
-def make_candidate_branch(name: str, purpose: str, prompt_template: str, trial_episodes: int) -> PromptBranch:
+def make_candidate_branch(
+    name: str,
+    purpose: str,
+    prompt_template: str,
+    trial_episodes: int,
+    initial_weight: float = 0.6,
+    metadata: dict | None = None,
+) -> PromptBranch:
     state = BranchState(
         name=name,
         purpose=purpose,
         prompt_template=prompt_template,
-        weight=0.6,
+        weight=initial_weight,
         status=BranchStatus.CANDIDATE,
+        metadata=metadata or {},
         trial_remaining=trial_episodes,
     )
     return PromptBranch(state)

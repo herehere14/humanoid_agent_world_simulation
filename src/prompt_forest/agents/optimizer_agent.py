@@ -93,7 +93,7 @@ class OptimizerAgent:
             return
 
         active_candidates = [b for b in branches.values() if b.state.status == BranchStatus.CANDIDATE]
-        if active_candidates:
+        if len(active_candidates) >= self.config.max_active_candidates:
             return
 
         active_rewards = [signal.branch_feedback[b].reward for b in route.activated_branches if b in signal.branch_feedback]
@@ -104,53 +104,90 @@ class OptimizerAgent:
             return
 
         dominant_failure = sorted(failure_map.items(), key=lambda x: x[1], reverse=True)[0][0]
-        candidate_name, purpose, template = self._candidate_spec_from_failure(dominant_failure, task.task_type)
+        base_name, capability_tag, purpose, template = self._candidate_spec_from_failure(dominant_failure, task.task_type)
+        parent_hint = route.activated_branches[-1] if route.activated_branches else ""
 
-        if candidate_name in branches:
+        if self._capability_exists_under_parent(branches, capability_tag, parent_hint):
             return
 
-        # Duplication guard: avoid creating a branch with near-identical role.
-        if any(candidate_name.split("_")[0] in b.state.name for b in branches.values()):
-            return
-
+        candidate_name = self._unique_candidate_name(base_name, branches)
         candidate = make_candidate_branch(
             name=candidate_name,
             purpose=purpose,
             prompt_template=template,
             trial_episodes=self.config.candidate_trial_episodes,
+            initial_weight=self.config.candidate_initial_weight,
+            metadata={
+                "capability_tag": capability_tag,
+                "creation_reason": dominant_failure,
+                "task_type": task.task_type,
+                "parent_hint": parent_hint,
+            },
         )
         branches[candidate_name] = candidate
         created.append(candidate_name)
 
-    def _candidate_spec_from_failure(self, failure_reason: str, task_type: str) -> tuple[str, str, str]:
+    def _candidate_spec_from_failure(self, failure_reason: str, task_type: str) -> tuple[str, str, str, str]:
         fr = failure_reason.lower()
         if "keyword_coverage" in fr or "low_quality" in fr:
             return (
                 f"evidence_fuser_{task_type}",
+                "evidence_fuser",
                 "Fuse retrieval evidence with strict task-keyword anchoring.",
                 (
                     "You are the Evidence Fuser candidate branch. Task type: {task_type}.\n"
                     "Task: {task}\n"
+                    "Parent context: {context}\n"
                     "Prioritize traceable evidence snippets and guarantee key requirement coverage."
                 ),
             )
         if "rule_miss" in fr:
             return (
                 f"constraint_solver_{task_type}",
+                "constraint_solver",
                 "Satisfy explicit constraints before producing final response.",
                 (
                     "You are the Constraint Solver candidate branch. Task type: {task_type}.\n"
                     "Task: {task}\n"
+                    "Parent context: {context}\n"
                     "First enumerate constraints, then produce an answer that verifies each one."
                 ),
             )
 
         return (
             f"verifier_plus_{task_type}",
+            "verifier_plus",
             "Deep verification and self-check loops for reliability.",
             (
                 "You are the Verifier Plus candidate branch. Task type: {task_type}.\n"
                 "Task: {task}\n"
+                "Parent context: {context}\n"
                 "Run a strict self-checklist and only return conclusions that pass all checks."
             ),
         )
+
+    @staticmethod
+    def _unique_candidate_name(base: str, branches: dict[str, PromptBranch]) -> str:
+        if base not in branches:
+            return base
+        i = 2
+        while f"{base}_v{i}" in branches:
+            i += 1
+        return f"{base}_v{i}"
+
+    @staticmethod
+    def _capability_exists_under_parent(
+        branches: dict[str, PromptBranch],
+        capability_tag: str,
+        parent_hint: str,
+    ) -> bool:
+        for branch in branches.values():
+            if branch.state.status == BranchStatus.ARCHIVED:
+                continue
+            meta = branch.state.metadata
+            if meta.get("capability_tag") != capability_tag:
+                continue
+            if parent_hint and meta.get("parent_hint") != parent_hint:
+                continue
+            return True
+        return False

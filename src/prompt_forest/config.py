@@ -26,6 +26,9 @@ class OptimizerConfig:
     candidate_promote_threshold: float = 0.6
     candidate_failure_trigger: int = 4
     max_active_branches: int = 24
+    max_active_candidates: int = 4
+    candidate_initial_weight: float = 0.6
+    max_hierarchy_depth: int = 4
 
 
 @dataclass

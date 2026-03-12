@@ -14,7 +14,10 @@
     "candidate_trial_episodes": 6,
     "candidate_promote_threshold": 0.62,
     "candidate_failure_trigger": 4,
-    "max_active_branches": 24
+    "max_active_branches": 24,
+    "max_active_candidates": 4,
+    "candidate_initial_weight": 0.6,
+    "max_hierarchy_depth": 4
   },
   "memory": {
     "max_records": 5000,

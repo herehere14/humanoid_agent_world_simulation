@@ -195,11 +195,17 @@ class PromptForestEngine:
             if self.forest.has_node(candidate_name):
                 continue
 
-            if route.activated_branches:
-                leaf = route.activated_branches[-1]
-                parent_id = self.forest.parent(leaf) or self.forest.root_id
-            else:
-                parent_id = self.forest.root_id
+            parent_id = self.forest.root_id
+            meta = self.branches[candidate_name].state.metadata
+            requested_parent = str(meta.get("parent_hint", "")).strip()
+            if requested_parent and self.forest.has_node(requested_parent):
+                parent_id = requested_parent
+            elif route.activated_branches:
+                parent_id = route.activated_branches[-1]
+
+            max_depth = self.config.optimizer.max_hierarchy_depth
+            while self.forest.depth(parent_id) >= max_depth - 1 and self.forest.parent(parent_id):
+                parent_id = self.forest.parent(parent_id) or self.forest.root_id
 
             self.forest.add_branch(
                 branch_name=candidate_name,

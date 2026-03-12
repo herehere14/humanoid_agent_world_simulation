@@ -194,6 +194,11 @@ or via CLI:
 prompt-forest detailed-validate --episodes 240 --seeds 11,17,19,23,29
 ```
 
+This detailed validation now also reports branch-growth metrics:
+- average number of newly created branches
+- hierarchy depth gain
+- reward trend during growth-probe runs
+
 ## Logged artifacts
 
 - `artifacts/events.jsonl`: per-task routing, branch rewards, optimization events
@@ -223,6 +228,12 @@ Focused RL-learning tests:
 
 ```bash
 PYTHONPATH=src pytest tests/test_learning_dynamics.py
+```
+
+Branch growth tests:
+
+```bash
+PYTHONPATH=src pytest tests/test_branch_growth.py
 ```
 
 ## Future research extensions

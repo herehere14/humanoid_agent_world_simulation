@@ -162,6 +162,7 @@ class DetailedHierarchicalValidator:
             "branch_inventory": branch_inventory,
             "learning": learning,
             "branch_effect": branch_effect,
+            "growth": self._growth_probe(seeds=seeds, episodes=episodes_per_seed),
             "top_selected_leaves": top_selected,
             "per_seed": per_seed,
         }
@@ -289,4 +290,57 @@ class DetailedHierarchicalValidator:
             "niche_sub_branch_count": len(niche),
             "macro_branches": sorted(macro),
             "niche_sub_branches": sorted(niche),
+        }
+
+    def _growth_probe(self, seeds: list[int], episodes: int) -> dict:
+        created_counts: list[int] = []
+        depth_gains: list[int] = []
+        reward_trends: list[float] = []
+
+        for seed in seeds:
+            cfg = load_config(self.config_path)
+            cfg.router.top_k = 1
+            cfg.router.min_candidates = 1
+            cfg.router.exploration = 0.35
+            cfg.optimizer.candidate_failure_trigger = 2
+            cfg.optimizer.candidate_trial_episodes = 4
+            cfg.optimizer.max_active_candidates = 6
+            cfg.optimizer.max_active_branches = 40
+            cfg.memory.bias_scale = 1.8
+
+            run_dir = self.root_dir / "artifacts" / "growth_probe_runs" / f"seed_{seed}"
+            if run_dir.exists():
+                shutil.rmtree(run_dir)
+            cfg.artifacts_dir = str(run_dir)
+
+            backend = DomainShiftBackend(shifted_quality_matrix(), noise=0.03, seed=seed)
+            engine = PromptForestEngine(config=cfg, backend=backend)
+
+            rewards: list[float] = []
+            base_branch_count = len(engine.branch_snapshot())
+            base_max_depth = max(meta["depth"] for meta in engine.branch_snapshot().values())
+
+            for i in range(episodes):
+                task_type = ["planning", "factual", "code", "creative", "general", "math"][i % 6]
+                metadata = {
+                    "expected_keywords": [f"kw_{task_type}_{j}" for j in range(20)],
+                    "required_substrings": ["never_present_token_zzz"],  # induce misses and candidate proposals
+                }
+                result = engine.run_task(
+                    text=f"High-complexity {task_type} task requiring missing capability fill-in",
+                    task_type=task_type,
+                    metadata=metadata,
+                )
+                rewards.append(result["evaluation_signal"]["reward_score"])
+
+            snap = engine.branch_snapshot()
+            created_counts.append(len(snap) - base_branch_count)
+            depth_gains.append(max(meta["depth"] for meta in snap.values()) - base_max_depth)
+            n = max(1, len(rewards) // 3)
+            reward_trends.append(mean(rewards[-n:]) - mean(rewards[:n]))
+
+        return {
+            "mean_new_branches_created": round(mean(created_counts), 4),
+            "mean_depth_gain": round(mean(depth_gains), 4),
+            "mean_growth_reward_trend": round(mean(reward_trends), 4),
         }
