@@ -31,6 +31,7 @@ class OptimizerConfig:
 class MemoryConfig:
     max_records: int = 5000
     similarity_window: int = 100
+    bias_scale: float = 0.6
 
 
 @dataclass

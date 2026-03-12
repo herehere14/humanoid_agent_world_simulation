@@ -53,7 +53,7 @@ class MemoryStore:
         bias: dict[str, float] = {}
         for branch, rewards in scores.items():
             avg = sum(rewards) / len(rewards)
-            bias[branch] = (avg - 0.5) * 0.6
+            bias[branch] = (avg - 0.5) * self.config.bias_scale
         return bias
 
     def repeated_failures(self, min_count: int = 3) -> dict[str, int]:
@@ -67,6 +67,13 @@ class MemoryStore:
             if branch_name in r.activated_branches and r.reward_score < threshold:
                 count += 1
         return count
+
+    def branch_visit_counts(self, task_type: str) -> dict[str, int]:
+        counts: Counter[str] = Counter()
+        for r in self.retrieve_similar(task_type, limit=self.config.similarity_window):
+            for branch_name in r.activated_branches:
+                counts[branch_name] += 1
+        return dict(counts)
 
     def useful_patterns(self, task_type: str) -> list[str]:
         records = self.retrieve_similar(task_type, limit=50)

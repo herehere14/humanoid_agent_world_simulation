@@ -48,6 +48,16 @@ class PromptForestEngine:
         self._event_log = self.artifacts_dir / "events.jsonl"
 
     def run_task(self, text: str, task_type: str = "auto", metadata: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self.run_task_controlled(text=text, task_type=task_type, metadata=metadata, adapt=True, update_memory=True)
+
+    def run_task_controlled(
+        self,
+        text: str,
+        task_type: str = "auto",
+        metadata: dict[str, Any] | None = None,
+        adapt: bool = True,
+        update_memory: bool = True,
+    ) -> dict[str, Any]:
         task = TaskInput(task_id=str(uuid4()), text=text, task_type=task_type, metadata=metadata or {})
 
         route = self.router.route(task, self.branches, self.memory)
@@ -66,13 +76,22 @@ class PromptForestEngine:
         aggregation = self.aggregator.aggregate(outputs, numeric_scores)
         signal = self.evaluator_agent.evaluate(task, route, branch_scores, aggregation)
 
-        optimize_event: OptimizationEvent = self.optimizer_agent.optimize(
-            task=task,
-            route=route,
-            signal=signal,
-            branches=self.branches,
-            memory=self.memory,
-        )
+        if adapt:
+            optimize_event: OptimizationEvent = self.optimizer_agent.optimize(
+                task=task,
+                route=route,
+                signal=signal,
+                branches=self.branches,
+                memory=self.memory,
+            )
+        else:
+            optimize_event = OptimizationEvent(
+                updated_weights={},
+                rewritten_prompts=[],
+                promoted_candidates=[],
+                archived_candidates=[],
+                created_candidates=[],
+            )
 
         record = MemoryRecord(
             task_id=task.task_id,
@@ -88,7 +107,8 @@ class PromptForestEngine:
             useful_patterns=self.memory.useful_patterns(route.task_type),
             branch_rewards={name: fb.reward for name, fb in signal.branch_feedback.items()},
         )
-        self.memory.add(record)
+        if update_memory:
+            self.memory.add(record)
 
         payload = {
             "task": asdict(task),

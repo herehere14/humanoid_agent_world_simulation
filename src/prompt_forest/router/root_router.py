@@ -14,6 +14,9 @@ class MemoryRoutingView(Protocol):
     def branch_success_bias(self, task_type: str) -> dict[str, float]:
         ...
 
+    def branch_visit_counts(self, task_type: str) -> dict[str, int]:
+        ...
+
 
 class RootRouter:
     def __init__(self, config: RouterConfig, seed: int = 7) -> None:
@@ -53,6 +56,7 @@ class RootRouter:
     ) -> RoutingDecision:
         task_type = self.classify_task_type(task)
         history_bias = memory.branch_success_bias(task_type)
+        visit_counts = memory.branch_visit_counts(task_type)
         affinity = self._task_branch_affinity.get(task_type, self._task_branch_affinity["general"])
 
         scores: dict[str, float] = {}
@@ -65,10 +69,10 @@ class RootRouter:
                 score *= 0.85
             scores[name] = max(0.01, score)
 
-        selected = self._select_top_with_exploration(scores)
+        selected = self._select_top_with_exploration(scores, visit_counts)
         return RoutingDecision(task_type=task_type, activated_branches=selected, branch_scores=scores)
 
-    def _select_top_with_exploration(self, scores: dict[str, float]) -> list[str]:
+    def _select_top_with_exploration(self, scores: dict[str, float], visit_counts: dict[str, int]) -> list[str]:
         if not scores:
             return []
 
@@ -77,8 +81,12 @@ class RootRouter:
         selected = [name for name, _ in ordered[:top_k]]
 
         if self._rng.random() < self.config.exploration and len(ordered) > top_k:
-            pool = [name for name, _ in ordered[top_k:]]
-            selected[-1] = self._rng.choice(pool)
+            underexplored = [name for name in scores if visit_counts.get(name, 0) <= 1]
+            if underexplored:
+                selected[-1] = self._rng.choice(underexplored)
+            else:
+                pool = [name for name, _ in ordered[top_k:]]
+                selected[-1] = self._rng.choice(pool)
 
         return selected
 

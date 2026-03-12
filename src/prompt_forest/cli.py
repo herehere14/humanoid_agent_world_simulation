@@ -7,6 +7,7 @@ from pathlib import Path
 from .config import load_config
 from .core.engine import PromptForestEngine
 from .experiments.benchmark import BenchmarkRunner
+from .experiments.rl_validation import RLLearningValidator
 from .utils.io import read_json
 
 
@@ -24,6 +25,10 @@ def build_parser() -> argparse.ArgumentParser:
     bench_cmd = sub.add_parser("benchmark", help="Run benchmark dataset")
     bench_cmd.add_argument("--dataset", type=str, default="examples/demo_tasks.json")
     bench_cmd.add_argument("--rounds", type=int, default=4)
+
+    val_cmd = sub.add_parser("rl-validate", help="Run adaptive-vs-frozen RL learning validation")
+    val_cmd.add_argument("--episodes", type=int, default=240)
+    val_cmd.add_argument("--seeds", type=str, default="11,17,19,23,29,31,37,41,43,47")
 
     oc_cmd = sub.add_parser("openclaw-event", help="Process OpenClaw-style trajectory event JSON")
     oc_cmd.add_argument("--event-file", type=str, required=True)
@@ -51,6 +56,13 @@ def main() -> None:
         runner = BenchmarkRunner(engine)
         summary = runner.run(dataset_path=args.dataset, rounds=args.rounds)
         print(json.dumps(summary.to_dict(), indent=2))
+        return
+
+    if args.command == "rl-validate":
+        seeds = [int(x.strip()) for x in args.seeds.split(",") if x.strip()]
+        validator = RLLearningValidator(Path.cwd())
+        report = validator.run(seeds=seeds, episodes_per_seed=args.episodes)
+        print(json.dumps(report, indent=2))
         return
 
     if args.command == "openclaw-event":

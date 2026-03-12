@@ -17,7 +17,8 @@
   },
   "memory": {
     "max_records": 5000,
-    "similarity_window": 120
+    "similarity_window": 120,
+    "bias_scale": 0.6
   },
   "evaluator": {
     "aggregation_strategy": "judge_select",

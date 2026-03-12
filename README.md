@@ -161,6 +161,18 @@ PYTHONPATH=src python examples/run_demo.py
 PYTHONPATH=src python examples/candidate_trial_demo.py
 ```
 
+### 6) RL learning validation (adaptive vs frozen)
+
+```bash
+PYTHONPATH=src python examples/run_rl_validation.py
+```
+
+or via CLI:
+
+```bash
+prompt-forest rl-validate --episodes 240 --seeds 11,17,19,23,29,31,37,41,43,47
+```
+
 ## Logged artifacts
 
 - `artifacts/events.jsonl`: per-task routing, branch rewards, optimization events
@@ -168,6 +180,7 @@ PYTHONPATH=src python examples/candidate_trial_demo.py
 - `artifacts/benchmark_summary.json`: benchmark metrics over rounds
 - `artifacts/demo_report.json`: final demo summary
 - `artifacts/candidate_trial_report.json`: candidate branch creation/trial state snapshot
+- `artifacts/rl_validation_report.json`: multi-seed adaptive-vs-frozen learning evidence
 
 ## What the MVP demonstrates
 
@@ -182,6 +195,12 @@ PYTHONPATH=src python examples/candidate_trial_demo.py
 
 ```bash
 pytest
+```
+
+Focused RL-learning tests:
+
+```bash
+PYTHONPATH=src pytest tests/test_learning_dynamics.py
 ```
 
 ## Future research extensions
