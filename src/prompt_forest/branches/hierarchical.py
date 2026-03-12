@@ -1,0 +1,352 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Any
+
+from ..types import BranchState
+from .base import PromptBranch
+
+
+@dataclass
+class ForestNode:
+    node_id: str
+    parent_id: str | None
+    depth: int
+    specialties: list[str] = field(default_factory=list)
+    children: list[str] = field(default_factory=list)
+
+
+class HierarchicalPromptForest:
+    def __init__(self) -> None:
+        self.root_id = "root"
+        self.nodes: dict[str, ForestNode] = {
+            self.root_id: ForestNode(node_id=self.root_id, parent_id=None, depth=0, specialties=["general"])
+        }
+        self.branches: dict[str, PromptBranch] = {}
+
+    @classmethod
+    def from_flat(cls, branches: dict[str, PromptBranch]) -> "HierarchicalPromptForest":
+        forest = cls()
+        for branch_name, branch in branches.items():
+            forest.add_branch(branch_name, branch, parent_id=forest.root_id, specialties=["general"])
+        return forest
+
+    def add_branch(
+        self,
+        branch_name: str,
+        branch: PromptBranch,
+        parent_id: str,
+        specialties: list[str] | None = None,
+    ) -> None:
+        if parent_id not in self.nodes:
+            raise KeyError(f"Unknown parent node: {parent_id}")
+        parent = self.nodes[parent_id]
+
+        self.branches[branch_name] = branch
+        self.nodes[branch_name] = ForestNode(
+            node_id=branch_name,
+            parent_id=parent_id,
+            depth=parent.depth + 1,
+            specialties=specialties or ["general"],
+        )
+        parent.children.append(branch_name)
+
+    def has_node(self, node_id: str) -> bool:
+        return node_id in self.nodes
+
+    def get_branch(self, node_id: str) -> PromptBranch:
+        return self.branches[node_id]
+
+    def children(self, node_id: str) -> list[str]:
+        return list(self.nodes[node_id].children)
+
+    def parent(self, node_id: str) -> str | None:
+        return self.nodes[node_id].parent_id
+
+    def depth(self, node_id: str) -> int:
+        return self.nodes[node_id].depth
+
+    def path_to_root(self, node_id: str) -> list[str]:
+        path: list[str] = []
+        cursor: str | None = node_id
+        while cursor and cursor != self.root_id:
+            path.append(cursor)
+            cursor = self.parent(cursor)
+        return list(reversed(path))
+
+    def branch_snapshot(self) -> dict[str, dict[str, Any]]:
+        out: dict[str, dict[str, Any]] = {}
+        for branch_name, branch in self.branches.items():
+            node = self.nodes[branch_name]
+            out[branch_name] = {
+                "weight": round(branch.state.weight, 4),
+                "status": branch.state.status.value,
+                "avg_reward": round(branch.state.avg_reward(), 4),
+                "trial_remaining": branch.state.trial_remaining,
+                "history_len": len(branch.state.historical_rewards),
+                "depth": node.depth,
+                "parent": node.parent_id,
+                "children": list(node.children),
+                "specialties": list(node.specialties),
+            }
+        return out
+
+
+
+def _branch(name: str, purpose: str, prompt: str, weight: float) -> PromptBranch:
+    return PromptBranch(
+        BranchState(
+            name=name,
+            purpose=purpose,
+            prompt_template=prompt,
+            weight=weight,
+        )
+    )
+
+
+
+def create_default_hierarchical_forest() -> HierarchicalPromptForest:
+    forest = HierarchicalPromptForest()
+
+    macro_specs = [
+        (
+            "analytical",
+            "Structured decomposition and explicit assumptions.",
+            (
+                "You are the Analytical macro branch. Task type: {task_type}.\\n"
+                "Task: {task}\\n"
+                "Upstream context: {context}\\n"
+                "Decompose the task into formal components and produce a precise intermediate reasoning state."
+            ),
+            1.05,
+            ["math", "code", "general"],
+        ),
+        (
+            "planner",
+            "Action-oriented sequencing and execution planning.",
+            (
+                "You are the Planning macro branch. Task type: {task_type}.\\n"
+                "Task: {task}\\n"
+                "Upstream context: {context}\\n"
+                "Produce a structured action plan with sequencing dependencies and risks."
+            ),
+            1.0,
+            ["planning", "general", "code"],
+        ),
+        (
+            "retrieval",
+            "Evidence gathering and grounding.",
+            (
+                "You are the Retrieval macro branch. Task type: {task_type}.\\n"
+                "Task: {task}\\n"
+                "Upstream context: {context}\\n"
+                "Extract key evidence points and factual anchors needed for high-confidence answers."
+            ),
+            1.0,
+            ["factual", "general", "code"],
+        ),
+        (
+            "critique",
+            "Failure detection and adversarial stress testing.",
+            (
+                "You are the Critique macro branch. Task type: {task_type}.\\n"
+                "Task: {task}\\n"
+                "Upstream context: {context}\\n"
+                "Identify likely failure modes, blind spots, and robustness risks."
+            ),
+            0.95,
+            ["code", "planning", "general"],
+        ),
+        (
+            "verification",
+            "Constraint validation and consistency checks.",
+            (
+                "You are the Verification macro branch. Task type: {task_type}.\\n"
+                "Task: {task}\\n"
+                "Upstream context: {context}\\n"
+                "Verify constraints, check consistency, and provide confidence-calibrated conclusions."
+            ),
+            1.15,
+            ["math", "factual", "general", "code"],
+        ),
+        (
+            "creative",
+            "Diverse solution generation under constraints.",
+            (
+                "You are the Creative macro branch. Task type: {task_type}.\\n"
+                "Task: {task}\\n"
+                "Upstream context: {context}\\n"
+                "Generate high-diversity options that still satisfy core constraints."
+            ),
+            0.9,
+            ["creative", "planning", "general"],
+        ),
+    ]
+
+    for name, purpose, prompt, weight, specialties in macro_specs:
+        forest.add_branch(name, _branch(name, purpose, prompt, weight), parent_id=forest.root_id, specialties=specialties)
+
+    niche_specs: dict[str, list[tuple[str, str, str, float, list[str]]]] = {
+        "analytical": [
+            (
+                "analytical_symbolic_solver",
+                "Symbolic and equation-level decomposition.",
+                (
+                    "You are the Symbolic Solver niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "Focus on precise symbolic derivations and explicit checkable steps."
+                ),
+                0.95,
+                ["math", "code"],
+            ),
+            (
+                "analytical_causal_decomposer",
+                "Cause-effect decomposition and dependency tracing.",
+                (
+                    "You are the Causal Decomposer niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "Model causal dependencies and isolate the highest-impact factors."
+                ),
+                0.92,
+                ["planning", "general", "code"],
+            ),
+        ],
+        "planner": [
+            (
+                "planner_timeline_optimizer",
+                "Timeline and milestone optimization.",
+                (
+                    "You are the Timeline Optimizer niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "Produce a realistic timeline with milestones, dependencies, and monitoring points."
+                ),
+                0.94,
+                ["planning", "general"],
+            ),
+            (
+                "planner_risk_allocator",
+                "Risk-aware planning and resource allocation.",
+                (
+                    "You are the Risk Allocator niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "Allocate resources under uncertainty and include fallback plans."
+                ),
+                0.93,
+                ["planning", "code", "general"],
+            ),
+        ],
+        "retrieval": [
+            (
+                "retrieval_evidence_tracer",
+                "Evidence tracing and source-grounded extraction.",
+                (
+                    "You are the Evidence Tracer niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "Prioritize evidence traceability and factual grounding cues."
+                ),
+                0.95,
+                ["factual", "general", "code"],
+            ),
+            (
+                "retrieval_source_triage",
+                "Source relevance triage and conflict resolution.",
+                (
+                    "You are the Source Triage niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "Rank source reliability and resolve conflicting factual signals."
+                ),
+                0.92,
+                ["factual", "general"],
+            ),
+        ],
+        "critique": [
+            (
+                "critique_failure_hunter",
+                "Edge-case and failure scenario mining.",
+                (
+                    "You are the Failure Hunter niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "Hunt for edge cases and brittle assumptions likely to break outputs."
+                ),
+                0.9,
+                ["code", "planning", "general"],
+            ),
+            (
+                "critique_adversarial_probe",
+                "Adversarial probing for hallucination and logic gaps.",
+                (
+                    "You are the Adversarial Probe niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "Probe contradictions and adversarially test reliability claims."
+                ),
+                0.9,
+                ["factual", "general", "code"],
+            ),
+        ],
+        "verification": [
+            (
+                "verification_constraint_checker",
+                "Hard-constraint satisfaction verification.",
+                (
+                    "You are the Constraint Checker niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "Verify required constraints and produce pass/fail evidence for each."
+                ),
+                0.97,
+                ["math", "factual", "code", "general"],
+            ),
+            (
+                "verification_consistency_auditor",
+                "Cross-step consistency and calibration auditing.",
+                (
+                    "You are the Consistency Auditor niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "Audit internal consistency and calibrate uncertainty statements."
+                ),
+                0.95,
+                ["general", "planning", "factual"],
+            ),
+        ],
+        "creative": [
+            (
+                "creative_divergent_generator",
+                "Divergent ideation with controlled novelty.",
+                (
+                    "You are the Divergent Generator niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "Generate diverse solution candidates and make novelty explicit."
+                ),
+                0.9,
+                ["creative", "general"],
+            ),
+            (
+                "creative_constraint_innovator",
+                "Constraint-aware innovation and refinement.",
+                (
+                    "You are the Constraint Innovator niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "Innovate while explicitly satisfying practical constraints."
+                ),
+                0.91,
+                ["creative", "planning", "code"],
+            ),
+        ],
+    }
+
+    for parent, specs in niche_specs.items():
+        for name, purpose, prompt, weight, specialties in specs:
+            forest.add_branch(name, _branch(name, purpose, prompt, weight), parent_id=parent, specialties=specialties)
+
+    return forest

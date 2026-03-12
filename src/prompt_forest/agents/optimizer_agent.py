@@ -100,7 +100,7 @@ class OptimizerAgent:
         if not active_rewards or max(active_rewards) > 0.55:
             return
 
-        if len([b for b in branches.values() if b.state.status != BranchStatus.ARCHIVED]) >= 9:
+        if len([b for b in branches.values() if b.state.status != BranchStatus.ARCHIVED]) >= self.config.max_active_branches:
             return
 
         dominant_failure = sorted(failure_map.items(), key=lambda x: x[1], reverse=True)[0][0]

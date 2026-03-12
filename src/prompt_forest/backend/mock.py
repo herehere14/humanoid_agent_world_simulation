@@ -65,7 +65,7 @@ class MockLLMBackend(LLMBackend):
 
     def generate(self, prompt: str, task: TaskInput, branch_name: str) -> tuple[str, dict[str, Any]]:
         task_type = task.task_type if task.task_type != "auto" else "general"
-        quality = self._quality.get(task_type, self._quality["general"]).get(branch_name, 0.5)
+        quality = self._quality_for_branch(task_type, branch_name)
         quality += self._rng.uniform(-0.07, 0.07)
         quality = max(0.01, min(0.99, quality))
 
@@ -93,3 +93,28 @@ class MockLLMBackend(LLMBackend):
         )
 
         return answer, {"quality": quality, "task_type": task_type, "branch": branch_name}
+
+    def _quality_for_branch(self, task_type: str, branch_name: str) -> float:
+        per_task = self._quality.get(task_type, self._quality["general"])
+        if branch_name in per_task:
+            return per_task[branch_name]
+
+        macro = branch_name.split("_")[0]
+        base = per_task.get(macro, 0.5)
+        tokens = set(branch_name.split("_"))
+
+        niche_bonus = 0.0
+        if task_type == "math" and {"symbolic", "solver", "constraint", "checker"} & tokens:
+            niche_bonus += 0.08
+        if task_type == "planning" and {"timeline", "risk", "allocator", "optimizer"} & tokens:
+            niche_bonus += 0.08
+        if task_type == "factual" and {"evidence", "source", "tracer", "triage"} & tokens:
+            niche_bonus += 0.08
+        if task_type == "code" and {"adversarial", "consistency", "checker", "auditor"} & tokens:
+            niche_bonus += 0.08
+        if task_type == "creative" and {"divergent", "innovator", "creative"} & tokens:
+            niche_bonus += 0.08
+        if task_type == "general" and {"consistency", "constraint", "auditor", "checker"} & tokens:
+            niche_bonus += 0.05
+
+        return max(0.01, min(0.99, base + niche_bonus))

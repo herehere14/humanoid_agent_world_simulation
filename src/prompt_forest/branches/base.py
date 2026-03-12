@@ -9,8 +9,12 @@ from ..types import BranchState, BranchStatus
 class PromptBranch:
     state: BranchState
 
-    def render_prompt(self, task_text: str, task_type: str) -> str:
-        return self.state.prompt_template.format(task=task_text, task_type=task_type)
+    def render_prompt(self, task_text: str, task_type: str, context: str = "") -> str:
+        return self.state.prompt_template.format(
+            task=task_text,
+            task_type=task_type,
+            context=context or "none",
+        )
 
     @property
     def name(self) -> str:

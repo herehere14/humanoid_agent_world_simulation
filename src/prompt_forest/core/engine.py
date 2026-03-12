@@ -7,15 +7,15 @@ from uuid import uuid4
 
 from ..agents.evaluator_agent import EvaluatorAgent
 from ..agents.optimizer_agent import OptimizationEvent, OptimizerAgent
-from ..aggregator.strategies import Aggregator
+from ..aggregator.strategies import AggregationResult, Aggregator
 from ..backend.base import LLMBackend
 from ..backend.mock import MockLLMBackend
 from ..branches.base import PromptBranch
-from ..branches.library import create_default_branches
+from ..branches.hierarchical import HierarchicalPromptForest, create_default_hierarchical_forest
 from ..config import EngineConfig, load_config
 from ..evaluator.judge import OutputJudge
 from ..memory.store import MemoryStore
-from ..router.root_router import RootRouter
+from ..router.hierarchical_router import HierarchicalRouter
 from ..types import MemoryRecord, RoutingDecision, TaskInput
 from ..utils.io import append_jsonl, ensure_parent
 from .executor import PromptExecutor
@@ -33,12 +33,15 @@ class PromptForestEngine:
         self.artifacts_dir = Path(self.config.artifacts_dir)
         ensure_parent(self.artifacts_dir / "dummy")
 
-        self.branches = branches or create_default_branches()
+        # Backward compatibility: if branches are supplied, wrap them as a 1-layer forest.
+        self.forest = HierarchicalPromptForest.from_flat(branches) if branches is not None else create_default_hierarchical_forest()
+        self.branches = self.forest.branches
+
         self.backend = backend or MockLLMBackend()
         self.executor = PromptExecutor(self.backend)
 
         self.memory = MemoryStore(self.config.memory, memory_path=self.artifacts_dir / "memory_records.jsonl")
-        self.router = RootRouter(self.config.router)
+        self.router = HierarchicalRouter(self.config.router)
         self.judge = OutputJudge(self.config.evaluator.reward_mode)
         self.evaluator_agent = EvaluatorAgent()
         self.optimizer_agent = OptimizerAgent(self.config.optimizer)
@@ -60,21 +63,17 @@ class PromptForestEngine:
     ) -> dict[str, Any]:
         task = TaskInput(task_id=str(uuid4()), text=text, task_type=task_type, metadata=metadata or {})
 
-        route = self.router.route(task, self.branches, self.memory)
+        route = self.router.route(task, self.forest, self.memory)
         task.task_type = route.task_type
         self._route_history.append(route)
 
-        outputs = {}
-        for branch_name in route.activated_branches:
-            branch = self.branches.get(branch_name)
-            if branch is None or not branch.is_active:
-                continue
-            outputs[branch_name] = self.executor.run_branch(branch, task, route.task_type)
-
+        outputs = self._run_path(route, task)
         branch_scores = self.judge.score_all(outputs, task)
         numeric_scores = {k: v.reward for k, v in branch_scores.items()}
-        aggregation = self.aggregator.aggregate(outputs, numeric_scores)
+
+        aggregation = self._aggregate(route, outputs, numeric_scores)
         signal = self.evaluator_agent.evaluate(task, route, branch_scores, aggregation)
+        self._propagate_rewards_along_path(route, signal, gamma=0.9, local_mix=0.55)
 
         if adapt:
             optimize_event: OptimizationEvent = self.optimizer_agent.optimize(
@@ -84,6 +83,7 @@ class PromptForestEngine:
                 branches=self.branches,
                 memory=self.memory,
             )
+            self._attach_created_candidates(route, optimize_event)
         else:
             optimize_event = OptimizationEvent(
                 updated_weights={},
@@ -130,20 +130,100 @@ class PromptForestEngine:
 
         return payload
 
+    def _run_path(self, route: RoutingDecision, task: TaskInput) -> dict[str, Any]:
+        outputs = {}
+        context = task.metadata.get("context_seed", "")
+
+        for branch_name in route.activated_branches:
+            branch = self.branches.get(branch_name)
+            if branch is None or not branch.is_active:
+                continue
+
+            branch_output = self.executor.run_branch(branch, task, route.task_type, context=context)
+            outputs[branch_name] = branch_output
+            context = self._roll_context(context, branch_output.output)
+
+        return outputs
+
+    def _aggregate(
+        self,
+        route: RoutingDecision,
+        outputs: dict[str, Any],
+        numeric_scores: dict[str, float],
+    ) -> AggregationResult:
+        if not outputs:
+            return AggregationResult(selected_branch="none", selected_output="", notes={"reason": "no_outputs"})
+
+        if self.config.evaluator.aggregation_strategy == "leaf_select" and route.activated_branches:
+            leaf = route.activated_branches[-1]
+            if leaf in outputs:
+                return AggregationResult(
+                    selected_branch=leaf,
+                    selected_output=outputs[leaf].output,
+                    notes={"strategy": "leaf_select", "path": route.activated_branches},
+                )
+
+        return self.aggregator.aggregate(outputs, numeric_scores)
+
+    def _propagate_rewards_along_path(self, route: RoutingDecision, signal, gamma: float, local_mix: float) -> None:
+        if not route.activated_branches:
+            return
+
+        leaf = route.activated_branches[-1]
+        leaf_feedback = signal.branch_feedback.get(leaf)
+        leaf_reward = leaf_feedback.reward if leaf_feedback else signal.reward_score
+
+        path_len = len(route.activated_branches)
+        for idx, branch_name in enumerate(route.activated_branches):
+            fb = signal.branch_feedback.get(branch_name)
+            if fb is None:
+                continue
+
+            distance = path_len - 1 - idx
+            propagated = (leaf_reward * (gamma**distance))
+            blended = (local_mix * fb.reward) + ((1.0 - local_mix) * propagated)
+            fb.reward = max(0.0, min(1.0, blended))
+            signal.branch_feedback[branch_name] = fb
+
+        if signal.selected_branch == leaf:
+            signal.reward_score = signal.branch_feedback[leaf].reward
+
+    def _attach_created_candidates(self, route: RoutingDecision, optimize_event: OptimizationEvent) -> None:
+        for candidate_name in optimize_event.created_candidates:
+            if candidate_name not in self.branches:
+                continue
+            if self.forest.has_node(candidate_name):
+                continue
+
+            if route.activated_branches:
+                leaf = route.activated_branches[-1]
+                parent_id = self.forest.parent(leaf) or self.forest.root_id
+            else:
+                parent_id = self.forest.root_id
+
+            self.forest.add_branch(
+                branch_name=candidate_name,
+                branch=self.branches[candidate_name],
+                parent_id=parent_id,
+                specialties=[route.task_type, "general"],
+            )
+
+    @staticmethod
+    def _roll_context(current_context: str, new_piece: str, max_chars: int = 800) -> str:
+        joined = f"{current_context}\n{new_piece}".strip()
+        if len(joined) <= max_chars:
+            return joined
+        return joined[-max_chars:]
+
     def branch_snapshot(self) -> dict[str, dict[str, Any]]:
-        return {
-            name: {
-                "weight": round(branch.state.weight, 4),
-                "status": branch.state.status.value,
-                "avg_reward": round(branch.state.avg_reward(), 4),
-                "trial_remaining": branch.state.trial_remaining,
-                "history_len": len(branch.state.historical_rewards),
-            }
-            for name, branch in self.branches.items()
-        }
+        return self.forest.branch_snapshot()
 
     def routing_histogram(self) -> dict[str, int]:
-        return self.router.branch_histogram(self._route_history)
+        counts: dict[str, int] = {}
+        for route in self._route_history:
+            for branch_name in route.activated_branches:
+                counts[branch_name] = counts.get(branch_name, 0) + 1
+        return counts
 
     def openclaw_ingest(self, trajectory_event: dict[str, Any]) -> dict[str, Any]:
         """Compatibility hook for OpenClaw-style runtime events."""

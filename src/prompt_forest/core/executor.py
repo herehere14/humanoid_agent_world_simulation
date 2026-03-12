@@ -9,8 +9,8 @@ class PromptExecutor:
     def __init__(self, backend: LLMBackend) -> None:
         self.backend = backend
 
-    def run_branch(self, branch: PromptBranch, task: TaskInput, task_type: str) -> BranchOutput:
-        prompt = branch.render_prompt(task.text, task_type)
+    def run_branch(self, branch: PromptBranch, task: TaskInput, task_type: str, context: str = "") -> BranchOutput:
+        prompt = branch.render_prompt(task.text, task_type, context=context)
         output, meta = self.backend.generate(prompt, task, branch.name)
         return BranchOutput(
             branch_name=branch.name,

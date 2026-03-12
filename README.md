@@ -22,12 +22,12 @@ It is **not** an AGI claim.
 ## Core idea
 
 For each task:
-1. Root router classifies task type and activates selected branches.
-2. Branches produce candidate outputs via prompt templates.
+1. Root router classifies task type and activates a sequential branch path.
+2. Branches execute one-by-one (hierarchical): macro branch -> niche sub-branch.
 3. Judge scores branch outputs.
-4. Aggregator chooses or merges candidates.
+4. Aggregator selects the final output (default: leaf node output).
 5. Evaluator Agent (Agent 1) emits structured reward and failure signals.
-6. Optimizer Agent (Agent 2) performs constrained local updates to active branches only.
+6. Optimizer Agent (Agent 2) performs constrained local updates to active path branches only.
 7. Memory records trajectories and biases future routing.
 
 ## Architecture
@@ -40,6 +40,14 @@ OpenClaw-compatible runtime adapter
 -> Optimizer layer (Agent 2)
 -> Memory layer
 ```
+
+### Hierarchical forest layout
+
+- Root node
+- Layer 1 (macro): 6 branches (`analytical`, `planner`, `retrieval`, `critique`, `verification`, `creative`)
+- Layer 2 (niche): 12 specialized sub-branches (2 under each macro branch)
+
+Routing is sequential, one node per layer.
 
 ### Main modules
 
@@ -69,6 +77,7 @@ Allowed actions:
 - Slight branch-weight updates (bounded)
 - Local prompt rewrite for weak branches
 - Candidate branch propose/trial/promote/archive under strict rules
+- Path-level reward propagation (leaf reward is propagated upstream with discount)
 
 Not allowed:
 - Global architecture rewrite

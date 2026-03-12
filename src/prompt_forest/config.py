@@ -25,6 +25,7 @@ class OptimizerConfig:
     candidate_trial_episodes: int = 6
     candidate_promote_threshold: float = 0.6
     candidate_failure_trigger: int = 4
+    max_active_branches: int = 24
 
 
 @dataclass
@@ -36,7 +37,7 @@ class MemoryConfig:
 
 @dataclass
 class EvaluatorConfig:
-    aggregation_strategy: str = "judge_select"
+    aggregation_strategy: str = "leaf_select"
     reward_mode: str = "hybrid"
 
 

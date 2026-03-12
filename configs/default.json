@@ -13,7 +13,8 @@
     "max_prompt_variants": 5,
     "candidate_trial_episodes": 6,
     "candidate_promote_threshold": 0.62,
-    "candidate_failure_trigger": 4
+    "candidate_failure_trigger": 4,
+    "max_active_branches": 24
   },
   "memory": {
     "max_records": 5000,
@@ -21,7 +22,7 @@
     "bias_scale": 0.6
   },
   "evaluator": {
-    "aggregation_strategy": "judge_select",
+    "aggregation_strategy": "leaf_select",
     "reward_mode": "hybrid"
   },
   "artifacts_dir": "artifacts"
