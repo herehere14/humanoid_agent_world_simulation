@@ -15,14 +15,16 @@ class DomainShiftBackend(LLMBackend):
         self.noise = noise
         self._rng = random.Random(seed)
 
-    def best_branch(self, task_type: str) -> str:
+    def best_branch(self, task_type: str, candidates: list[str] | None = None) -> str:
+        if candidates:
+            scored = [(name, self._quality_for_branch(task_type, name)) for name in candidates]
+            return max(scored, key=lambda x: x[1])[0]
         scores = self.quality_matrix[task_type]
         return max(scores.items(), key=lambda x: x[1])[0]
 
     def generate(self, prompt: str, task: TaskInput, branch_name: str) -> tuple[str, dict[str, Any]]:
         task_type = task.task_type if task.task_type != "auto" else "general"
-        scores = self.quality_matrix.get(task_type, self.quality_matrix["general"])
-        quality = scores.get(branch_name, 0.4)
+        quality = self._quality_for_branch(task_type, branch_name)
         quality += self._rng.uniform(-self.noise, self.noise)
         quality = max(0.01, min(0.99, quality))
 
@@ -37,56 +39,102 @@ class DomainShiftBackend(LLMBackend):
         )
         return answer, {"quality": quality, "task_type": task_type, "branch": branch_name}
 
+    def _quality_for_branch(self, task_type: str, branch_name: str) -> float:
+        scores = self.quality_matrix.get(task_type, self.quality_matrix["general"])
+        if branch_name in scores:
+            return scores[branch_name]
+
+        macro = branch_name.split("_")[0]
+        base = scores.get(macro, 0.4)
+        tokens = set(branch_name.split("_"))
+
+        bonus = 0.0
+        if task_type == "math":
+            if {"symbolic", "solver", "constraint", "checker"} & tokens:
+                bonus += 0.2
+            if {"causal", "decomposer"} & tokens:
+                bonus += 0.04
+        elif task_type == "planning":
+            if {"timeline", "optimizer", "risk", "allocator"} & tokens:
+                bonus += 0.2
+            if {"constraint", "innovator"} & tokens:
+                bonus += 0.05
+        elif task_type == "factual":
+            if {"evidence", "tracer", "source", "triage"} & tokens:
+                bonus += 0.2
+            if {"consistency", "auditor"} & tokens:
+                bonus += 0.07
+        elif task_type == "code":
+            if {"adversarial", "probe", "consistency", "auditor"} & tokens:
+                bonus += 0.2
+            if {"symbolic", "solver"} & tokens:
+                bonus += 0.04
+        elif task_type == "creative":
+            if {"divergent", "generator", "innovator"} & tokens:
+                bonus += 0.2
+            if {"timeline", "optimizer"} & tokens:
+                bonus += 0.03
+        elif task_type == "general":
+            if {"consistency", "auditor", "constraint", "checker"} & tokens:
+                bonus += 0.15
+            if {"evidence", "tracer"} & tokens:
+                bonus += 0.08
+
+        # Minor penalty for branches with no observed specialization markers.
+        if len(tokens) == 1:
+            bonus -= 0.02
+        return max(0.01, min(0.99, base + bonus))
+
 
 def shifted_quality_matrix() -> dict[str, dict[str, float]]:
     # Intentionally conflicts with default router affinity so adaptation is required.
     return {
         "math": {
-            "analytical": 0.45,
-            "planner": 0.35,
-            "retrieval": 0.48,
-            "critique": 0.42,
-            "verification": 0.55,
-            "creative": 0.9,
+            "analytical": 0.28,
+            "planner": 0.2,
+            "retrieval": 0.22,
+            "critique": 0.25,
+            "verification": 0.35,
+            "creative": 0.92,
         },
         "planning": {
-            "analytical": 0.4,
-            "planner": 0.52,
+            "analytical": 0.26,
+            "planner": 0.28,
             "retrieval": 0.92,
-            "critique": 0.46,
-            "verification": 0.44,
-            "creative": 0.38,
+            "critique": 0.3,
+            "verification": 0.32,
+            "creative": 0.27,
         },
         "factual": {
-            "analytical": 0.42,
-            "planner": 0.89,
-            "retrieval": 0.53,
-            "critique": 0.4,
-            "verification": 0.5,
-            "creative": 0.3,
+            "analytical": 0.25,
+            "planner": 0.91,
+            "retrieval": 0.27,
+            "critique": 0.24,
+            "verification": 0.31,
+            "creative": 0.2,
         },
         "code": {
-            "analytical": 0.54,
-            "planner": 0.43,
-            "retrieval": 0.35,
+            "analytical": 0.33,
+            "planner": 0.25,
+            "retrieval": 0.2,
             "critique": 0.91,
-            "verification": 0.56,
-            "creative": 0.33,
+            "verification": 0.36,
+            "creative": 0.22,
         },
         "creative": {
-            "analytical": 0.93,
-            "planner": 0.38,
-            "retrieval": 0.34,
-            "critique": 0.48,
-            "verification": 0.29,
-            "creative": 0.47,
+            "analytical": 0.92,
+            "planner": 0.26,
+            "retrieval": 0.2,
+            "critique": 0.3,
+            "verification": 0.22,
+            "creative": 0.29,
         },
         "general": {
-            "analytical": 0.45,
-            "planner": 0.45,
-            "retrieval": 0.45,
-            "critique": 0.45,
-            "verification": 0.88,
-            "creative": 0.45,
+            "analytical": 0.34,
+            "planner": 0.34,
+            "retrieval": 0.34,
+            "critique": 0.34,
+            "verification": 0.9,
+            "creative": 0.34,
         },
     }

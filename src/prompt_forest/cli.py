@@ -7,6 +7,7 @@ from pathlib import Path
 from .config import load_config
 from .core.engine import PromptForestEngine
 from .experiments.benchmark import BenchmarkRunner
+from .experiments.detailed_validation import DetailedHierarchicalValidator
 from .experiments.rl_validation import RLLearningValidator
 from .utils.io import read_json
 
@@ -29,6 +30,10 @@ def build_parser() -> argparse.ArgumentParser:
     val_cmd = sub.add_parser("rl-validate", help="Run adaptive-vs-frozen RL learning validation")
     val_cmd.add_argument("--episodes", type=int, default=240)
     val_cmd.add_argument("--seeds", type=str, default="11,17,19,23,29,31,37,41,43,47")
+
+    detail_cmd = sub.add_parser("detailed-validate", help="Run detailed hierarchical learning + ablation validation")
+    detail_cmd.add_argument("--episodes", type=int, default=240)
+    detail_cmd.add_argument("--seeds", type=str, default="11,17,19,23,29")
 
     oc_cmd = sub.add_parser("openclaw-event", help="Process OpenClaw-style trajectory event JSON")
     oc_cmd.add_argument("--event-file", type=str, required=True)
@@ -61,6 +66,13 @@ def main() -> None:
     if args.command == "rl-validate":
         seeds = [int(x.strip()) for x in args.seeds.split(",") if x.strip()]
         validator = RLLearningValidator(Path.cwd())
+        report = validator.run(seeds=seeds, episodes_per_seed=args.episodes)
+        print(json.dumps(report, indent=2))
+        return
+
+    if args.command == "detailed-validate":
+        seeds = [int(x.strip()) for x in args.seeds.split(",") if x.strip()]
+        validator = DetailedHierarchicalValidator(Path.cwd())
         report = validator.run(seeds=seeds, episodes_per_seed=args.episodes)
         print(json.dumps(report, indent=2))
         return

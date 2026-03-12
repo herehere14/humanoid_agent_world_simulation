@@ -182,6 +182,18 @@ or via CLI:
 prompt-forest rl-validate --episodes 240 --seeds 11,17,19,23,29,31,37,41,43,47
 ```
 
+### 7) Detailed hierarchical validation (learning + ablations)
+
+```bash
+PYTHONPATH=src python examples/run_detailed_validation.py
+```
+
+or via CLI:
+
+```bash
+prompt-forest detailed-validate --episodes 240 --seeds 11,17,19,23,29
+```
+
 ## Logged artifacts
 
 - `artifacts/events.jsonl`: per-task routing, branch rewards, optimization events
@@ -190,6 +202,7 @@ prompt-forest rl-validate --episodes 240 --seeds 11,17,19,23,29,31,37,41,43,47
 - `artifacts/demo_report.json`: final demo summary
 - `artifacts/candidate_trial_report.json`: candidate branch creation/trial state snapshot
 - `artifacts/rl_validation_report.json`: multi-seed adaptive-vs-frozen learning evidence
+- `artifacts/detailed_validation_report.json`: branch inventory, improvement metrics, and branch-ablation effects
 
 ## What the MVP demonstrates
 
