@@ -1,0 +1,18 @@
+{
+  "episode_id": "ep-001",
+  "task": "Verify whether a generated answer satisfies strict constraints and required evidence.",
+  "task_type": "general",
+  "tool_events": [
+    {
+      "tool": "search",
+      "status": "ok"
+    }
+  ],
+  "branch_activity": ["verification", "critique"],
+  "outputs": {},
+  "expected_keywords": ["verify", "constraints", "evidence"],
+  "required_checks": ["confidence"],
+  "judge_signals": {
+    "source": "external_judge_placeholder"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "tasks": [
+    {
+      "text": "Calculate the derivative of x^2 and explain the result.",
+      "task_type": "math",
+      "metadata": {
+        "expected_keywords": ["derivative", "2x", "result"],
+        "required_substrings": ["confidence"]
+      }
+    },
+    {
+      "text": "Create a 3-week roadmap to launch an MVP with risk controls.",
+      "task_type": "planning",
+      "metadata": {
+        "expected_keywords": ["milestones", "risks", "next"],
+        "required_substrings": ["confidence"]
+      }
+    },
+    {
+      "text": "Provide facts about reinforcement learning reward shaping.",
+      "task_type": "factual",
+      "metadata": {
+        "expected_keywords": ["reward", "policy", "feedback"],
+        "required_substrings": ["confidence"]
+      }
+    },
+    {
+      "text": "Refactor a Python function for readability and testability.",
+      "task_type": "code",
+      "metadata": {
+        "expected_keywords": ["python", "refactor", "test"],
+        "required_substrings": ["confidence"]
+      }
+    },
+    {
+      "text": "Brainstorm three creative ideas for a climate-tech startup.",
+      "task_type": "creative",
+      "metadata": {
+        "expected_keywords": ["novel", "ideas", "constraints"],
+        "required_substrings": ["confidence"]
+      }
+    },
+    {
+      "text": "Plan a benchmarking protocol to compare routing strategies.",
+      "task_type": "planning",
+      "metadata": {
+        "expected_keywords": ["benchmark", "metrics", "ablation"],
+        "required_substrings": ["confidence"]
+      }
+    },
+    {
+      "text": "Explain Q-learning update intuition with a small example.",
+      "task_type": "factual",
+      "metadata": {
+        "expected_keywords": ["q-learning", "update", "value"],
+        "required_substrings": ["confidence"]
+      }
+    },
+    {
+      "text": "Design checks to verify an answer is not hallucinated.",
+      "task_type": "general",
+      "metadata": {
+        "expected_keywords": ["verify", "checks", "evidence"],
+        "required_substrings": ["confidence"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "created_candidates": [
+    "evidence_fuser_general"
+  ],
+  "promoted_candidates": [],
+  "archived_candidates": [],
+  "final_snapshot": {
+    "analytical": {
+      "weight": 1.0562,
+      "status": "active",
+      "avg_reward": 0.4694,
+      "trial_remaining": 0,
+      "history_len": 9
+    },
+    "planner": {
+      "weight": 1.0,
+      "status": "active",
+      "avg_reward": 0.0,
+      "trial_remaining": 0,
+      "history_len": 0
+    },
+    "retrieval": {
+      "weight": 0.9942,
+      "status": "active",
+      "avg_reward": 0.4625,
+      "trial_remaining": 0,
+      "history_len": 2
+    },
+    "critique": {
+      "weight": 0.9,
+      "status": "active",
+      "avg_reward": 0.0,
+      "trial_remaining": 0,
+      "history_len": 0
+    },
+    "verification": {
+      "weight": 1.1565,
+      "status": "active",
+      "avg_reward": 0.4313,
+      "trial_remaining": 0,
+      "history_len": 4
+    },
+    "creative": {
+      "weight": 0.798,
+      "status": "active",
+      "avg_reward": 0.4,
+      "trial_remaining": 0,
+      "history_len": 1
+    },
+    "evidence_fuser_general": {
+      "weight": 0.6153,
+      "status": "candidate",
+      "avg_reward": 0.4,
+      "trial_remaining": 2,
+      "history_len": 4
+    }
+  },
+  "memory": {
+    "records": 20,
+    "avg_reward": 0.475,
+    "task_distribution": {
+      "general": 20
+    }
+  }
+}

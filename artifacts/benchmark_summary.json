@@ -1,0 +1,49 @@
+{
+  "episodes": 24,
+  "average_reward": 0.8222,
+  "reward_by_round": [
+    0.8292,
+    0.8292,
+    0.8083
+  ],
+  "branch_weight_trajectory": {
+    "analytical": [
+      1.228,
+      1.378,
+      1.55
+    ],
+    "planner": [
+      1.106,
+      1.256,
+      1.428
+    ],
+    "retrieval": [
+      1.108,
+      1.214,
+      1.32
+    ],
+    "critique": [
+      0.964,
+      0.964,
+      0.964
+    ],
+    "verification": [
+      1.456,
+      1.692,
+      1.908
+    ],
+    "creative": [
+      0.866,
+      0.932,
+      0.954
+    ]
+  },
+  "route_counts": {
+    "analytical": 15,
+    "verification": 24,
+    "planner": 14,
+    "creative": 7,
+    "retrieval": 10,
+    "critique": 2
+  }
+}

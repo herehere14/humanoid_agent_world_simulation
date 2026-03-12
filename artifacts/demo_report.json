@@ -1,0 +1,128 @@
+{
+  "summary": {
+    "episodes": 48,
+    "average_reward": 0.8292,
+    "reward_by_round": [
+      0.8292,
+      0.8292,
+      0.8292,
+      0.8292,
+      0.8292,
+      0.8292
+    ],
+    "branch_weight_trajectory": {
+      "analytical": [
+        1.1693,
+        1.2307,
+        1.2915,
+        1.3481,
+        1.3984,
+        1.4387
+      ],
+      "planner": [
+        1.069,
+        1.1646,
+        1.2359,
+        1.3037,
+        1.3461,
+        1.3849
+      ],
+      "retrieval": [
+        1.0552,
+        1.1186,
+        1.1865,
+        1.2384,
+        1.3107,
+        1.3475
+      ],
+      "critique": [
+        0.9348,
+        0.9348,
+        0.9348,
+        0.9348,
+        0.9348,
+        0.9514
+      ],
+      "verification": [
+        1.3094,
+        1.3823,
+        1.4279,
+        1.4637,
+        1.5046,
+        1.5238
+      ],
+      "creative": [
+        0.8927,
+        0.9444,
+        0.9895,
+        1.0178,
+        1.0453,
+        1.0978
+      ]
+    },
+    "route_counts": {
+      "analytical": 33,
+      "verification": 48,
+      "planner": 26,
+      "creative": 14,
+      "retrieval": 20,
+      "critique": 3
+    }
+  },
+  "final_branches": {
+    "analytical": {
+      "weight": 1.4387,
+      "status": "active",
+      "avg_reward": 0.7439,
+      "trial_remaining": 0,
+      "history_len": 33
+    },
+    "planner": {
+      "weight": 1.3849,
+      "status": "active",
+      "avg_reward": 0.7603,
+      "trial_remaining": 0,
+      "history_len": 26
+    },
+    "retrieval": {
+      "weight": 1.3475,
+      "status": "active",
+      "avg_reward": 0.7833,
+      "trial_remaining": 0,
+      "history_len": 20
+    },
+    "critique": {
+      "weight": 0.9514,
+      "status": "active",
+      "avg_reward": 0.6833,
+      "trial_remaining": 0,
+      "history_len": 3
+    },
+    "verification": {
+      "weight": 1.5238,
+      "status": "active",
+      "avg_reward": 0.7389,
+      "trial_remaining": 0,
+      "history_len": 48
+    },
+    "creative": {
+      "weight": 1.0978,
+      "status": "active",
+      "avg_reward": 0.7429,
+      "trial_remaining": 0,
+      "history_len": 14
+    }
+  },
+  "memory": {
+    "records": 48,
+    "avg_reward": 0.8292,
+    "task_distribution": {
+      "math": 6,
+      "planning": 12,
+      "factual": 12,
+      "code": 6,
+      "creative": 6,
+      "general": 6
+    }
+  }
+}

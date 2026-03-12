@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prompt-forest-agent"
+version = "0.1.0"
+description = "Random-Forest-inspired prompt-branch adaptive agent with reward-guided routing"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "OpenClaw Prompt Forest Research" }]
+license = { text = "MIT" }
+keywords = ["prompt-routing", "agent", "reinforcement-learning", "ensemble", "openclaw"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+prompt-forest = "prompt_forest.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"
