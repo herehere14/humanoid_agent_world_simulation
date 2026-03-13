@@ -13,6 +13,8 @@ class LLMOptimizerAdvisor:
 
     def __init__(self, runtime_config: AgentRuntimeConfig) -> None:
         self.runtime = AgentRuntimeClient(runtime_config)
+        self._max_context_chars = 260
+        self._max_keywords = 12
 
     def is_enabled(self) -> bool:
         return self.runtime.is_enabled()
@@ -30,19 +32,21 @@ class LLMOptimizerAdvisor:
         payload = {
             "task": {
                 "task_type": route.task_type,
-                "text": task.text,
-                "metadata": task.metadata,
+                "text": self._trim(task.text, self._max_context_chars),
+                "metadata": self._compact_metadata(task.metadata),
             },
             "activated_branches": route.activated_branches,
             "selected_branch": signal.selected_branch,
             "reward_score": signal.reward_score,
-            "failure_reason": signal.failure_reason,
+            "failure_reason": self._trim(signal.failure_reason, self._max_context_chars),
             "branch_feedback": {
                 name: {
                     "reward": fb.reward,
                     "confidence": fb.confidence,
-                    "failure_reason": fb.failure_reason,
-                    "suggested_improvement_direction": fb.suggested_improvement_direction,
+                    "failure_reason": self._trim(fb.failure_reason, self._max_context_chars),
+                    "suggested_improvement_direction": self._trim(
+                        fb.suggested_improvement_direction, self._max_context_chars
+                    ),
                 }
                 for name, fb in signal.branch_feedback.items()
             },
@@ -51,7 +55,7 @@ class LLMOptimizerAdvisor:
                     "weight": branches[name].state.weight,
                     "status": branches[name].state.status.value,
                     "avg_reward": branches[name].state.avg_reward(),
-                    "purpose": branches[name].state.purpose,
+                    "purpose": self._trim(branches[name].state.purpose, self._max_context_chars),
                 }
                 for name in route.activated_branches
                 if name in branches
@@ -84,3 +88,17 @@ class LLMOptimizerAdvisor:
             "Constraints: extra_weight_delta must be between -0.1 and 0.1."
         )
         return self.runtime.generate_json(system_prompt, payload)
+
+    def _compact_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
+        out = dict(metadata or {})
+        kws = out.get("expected_keywords")
+        if isinstance(kws, list):
+            out["expected_keywords"] = kws[: self._max_keywords]
+        return out
+
+    @staticmethod
+    def _trim(text: Any, max_chars: int) -> str:
+        s = str(text)
+        if len(s) <= max_chars:
+            return s
+        return f"{s[: max_chars - 3]}..."

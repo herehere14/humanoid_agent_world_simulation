@@ -16,6 +16,9 @@ class LLMEvaluatorAgent:
     def __init__(self, runtime_config: AgentRuntimeConfig, fallback: EvaluatorAgent | None = None) -> None:
         self.runtime = AgentRuntimeClient(runtime_config)
         self.fallback = fallback or EvaluatorAgent()
+        self._max_output_chars = 360
+        self._max_reason_chars = 140
+        self._max_keywords = 12
 
     def evaluate(
         self,
@@ -33,14 +36,17 @@ class LLMEvaluatorAgent:
             "task": {
                 "task_type": route.task_type,
                 "text": task.text,
-                "metadata": task.metadata,
+                "metadata": self._compact_metadata(task.metadata),
             },
             "activated_branches": route.activated_branches,
-            "branch_scores": {k: {"reward": v.reward, "reason": v.reason} for k, v in branch_scores.items()},
-            "branch_outputs": branch_outputs or {},
+            "branch_scores": {
+                k: {"reward": v.reward, "reason": self._trim(v.reason, self._max_reason_chars)}
+                for k, v in branch_scores.items()
+            },
+            "branch_outputs": self._compact_outputs(branch_outputs or {}, route.activated_branches),
             "aggregation": {
                 "selected_branch": aggregation.selected_branch,
-                "selected_output": aggregation.selected_output,
+                "selected_output": self._trim(aggregation.selected_output, self._max_output_chars),
                 "notes": aggregation.notes,
             },
         }
@@ -126,3 +132,25 @@ class LLMEvaluatorAgent:
             branch_feedback=feedback,
             aggregator_notes=notes,
         )
+
+    def _compact_outputs(self, outputs: dict[str, str], activated: list[str]) -> dict[str, str]:
+        compact: dict[str, str] = {}
+        for name in activated:
+            if name not in outputs:
+                continue
+            compact[name] = self._trim(outputs[name], self._max_output_chars)
+        return compact
+
+    def _compact_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
+        out = dict(metadata or {})
+        kws = out.get("expected_keywords")
+        if isinstance(kws, list):
+            out["expected_keywords"] = kws[: self._max_keywords]
+        return out
+
+    @staticmethod
+    def _trim(text: Any, max_chars: int) -> str:
+        s = str(text)
+        if len(s) <= max_chars:
+            return s
+        return f"{s[: max_chars - 3]}..."

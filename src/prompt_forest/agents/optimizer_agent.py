@@ -365,6 +365,7 @@ class OptimizerAgent:
         if not isinstance(items, list):
             return out
         fallback_parent = route.activated_branches[-1] if route.activated_branches else ""
+        active_set = set(route.activated_branches)
         for item in items:
             if not isinstance(item, dict):
                 continue
@@ -373,6 +374,8 @@ class OptimizerAgent:
             purpose = str(item.get("purpose", "")).strip()
             template = str(item.get("prompt_template", "")).strip()
             parent_hint = str(item.get("parent_hint", fallback_parent)).strip() or fallback_parent
+            if parent_hint not in active_set:
+                parent_hint = fallback_parent
             if not base_name or not capability_tag or not purpose or not template:
                 continue
             if "{task}" not in template or "{task_type}" not in template or "{context}" not in template:
@@ -386,6 +389,8 @@ class OptimizerAgent:
                     "parent_hint": parent_hint,
                 }
             )
+            if len(out) >= 2:
+                break
         return out
 
     @staticmethod

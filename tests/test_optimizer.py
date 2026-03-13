@@ -13,6 +13,27 @@ from prompt_forest.types import (
 )
 
 
+class _FakeAdvisor:
+    def is_enabled(self) -> bool:
+        return True
+
+    def advise(self, task, route, signal, branches):
+        return {
+            "branch_directives": [
+                {"branch_name": "planner", "extra_weight_delta": 0.1, "rewrite_hint": "bad", "confidence": 0.95}
+            ],
+            "candidate_proposals": [
+                {
+                    "base_name": "advisor_local_candidate",
+                    "capability_tag": "advisor_local_cap",
+                    "purpose": "Advisor proposed local branch",
+                    "prompt_template": "Task={task}; Type={task_type}; Context={context}",
+                    "parent_hint": "planner",
+                }
+            ],
+        }
+
+
 def _signal(branches: list[str], reward: float, reason: str = "low_quality") -> EvaluationSignal:
     feedback = {
         b: BranchFeedback(
@@ -202,3 +223,48 @@ def test_candidate_trial_extends_near_promotion_threshold(tmp_path):
 
     assert branches["candidate_x"].state.status.value == "candidate"
     assert branches["candidate_x"].state.trial_remaining == 2
+
+
+def test_advisor_directives_are_scoped_to_active_path_and_parent_is_local(tmp_path):
+    branches = create_default_branches()
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    optimizer = OptimizerAgent(
+        OptimizerConfig(
+            learning_rate=0.1,
+            candidate_failure_trigger=3,
+            candidate_spawn_per_event=1,
+            max_active_candidates=6,
+            max_active_branches=40,
+        ),
+        advisor=_FakeAdvisor(),
+    )
+
+    for i in range(4):
+        memory.add(
+            MemoryRecord(
+                task_id=f"adv{i}",
+                task_type="math",
+                input_text="x",
+                activated_branches=["analytical", "verification"],
+                branch_outputs={},
+                selected_branch="analytical",
+                selected_output="",
+                reward_score=0.2,
+                failure_reason="rule_miss|required_substring:0/1",
+                confidence=0.4,
+                useful_patterns=[],
+            )
+        )
+
+    route = RoutingDecision(task_type="math", activated_branches=["analytical", "verification"], branch_scores={})
+    signal = _signal(["analytical", "verification"], reward=0.2, reason="rule_miss|required_substring:0/1")
+    planner_before = branches["planner"].state.weight
+
+    event = optimizer.optimize(TaskInput("1", "task", "math"), route, signal, branches, memory)
+
+    # Non-active branch cannot be modified by advisor directives.
+    assert branches["planner"].state.weight == planner_before
+    # Candidate proposal with non-local parent gets forced to route leaf parent.
+    assert event.created_candidates
+    created = event.created_candidates[0]
+    assert branches[created].state.metadata.get("parent_hint") == "verification"
