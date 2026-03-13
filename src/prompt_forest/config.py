@@ -41,8 +41,8 @@ class OptimizerConfig:
     max_hierarchy_depth: int = 4
     candidate_spawn_per_event: int = 1
     candidate_max_children_per_parent: int = 8
-    advisor_weight_delta_cap: float = 0.06
-    advisor_rewrite_confidence_threshold: float = 0.62
+    advisor_weight_delta_cap: float = 0.02
+    advisor_rewrite_confidence_threshold: float = 0.8
     rewrite_cooldown_episodes: int = 8
     rewrite_failure_streak_trigger: int = 3
     update_acceptance_window: int = 8
@@ -85,7 +85,8 @@ class AgentRuntimeConfig:
     model: str = "gpt-4.1-mini"
     api_key_env: str = "OPENAI_API_KEY"
     base_url: str = "https://api.openai.com/v1"
-    temperature: float = 0.1
+    temperature: float = 0.0
+    seed: int | None = 42
     max_output_tokens: int = 800
     timeout_seconds: int = 45
 

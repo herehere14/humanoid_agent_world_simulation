@@ -268,3 +268,158 @@ def test_advisor_directives_are_scoped_to_active_path_and_parent_is_local(tmp_pa
     assert event.created_candidates
     created = event.created_candidates[0]
     assert branches[created].state.metadata.get("parent_hint") == "verification"
+
+
+def test_rewrite_requires_streak_and_respects_cooldown(tmp_path):
+    branches = create_default_branches()
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    optimizer = OptimizerAgent(
+        OptimizerConfig(
+            learning_rate=0.1,
+            prompt_rewrite_threshold=0.7,
+            rewrite_failure_streak_trigger=3,
+            rewrite_cooldown_episodes=4,
+        )
+    )
+    route = RoutingDecision(task_type="math", activated_branches=["analytical"], branch_scores={})
+    low = _signal(["analytical"], reward=0.2, reason="low_quality")
+
+    optimizer.optimize(TaskInput("1", "task", "math"), route, low, branches, memory)
+    optimizer.optimize(TaskInput("2", "task", "math"), route, low, branches, memory)
+    assert branches["analytical"].state.rewrite_history == []
+
+    optimizer.optimize(TaskInput("3", "task", "math"), route, low, branches, memory)
+    assert len(branches["analytical"].state.rewrite_history) == 1
+
+    optimizer.optimize(TaskInput("4", "task", "math"), route, low, branches, memory)
+    assert len(branches["analytical"].state.rewrite_history) == 1
+
+
+def test_acceptance_gate_rolls_back_low_gain_updates(tmp_path):
+    branches = create_default_branches()
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    for i in range(6):
+        memory.add(
+            MemoryRecord(
+                task_id=f"a{i}",
+                task_type="math",
+                input_text="x",
+                activated_branches=["analytical"],
+                branch_outputs={},
+                selected_branch="analytical",
+                selected_output="",
+                reward_score=0.6,
+                failure_reason="",
+                confidence=0.5,
+                useful_patterns=[],
+                branch_rewards={"analytical": 0.6},
+            )
+        )
+
+    optimizer = OptimizerAgent(
+        OptimizerConfig(
+            learning_rate=0.01,
+            prompt_rewrite_threshold=0.1,
+            update_acceptance_min_gain=0.05,
+            update_acceptance_window=6,
+        )
+    )
+    route = RoutingDecision(task_type="math", activated_branches=["analytical"], branch_scores={})
+    signal = _signal(["analytical"], reward=0.55, reason="ok")
+    old_weight = branches["analytical"].state.weight
+
+    event = optimizer.optimize(
+        TaskInput("now", "task", "math", metadata={"user_id": "global"}),
+        route,
+        signal,
+        branches,
+        memory,
+    )
+
+    assert branches["analytical"].state.weight == old_weight
+    assert event.update_details["analytical"]["update_accepted"] is False
+
+
+def test_candidate_creation_requires_clustered_failures(tmp_path):
+    branches = create_default_branches()
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    optimizer = OptimizerAgent(
+        OptimizerConfig(candidate_failure_trigger=3, candidate_trial_episodes=2, learning_rate=0.1)
+    )
+
+    # Single failure pattern at exactly threshold should not pass clustered-failure gate.
+    for i in range(3):
+        memory.add(
+            MemoryRecord(
+                task_id=f"c{i}",
+                task_type="general",
+                input_text="x",
+                activated_branches=["analytical", "retrieval"],
+                branch_outputs={},
+                selected_branch="analytical",
+                selected_output="",
+                reward_score=0.2,
+                failure_reason="low_quality|keyword_coverage:0/3",
+                confidence=0.4,
+                useful_patterns=[],
+            )
+        )
+
+    route = RoutingDecision(task_type="general", activated_branches=["analytical", "retrieval"], branch_scores={})
+    signal = _signal(["analytical", "retrieval"], reward=0.2, reason="low_quality|keyword_coverage:0/3")
+    event = optimizer.optimize(TaskInput("x", "task", "general"), route, signal, branches, memory)
+    assert event.created_candidates == []
+
+
+def test_candidate_parent_gate_blocks_promotion_without_enough_comparisons(tmp_path):
+    branches = create_default_branches()
+    branches["candidate_x"] = make_candidate_branch(
+        name="candidate_x",
+        purpose="extra verifier",
+        prompt_template="Task {task}",
+        trial_episodes=2,
+        metadata={"parent_hint": "verification"},
+    )
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    optimizer = OptimizerAgent(
+        OptimizerConfig(
+            candidate_failure_trigger=99,
+            candidate_trial_episodes=2,
+            candidate_promote_threshold=0.6,
+            candidate_parent_min_comparisons=3,
+            learning_rate=0.1,
+        )
+    )
+
+    feedback = {
+        "verification": BranchFeedback(
+            branch_name="verification",
+            reward=0.5,
+            confidence=0.7,
+            failure_reason="ok",
+            suggested_improvement_direction="",
+        ),
+        "candidate_x": BranchFeedback(
+            branch_name="candidate_x",
+            reward=0.9,
+            confidence=0.7,
+            failure_reason="ok",
+            suggested_improvement_direction="",
+        ),
+    }
+    signal = EvaluationSignal(
+        reward_score=0.9,
+        confidence=0.7,
+        selected_branch="candidate_x",
+        selected_output="x",
+        failure_reason="ok",
+        suggested_improvement_direction="",
+        branch_feedback=feedback,
+    )
+    route = RoutingDecision(task_type="general", activated_branches=["verification", "candidate_x"], branch_scores={})
+
+    optimizer.optimize(TaskInput("1", "x", "general"), route, signal, branches, memory)
+    optimizer.optimize(TaskInput("2", "x", "general"), route, signal, branches, memory)
+
+    # Strong rewards but not enough parent comparisons, so promotion is blocked.
+    assert branches["candidate_x"].state.status.value != "active"

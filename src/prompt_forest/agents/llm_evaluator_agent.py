@@ -19,6 +19,12 @@ class LLMEvaluatorAgent:
         self._max_output_chars = 360
         self._max_reason_chars = 140
         self._max_keywords = 12
+        # Conservative blend: keep deterministic judge as anchor, only trust LLM strongly at high confidence.
+        self._override_conf_threshold = 0.8
+        self._max_reward_blend = 0.65
+        self._max_branch_blend = 0.7
+        self._reward_drift_cap = 0.2
+        self._branch_reward_drift_cap = 0.25
 
     def evaluate(
         self,
@@ -75,7 +81,8 @@ class LLMEvaluatorAgent:
 
         try:
             raw = self.runtime.generate_json(system_prompt, payload)
-            return self._to_signal(raw, base, route, aggregation)
+            llm_signal = self._to_signal(raw, base, route, aggregation)
+            return self._stabilize_signal(base, llm_signal, route, aggregation)
         except Exception as exc:  # pragma: no cover - runtime path depends on external APIs
             base.aggregator_notes = dict(base.aggregator_notes or {})
             base.aggregator_notes["evaluator_runtime_error"] = str(exc)
@@ -129,6 +136,98 @@ class LLMEvaluatorAgent:
             suggested_improvement_direction=str(
                 raw.get("suggested_improvement_direction", base.suggested_improvement_direction)
             ),
+            branch_feedback=feedback,
+            aggregator_notes=notes,
+        )
+
+    def _stabilize_signal(
+        self,
+        base: EvaluationSignal,
+        llm_signal: EvaluationSignal,
+        route: RoutingDecision,
+        aggregation: AggregationResult,
+    ) -> EvaluationSignal:
+        def clamp01(value: float) -> float:
+            return max(0.0, min(1.0, value))
+
+        def blend_alpha(confidence: float, max_blend: float) -> float:
+            conf = clamp01(confidence)
+            if conf <= self._override_conf_threshold:
+                return 0.0
+            scaled = (conf - self._override_conf_threshold) / max(1e-8, 1.0 - self._override_conf_threshold)
+            return clamp01(scaled) * max_blend
+
+        selected_branch = base.selected_branch
+        if llm_signal.selected_branch in route.activated_branches and llm_signal.confidence >= self._override_conf_threshold:
+            selected_branch = llm_signal.selected_branch
+
+        reward_alpha = blend_alpha(llm_signal.confidence, self._max_reward_blend)
+        blended_reward = base.reward_score + reward_alpha * (llm_signal.reward_score - base.reward_score)
+        reward_drift = blended_reward - base.reward_score
+        reward_drift = max(-self._reward_drift_cap, min(self._reward_drift_cap, reward_drift))
+        final_reward = clamp01(base.reward_score + reward_drift)
+
+        feedback: dict[str, BranchFeedback] = {}
+        for branch_name in route.activated_branches:
+            base_fb = base.branch_feedback.get(branch_name)
+            llm_fb = llm_signal.branch_feedback.get(branch_name)
+            if base_fb is None and llm_fb is None:
+                continue
+            if base_fb is None:
+                base_fb = BranchFeedback(
+                    branch_name=branch_name,
+                    reward=base.reward_score,
+                    confidence=base.confidence,
+                    failure_reason=base.failure_reason,
+                    suggested_improvement_direction=base.suggested_improvement_direction,
+                )
+            if llm_fb is None:
+                llm_fb = base_fb
+
+            branch_alpha = blend_alpha(llm_fb.confidence, self._max_branch_blend)
+            blended_branch_reward = base_fb.reward + branch_alpha * (llm_fb.reward - base_fb.reward)
+            branch_drift = blended_branch_reward - base_fb.reward
+            branch_drift = max(-self._branch_reward_drift_cap, min(self._branch_reward_drift_cap, branch_drift))
+            final_branch_reward = clamp01(base_fb.reward + branch_drift)
+
+            failure_reason = llm_fb.failure_reason if branch_alpha >= 0.25 else base_fb.failure_reason
+            suggestion = (
+                llm_fb.suggested_improvement_direction
+                if branch_alpha >= 0.25
+                else base_fb.suggested_improvement_direction
+            )
+            final_branch_conf = max(base_fb.confidence, llm_fb.confidence * branch_alpha)
+
+            feedback[branch_name] = BranchFeedback(
+                branch_name=branch_name,
+                reward=final_branch_reward,
+                confidence=clamp01(final_branch_conf),
+                failure_reason=failure_reason,
+                suggested_improvement_direction=suggestion,
+            )
+
+        final_conf = max(base.confidence, min(1.0, llm_signal.confidence * 0.9))
+        final_failure_reason = llm_signal.failure_reason if reward_alpha >= 0.25 else base.failure_reason
+        final_improvement = (
+            llm_signal.suggested_improvement_direction
+            if reward_alpha >= 0.25
+            else base.suggested_improvement_direction
+        )
+
+        notes = dict(base.aggregator_notes or {})
+        notes["evaluator_runtime"] = "llm_blended"
+        notes["evaluator_reward_blend_alpha"] = round(reward_alpha, 4)
+        notes["evaluator_reward_base"] = round(base.reward_score, 4)
+        notes["evaluator_reward_llm"] = round(llm_signal.reward_score, 4)
+        notes["evaluator_selected_branch_llm"] = llm_signal.selected_branch
+
+        return EvaluationSignal(
+            reward_score=final_reward,
+            confidence=final_conf,
+            selected_branch=selected_branch,
+            selected_output=aggregation.selected_output,
+            failure_reason=final_failure_reason,
+            suggested_improvement_direction=final_improvement,
             branch_feedback=feedback,
             aggregator_notes=notes,
         )

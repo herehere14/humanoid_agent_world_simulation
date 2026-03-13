@@ -48,6 +48,8 @@ class AgentRuntimeClient:
                 {"role": "user", "content": json.dumps(user_payload, ensure_ascii=True)},
             ],
         }
+        if self.config.seed is not None:
+            body["seed"] = int(self.config.seed)
         payload = json.dumps(body, ensure_ascii=True).encode("utf-8")
         req = Request(
             url,

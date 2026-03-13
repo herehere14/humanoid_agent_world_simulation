@@ -79,8 +79,21 @@ class OptimizerAgent:
             advice = advisor_directives.get(branch_name, {})
 
             advantage = reward - task_baseline_before
-            delta = self.config.learning_rate * advantage
+            fb_conf = self._clamp01(fb.confidence if fb else 0.5)
+            confidence_scale = max(0.0, min(1.0, (fb_conf - 0.4) / 0.6))
+
+            # Damp noisy updates from low-confidence branch feedback.
+            delta = self.config.learning_rate * advantage * confidence_scale
+
+            advice_conf = self._clamp01(advice.get("confidence", 0.0))
+            advice_weight_threshold = max(0.55, self.config.advisor_rewrite_confidence_threshold - 0.15)
             advisory_extra_delta = self._bounded_advisory_delta(advice.get("extra_weight_delta", 0.0))
+            if advice_conf < advice_weight_threshold:
+                advisory_extra_delta = 0.0
+            else:
+                advisory_extra_delta *= ((advice_conf - advice_weight_threshold) / max(1e-8, 1.0 - advice_weight_threshold))
+                advisory_extra_delta *= confidence_scale
+
             total_delta = delta + advisory_extra_delta
             decay = self.config.weight_decay * (old_weight - 1.0)
             raw_weight = old_weight + total_delta - decay
@@ -90,7 +103,6 @@ class OptimizerAgent:
 
             prompt_rewritten = False
             advice_rewrite_hint = str(advice.get("rewrite_hint", "")).strip()
-            advice_conf = self._clamp01(advice.get("confidence", 0.0))
             rewrite_hint = fb.suggested_improvement_direction if fb else "improve_clarity_and_verification"
             if advice_rewrite_hint and advice_conf >= self.config.advisor_rewrite_confidence_threshold:
                 rewrite_hint = advice_rewrite_hint
@@ -149,6 +161,9 @@ class OptimizerAgent:
                 "advisory_extra_delta": round(advisory_extra_delta, 4),
                 "total_delta": round(total_delta, 4),
                 "decay": round(decay, 4),
+                "feedback_confidence": round(fb_conf, 4),
+                "confidence_scale": round(confidence_scale, 4),
+                "advisor_confidence": round(advice_conf, 4),
                 "old_weight": round(old_weight, 4),
                 "raw_weight_after_update": round(raw_weight, 4),
                 "new_weight": round(branch.state.weight, 4),

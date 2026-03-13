@@ -399,17 +399,33 @@ class RLLearningValidator:
         cfg.optimizer.candidate_trial_episodes = 10
         cfg.optimizer.candidate_failure_trigger = 999
         cfg.optimizer.max_active_candidates = 0
-        cfg.optimizer.rewrite_cooldown_episodes = 1
-        cfg.optimizer.rewrite_failure_streak_trigger = 1
-        cfg.optimizer.update_acceptance_min_gain = -1.0
+        # Keep API-runtime evaluations conservative; LLM noise can otherwise amplify unstable updates.
+        llm_runtime_on = cfg.agent_runtimes.evaluator.enabled or cfg.agent_runtimes.optimizer.enabled
+        if llm_runtime_on:
+            cfg.optimizer.rewrite_cooldown_episodes = max(cfg.optimizer.rewrite_cooldown_episodes, 6)
+            cfg.optimizer.rewrite_failure_streak_trigger = max(cfg.optimizer.rewrite_failure_streak_trigger, 3)
+            cfg.optimizer.update_acceptance_min_gain = max(cfg.optimizer.update_acceptance_min_gain, 0.001)
+        else:
+            cfg.optimizer.rewrite_cooldown_episodes = 1
+            cfg.optimizer.rewrite_failure_streak_trigger = 1
+            cfg.optimizer.update_acceptance_min_gain = -1.0
 
         if policy == "full":
-            cfg.router.exploration = 0.08
-            cfg.router.exploration_min = 0.03
-            cfg.router.exploration_decay = 0.995
-            cfg.router.memory_coef = 0.12
-            cfg.memory.bias_scale = 0.4
-            cfg.optimizer.learning_rate = 0.1
+            if llm_runtime_on:
+                # API-runtime mode: avoid short-run overreaction from noisy judge/advisor signals.
+                cfg.router.exploration = 0.03
+                cfg.router.exploration_min = 0.01
+                cfg.router.exploration_decay = 0.997
+                cfg.router.memory_coef = 0.08
+                cfg.memory.bias_scale = 0.35
+                cfg.optimizer.learning_rate = 0.07
+            else:
+                cfg.router.exploration = 0.08
+                cfg.router.exploration_min = 0.03
+                cfg.router.exploration_decay = 0.995
+                cfg.router.memory_coef = 0.12
+                cfg.memory.bias_scale = 0.4
+                cfg.optimizer.learning_rate = 0.1
             if config_patch:
                 self._apply_config_patch(cfg, config_patch)
             return

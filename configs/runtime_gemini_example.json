@@ -5,7 +5,8 @@
       "provider": "gemini",
       "model": "gemini-2.0-flash",
       "api_key_env": "GEMINI_API_KEY",
-      "temperature": 0.1,
+      "temperature": 0.0,
+      "seed": 42,
       "max_output_tokens": 800,
       "timeout_seconds": 45
     },
@@ -14,7 +15,8 @@
       "provider": "gemini",
       "model": "gemini-2.0-flash",
       "api_key_env": "GEMINI_API_KEY",
-      "temperature": 0.1,
+      "temperature": 0.0,
+      "seed": 42,
       "max_output_tokens": 900,
       "timeout_seconds": 45
     }
