@@ -22,6 +22,7 @@ class CandidateResult:
     gain_std: float
     branch_concentration_gap: float
     report_path: str
+    ci_gate_passed: bool
 
 
 class AutoImprover:
@@ -92,7 +93,7 @@ class AutoImprover:
 
             round_best = max(evaluated, key=lambda x: x.objective)
             improved = round_best.objective > best.objective + 1e-6
-            if improved:
+            if improved and round_best.ci_gate_passed:
                 best = round_best
                 incumbent_patch = dict(round_best.patch)
 
@@ -183,6 +184,7 @@ class AutoImprover:
             gain_std=gain_std,
             branch_concentration_gap=branch_concentration_gap,
             report_path=str(report_path),
+            ci_gate_passed=(full_ci95_low >= 0.0),
         )
 
     def _objective(
@@ -267,4 +269,5 @@ class AutoImprover:
             "gain_std": round(result.gain_std, 6),
             "branch_concentration_gap": round(result.branch_concentration_gap, 6),
             "report_path": result.report_path,
+            "ci_gate_passed": result.ci_gate_passed,
         }

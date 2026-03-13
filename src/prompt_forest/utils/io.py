@@ -28,6 +28,13 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return out
 
 
+def write_jsonl(path: Path, payloads: list[dict[str, Any]]) -> None:
+    ensure_parent(path)
+    with path.open("w", encoding="utf-8") as f:
+        for payload in payloads:
+            f.write(json.dumps(payload, ensure_ascii=True) + "\n")
+
+
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     ensure_parent(path)
     with path.open("w", encoding="utf-8") as f:

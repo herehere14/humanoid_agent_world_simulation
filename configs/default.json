@@ -30,8 +30,14 @@
     "max_hierarchy_depth": 4,
     "candidate_spawn_per_event": 1,
     "candidate_max_children_per_parent": 8,
-    "advisor_weight_delta_cap": 0.06,
-    "advisor_rewrite_confidence_threshold": 0.62
+    "advisor_weight_delta_cap": 0.02,
+    "advisor_rewrite_confidence_threshold": 0.8,
+    "rewrite_cooldown_episodes": 8,
+    "rewrite_failure_streak_trigger": 3,
+    "update_acceptance_window": 8,
+    "update_acceptance_min_gain": 0.002,
+    "candidate_parent_win_rate_threshold": 0.55,
+    "candidate_parent_min_comparisons": 3
   },
   "memory": {
     "max_records": 5000,
@@ -39,7 +45,16 @@
     "bias_scale": 0.526598,
     "bias_cap": 0.15,
     "shrinkage_k": 40.0,
-    "recency_decay": 0.982064
+    "recency_decay": 0.982064,
+    "user_bias_mix": 0.7
+  },
+  "feedback": {
+    "user_feedback_weight": 0.5,
+    "verifier_weight": 0.25,
+    "task_rules_weight": 0.15,
+    "llm_judge_weight": 0.1,
+    "correction_anchor_weight": 0.7,
+    "preference_penalty_cap": 0.25
   },
   "evaluator": {
     "aggregation_strategy": "leaf_select",

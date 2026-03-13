@@ -32,6 +32,7 @@ class OptimizerAgent:
         self.config = config
         self._task_baselines: dict[str, float] = {}
         self._advisor = advisor
+        self._episode_idx = 0
 
     def optimize(
         self,
@@ -41,6 +42,7 @@ class OptimizerAgent:
         branches: dict[str, PromptBranch],
         memory: MemoryStore,
     ) -> OptimizationEvent:
+        self._episode_idx += 1
         updated: dict[str, float] = {}
         details: dict[str, dict[str, Any]] = {}
         rewritten: list[str] = []
@@ -48,6 +50,7 @@ class OptimizerAgent:
         archived: list[str] = []
         created: list[str] = []
         task_baseline_before = self._task_baselines.get(route.task_type, 0.5)
+        user_id = str(task.metadata.get("user_id", "global")).strip() or "global"
 
         advisor_directives: dict[str, dict[str, Any]] = {}
         advisor_proposals: list[dict[str, str]] = []
@@ -84,7 +87,6 @@ class OptimizerAgent:
             new_weight = raw_weight
             branch.state.weight = max(self.config.min_weight, min(self.config.max_weight, new_weight))
             branch.state.metadata["last_advantage"] = round(advantage, 6)
-            updated[branch_name] = round(branch.state.weight, 4)
 
             prompt_rewritten = False
             advice_rewrite_hint = str(advice.get("rewrite_hint", "")).strip()
@@ -93,22 +95,42 @@ class OptimizerAgent:
             if advice_rewrite_hint and advice_conf >= self.config.advisor_rewrite_confidence_threshold:
                 rewrite_hint = advice_rewrite_hint
 
-            should_rewrite = False
-            if reward < self.config.prompt_rewrite_threshold and fb:
-                should_rewrite = True
-            if advice_rewrite_hint and advice_conf >= self.config.advisor_rewrite_confidence_threshold and reward < 0.8:
-                should_rewrite = True
+            should_rewrite = self._should_rewrite_branch(
+                branch=branch,
+                reward=reward,
+                advice_rewrite_hint=advice_rewrite_hint,
+                advice_conf=advice_conf,
+            )
 
             if should_rewrite:
                 branch.rewrite_prompt(rewrite_hint, self.config.max_prompt_variants)
                 rewritten.append(branch_name)
                 prompt_rewritten = True
 
+            accepted_update = self._passes_acceptance_gate(
+                memory=memory,
+                branch_name=branch_name,
+                task_type=route.task_type,
+                user_id=user_id,
+                old_weight=old_weight,
+                new_weight=branch.state.weight,
+                prompt_rewritten=prompt_rewritten,
+            )
+            if not accepted_update:
+                branch.state.weight = old_weight
+                if prompt_rewritten:
+                    branch.rollback_prompt()
+                    if branch_name in rewritten:
+                        rewritten.remove(branch_name)
+                prompt_rewritten = False
+            updated[branch_name] = round(branch.state.weight, 4)
+
             if branch.state.status == BranchStatus.CANDIDATE:
+                self._update_candidate_parent_comparison(branch_name, branch, route, signal)
                 branch.state.trial_remaining -= 1
                 if branch.state.trial_remaining <= 0:
                     avg = branch.state.avg_reward()
-                    if avg >= self.config.candidate_promote_threshold:
+                    if avg >= self.config.candidate_promote_threshold and self._passes_parent_gate(branch):
                         branch.state.status = BranchStatus.ACTIVE
                         branch.state.weight = max(1.0, branch.state.weight)
                         promoted.append(branch_name)
@@ -132,6 +154,8 @@ class OptimizerAgent:
                 "new_weight": round(branch.state.weight, 4),
                 "prompt_rewritten": prompt_rewritten,
                 "advisory_rewrite_hint_used": bool(advice_rewrite_hint and rewrite_hint == advice_rewrite_hint),
+                "update_accepted": accepted_update,
+                "low_reward_streak": int(branch.state.metadata.get("low_reward_streak", 0)),
                 "trial_remaining": branch.state.trial_remaining,
             }
 
@@ -191,6 +215,8 @@ class OptimizerAgent:
     ) -> None:
         failure_map = memory.repeated_failures(min_count=self.config.candidate_failure_trigger)
         if not failure_map:
+            return
+        if not self._has_clustered_failures(failure_map):
             return
 
         active_candidates = [b for b in branches.values() if b.state.status == BranchStatus.CANDIDATE]
@@ -430,6 +456,97 @@ class OptimizerAgent:
             if branch.state.metadata.get("parent_hint") == parent_hint:
                 count += 1
         return count
+
+    def _should_rewrite_branch(
+        self,
+        branch: PromptBranch,
+        reward: float,
+        advice_rewrite_hint: str,
+        advice_conf: float,
+    ) -> bool:
+        streak = int(branch.state.metadata.get("low_reward_streak", 0))
+        if reward < self.config.prompt_rewrite_threshold:
+            streak += 1
+        else:
+            streak = 0
+        branch.state.metadata["low_reward_streak"] = streak
+
+        last_rewrite_episode = int(branch.state.metadata.get("last_rewrite_episode", -10**9))
+        cooldown_ok = (self._episode_idx - last_rewrite_episode) >= max(1, self.config.rewrite_cooldown_episodes)
+        repeated_failures_ok = streak >= max(1, self.config.rewrite_failure_streak_trigger)
+        advisor_ok = bool(advice_rewrite_hint and advice_conf >= self.config.advisor_rewrite_confidence_threshold)
+
+        should = cooldown_ok and repeated_failures_ok and (reward < self.config.prompt_rewrite_threshold or advisor_ok)
+        if should:
+            branch.state.metadata["last_rewrite_episode"] = self._episode_idx
+        return should
+
+    def _passes_acceptance_gate(
+        self,
+        memory: MemoryStore,
+        branch_name: str,
+        task_type: str,
+        user_id: str,
+        old_weight: float,
+        new_weight: float,
+        prompt_rewritten: bool,
+    ) -> bool:
+        before_est = memory.branch_expected_reward(
+            branch_name=branch_name,
+            task_type=task_type,
+            user_id=user_id,
+            limit=self.config.update_acceptance_window,
+        )
+        if before_est is None:
+            return True
+
+        weight_effect = 0.4 * (new_weight - old_weight)
+        rewrite_effect = 0.015 if prompt_rewritten else 0.0
+        after_est = before_est + weight_effect + rewrite_effect
+        return after_est >= (before_est + self.config.update_acceptance_min_gain)
+
+    @staticmethod
+    def _update_candidate_parent_comparison(
+        branch_name: str,
+        branch: PromptBranch,
+        route: RoutingDecision,
+        signal: EvaluationSignal,
+    ) -> None:
+        parent_hint = str(branch.state.metadata.get("parent_hint", "")).strip()
+        if not parent_hint or parent_hint not in route.activated_branches:
+            return
+        candidate_fb = signal.branch_feedback.get(branch_name)
+        parent_fb = signal.branch_feedback.get(parent_hint)
+        if not candidate_fb or not parent_fb:
+            return
+
+        compare_n = int(branch.state.metadata.get("parent_compare_count", 0)) + 1
+        win_n = int(branch.state.metadata.get("parent_win_count", 0))
+        if candidate_fb.reward > parent_fb.reward + 0.02:
+            win_n += 1
+        branch.state.metadata["parent_compare_count"] = compare_n
+        branch.state.metadata["parent_win_count"] = win_n
+
+    def _passes_parent_gate(self, branch: PromptBranch) -> bool:
+        parent_hint = str(branch.state.metadata.get("parent_hint", "")).strip()
+        if not parent_hint:
+            return True
+        compares = int(branch.state.metadata.get("parent_compare_count", 0))
+        wins = int(branch.state.metadata.get("parent_win_count", 0))
+        if compares < self.config.candidate_parent_min_comparisons:
+            return False
+        win_rate = wins / max(1, compares)
+        return win_rate >= self.config.candidate_parent_win_rate_threshold
+
+    def _has_clustered_failures(self, failure_map: dict[str, int]) -> bool:
+        if not failure_map:
+            return False
+        ordered = sorted(failure_map.values(), reverse=True)
+        if ordered[0] < self.config.candidate_failure_trigger:
+            return False
+        if len(ordered) == 1:
+            return ordered[0] >= self.config.candidate_failure_trigger + 1
+        return ordered[1] >= max(2, self.config.candidate_failure_trigger // 2)
 
     def _bounded_advisory_delta(self, value: Any) -> float:
         try:

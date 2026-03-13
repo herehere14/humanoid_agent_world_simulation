@@ -202,8 +202,12 @@ class DetailedHierarchicalValidator:
         cfg.router.exploration = 0.12 if adaptive else 0.02
         cfg.router.memory_coef = 0.2
         cfg.memory.bias_scale = max(0.2, min(0.6, cfg.memory.bias_scale))
+        cfg.memory.user_bias_mix = 0.0
         cfg.optimizer.learning_rate = 0.08
         cfg.optimizer.weight_decay = 0.03
+        cfg.optimizer.rewrite_cooldown_episodes = 1
+        cfg.optimizer.rewrite_failure_streak_trigger = 1
+        cfg.optimizer.update_acceptance_min_gain = -1.0
         cfg.optimizer.candidate_failure_trigger = 999
         cfg.optimizer.max_active_candidates = 0
 
@@ -309,6 +313,9 @@ class DetailedHierarchicalValidator:
             cfg.optimizer.learning_rate = 0.08
             cfg.optimizer.weight_decay = 0.03
             cfg.optimizer.advantage_baseline_beta = 0.1
+            cfg.optimizer.rewrite_cooldown_episodes = 1
+            cfg.optimizer.rewrite_failure_streak_trigger = 1
+            cfg.optimizer.update_acceptance_min_gain = -1.0
             cfg.optimizer.candidate_failure_trigger = 2
             cfg.optimizer.candidate_trial_episodes = 4
             cfg.optimizer.max_active_candidates = 6

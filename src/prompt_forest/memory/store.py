@@ -7,7 +7,7 @@ from typing import Any
 
 from ..config import MemoryConfig
 from ..types import MemoryRecord
-from ..utils.io import append_jsonl, read_jsonl
+from ..utils.io import append_jsonl, read_json, read_jsonl, write_json, write_jsonl
 
 
 class MemoryStore:
@@ -15,8 +15,12 @@ class MemoryStore:
         self.config = config
         self._records: list[MemoryRecord] = []
         self.memory_path = Path(memory_path) if memory_path else None
+        self.user_profiles_path = self.memory_path.parent / "user_profiles.json" if self.memory_path else None
+        self._user_profiles: dict[str, dict[str, Any]] = {}
         if self.memory_path and self.memory_path.exists():
             self._load()
+        if self.user_profiles_path and self.user_profiles_path.exists():
+            self._user_profiles = read_json(self.user_profiles_path)
 
     def add(self, record: MemoryRecord) -> None:
         self._records.append(record)
@@ -34,13 +38,32 @@ class MemoryStore:
     def recent(self, limit: int = 20) -> list[MemoryRecord]:
         return self._records[-limit:]
 
-    def retrieve_similar(self, task_type: str, limit: int | None = None) -> list[MemoryRecord]:
+    def retrieve_similar(self, task_type: str, limit: int | None = None, user_id: str | None = None) -> list[MemoryRecord]:
         n = limit or self.config.similarity_window
-        out = [r for r in reversed(self._records) if r.task_type == task_type]
+        out = [r for r in reversed(self._records) if r.task_type == task_type and (not user_id or r.user_id == user_id)]
         return list(reversed(out[:n]))
 
-    def branch_success_bias(self, task_type: str) -> dict[str, float]:
-        records = self.retrieve_similar(task_type, limit=self.config.similarity_window)
+    def branch_success_bias(self, task_type: str, user_id: str | None = None) -> dict[str, float]:
+        global_records = self.retrieve_similar(task_type, limit=self.config.similarity_window)
+        user_records = self.retrieve_similar(task_type, limit=self.config.similarity_window, user_id=user_id) if user_id else []
+        if not global_records and not user_records:
+            return {}
+
+        global_bias = self._compute_bias(global_records)
+        if not user_records:
+            return global_bias
+
+        user_bias = self._compute_bias(user_records)
+        user_mix = max(0.0, min(1.0, self.config.user_bias_mix))
+        out = dict(global_bias)
+        all_branches = set(global_bias) | set(user_bias)
+        for branch in all_branches:
+            gb = global_bias.get(branch, 0.0)
+            ub = user_bias.get(branch, 0.0)
+            out[branch] = ((1.0 - user_mix) * gb) + (user_mix * ub)
+        return out
+
+    def _compute_bias(self, records: list[MemoryRecord]) -> dict[str, float]:
         if not records:
             return {}
 
@@ -89,9 +112,12 @@ class MemoryStore:
                 count += 1
         return count
 
-    def branch_visit_counts(self, task_type: str) -> dict[str, int]:
+    def branch_visit_counts(self, task_type: str, user_id: str | None = None) -> dict[str, int]:
         counts: Counter[str] = Counter()
-        for r in self.retrieve_similar(task_type, limit=self.config.similarity_window):
+        records = self.retrieve_similar(task_type, limit=self.config.similarity_window, user_id=user_id)
+        if not records:
+            records = self.retrieve_similar(task_type, limit=self.config.similarity_window, user_id=None)
+        for r in records:
             for branch_name in r.activated_branches:
                 counts[branch_name] += 1
         return dict(counts)
@@ -122,3 +148,99 @@ class MemoryStore:
 
     def dump_records(self) -> list[dict[str, Any]]:
         return [asdict(r) for r in self._records]
+
+    def persist_records(self) -> None:
+        if self.memory_path:
+            write_jsonl(self.memory_path, [r.to_dict() for r in self._records[-self.config.max_records :]])
+
+    def update_feedback(
+        self,
+        task_id: str,
+        feedback_score: float,
+        accepted: bool | None = None,
+        corrected_answer: str = "",
+        feedback_text: str = "",
+        user_id: str | None = None,
+    ) -> MemoryRecord | None:
+        target: MemoryRecord | None = None
+        for record in reversed(self._records):
+            if record.task_id != task_id:
+                continue
+            target = record
+            break
+        if target is None:
+            return None
+
+        score = self._normalize_feedback_score(feedback_score)
+        target.feedback_score = score
+        if accepted is not None:
+            target.accepted = accepted
+        if corrected_answer:
+            target.corrected_answer = corrected_answer
+        if feedback_text:
+            target.feedback_text = feedback_text
+        if user_id:
+            target.user_id = user_id
+
+        if self.memory_path:
+            write_jsonl(self.memory_path, [r.to_dict() for r in self._records[-self.config.max_records :]])
+        return target
+
+    @staticmethod
+    def _normalize_feedback_score(score: float) -> float:
+        if score > 1.0 and score <= 5.0:
+            score = score / 5.0
+        return max(0.0, min(1.0, float(score)))
+
+    def branch_expected_reward(
+        self,
+        branch_name: str,
+        task_type: str,
+        user_id: str | None = None,
+        limit: int = 12,
+    ) -> float | None:
+        records = self.retrieve_similar(task_type, limit=limit, user_id=user_id)
+        if not records and user_id:
+            records = self.retrieve_similar(task_type, limit=limit, user_id=None)
+        if not records:
+            return None
+        vals: list[float] = []
+        n_records = len(records)
+        for idx, record in enumerate(records):
+            age = n_records - 1 - idx
+            recency_weight = self.config.recency_decay**age
+            if branch_name in record.branch_rewards:
+                vals.append(record.branch_rewards[branch_name] * recency_weight)
+            elif branch_name in record.activated_branches:
+                vals.append(record.reward_score * recency_weight)
+        if not vals:
+            return None
+        return sum(vals) / len(vals)
+
+    def get_user_profile(self, user_id: str | None) -> dict[str, Any]:
+        if not user_id:
+            return {}
+        return dict(self._user_profiles.get(user_id, {}))
+
+    def upsert_user_profile(
+        self,
+        user_id: str,
+        *,
+        style: str | None = None,
+        verbosity: str | None = None,
+        domain_preferences: list[str] | None = None,
+        hard_constraints: list[str] | None = None,
+    ) -> dict[str, Any]:
+        profile = dict(self._user_profiles.get(user_id, {}))
+        if style is not None:
+            profile["style"] = style
+        if verbosity is not None:
+            profile["verbosity"] = verbosity
+        if domain_preferences is not None:
+            profile["domain_preferences"] = list(domain_preferences)
+        if hard_constraints is not None:
+            profile["hard_constraints"] = list(hard_constraints)
+        self._user_profiles[user_id] = profile
+        if self.user_profiles_path:
+            write_json(self.user_profiles_path, self._user_profiles)
+        return profile

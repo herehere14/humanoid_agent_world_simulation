@@ -24,6 +24,10 @@
   "optimizer": {
     "candidate_spawn_per_event": 2,
     "max_active_candidates": 8,
-    "max_active_branches": 48
+    "max_active_branches": 48,
+    "advisor_weight_delta_cap": 0.02,
+    "advisor_rewrite_confidence_threshold": 0.8,
+    "rewrite_cooldown_episodes": 8,
+    "rewrite_failure_streak_trigger": 3
   }
 }

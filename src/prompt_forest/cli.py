@@ -25,6 +25,7 @@ def build_parser() -> argparse.ArgumentParser:
     task_cmd = sub.add_parser("run-task", help="Run one task through the prompt-forest")
     task_cmd.add_argument("--task", type=str, required=True)
     task_cmd.add_argument("--task-type", type=str, default="auto")
+    task_cmd.add_argument("--user-id", type=str, default="global")
     task_cmd.add_argument("--metadata", type=str, default="{}", help="JSON string metadata")
     task_cmd.add_argument(
         "--visibility",
@@ -37,6 +38,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     chat_cmd = sub.add_parser("chat", help="Interactive chat with the adaptive RL prompt-forest agent")
     chat_cmd.add_argument("--task-type", type=str, default="auto")
+    chat_cmd.add_argument("--user-id", type=str, default="global")
     chat_cmd.add_argument("--show-route", action="store_true", help="Show activated route and reward after each turn")
     chat_cmd.add_argument(
         "--visibility",
@@ -84,6 +86,19 @@ def build_parser() -> argparse.ArgumentParser:
     oc_cmd = sub.add_parser("openclaw-event", help="Process OpenClaw-style trajectory event JSON")
     oc_cmd.add_argument("--event-file", type=str, required=True)
 
+    fb_cmd = sub.add_parser("feedback", help="Apply explicit user feedback to a previous task")
+    fb_cmd.add_argument("--task-id", type=str, required=True)
+    fb_cmd.add_argument("--score", type=float, required=True, help="Feedback score in [0,1] or [1,5]")
+    fb_cmd.add_argument("--accepted", action="store_true", help="Mark previous answer as accepted")
+    fb_cmd.add_argument("--rejected", action="store_true", help="Mark previous answer as rejected")
+    fb_cmd.add_argument("--corrected-answer", type=str, default="")
+    fb_cmd.add_argument("--feedback-text", type=str, default="")
+    fb_cmd.add_argument("--user-id", type=str, default="")
+    fb_cmd.add_argument("--style", type=str, default=None)
+    fb_cmd.add_argument("--verbosity", type=str, default=None)
+    fb_cmd.add_argument("--domain-preferences", type=str, default="", help="Comma-separated domains")
+    fb_cmd.add_argument("--hard-constraints", type=str, default="", help="Comma-separated required constraints")
+
     inspect_cmd = sub.add_parser("inspect-events", help="Inspect recent evaluator/optimizer traces from events log")
     inspect_cmd.add_argument("--limit", type=int, default=10)
     inspect_cmd.add_argument(
@@ -99,7 +114,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _chat_metadata_from_text(text: str) -> dict:
+def _chat_metadata_from_text(text: str, user_id: str) -> dict:
     tokens = re.findall(r"[a-zA-Z]{4,}", text.lower())
     deduped: list[str] = []
     for token in tokens:
@@ -110,12 +125,14 @@ def _chat_metadata_from_text(text: str) -> dict:
     return {
         "expected_keywords": deduped,
         "required_substrings": ["confidence"],
+        "user_id": user_id,
     }
 
 
 def _run_chat_loop(
     engine: PromptForestEngine,
     default_task_type: str,
+    user_id: str,
     show_route: bool,
     visibility: str,
     top_branches: int,
@@ -145,7 +162,7 @@ def _run_chat_loop(
             print("task_type set to: auto")
             continue
 
-        metadata = _chat_metadata_from_text(text)
+        metadata = _chat_metadata_from_text(text, user_id=user_id)
         result = engine.run_task(text=text, task_type=task_type, metadata=metadata)
         signal = result["evaluation_signal"]
         print(f"agent> {signal['selected_output']}")
@@ -170,6 +187,7 @@ def main() -> None:
 
     if args.command == "run-task":
         metadata = json.loads(args.metadata)
+        metadata["user_id"] = args.user_id
         result = engine.run_task(text=args.task, task_type=args.task_type, metadata=metadata)
         if args.visibility != "minimal":
             print(format_turn_trace(result, visibility=args.visibility, top_branches=args.top_branches))
@@ -181,6 +199,7 @@ def main() -> None:
         _run_chat_loop(
             engine,
             default_task_type=args.task_type,
+            user_id=args.user_id,
             show_route=args.show_route,
             visibility=args.visibility,
             top_branches=args.top_branches,
@@ -249,6 +268,29 @@ def main() -> None:
         print(json.dumps(result, indent=2))
         return
 
+    if args.command == "feedback":
+        accepted_value = None
+        if args.accepted:
+            accepted_value = True
+        elif args.rejected:
+            accepted_value = False
+        domains = [x.strip() for x in args.domain_preferences.split(",") if x.strip()]
+        constraints = [x.strip() for x in args.hard_constraints.split(",") if x.strip()]
+        result = engine.apply_feedback(
+            task_id=args.task_id,
+            score=args.score,
+            accepted=accepted_value,
+            corrected_answer=args.corrected_answer,
+            feedback_text=args.feedback_text,
+            user_id=args.user_id or None,
+            style=args.style,
+            verbosity=args.verbosity,
+            domain_preferences=domains if domains else None,
+            hard_constraints=constraints if constraints else None,
+        )
+        print(json.dumps(result, indent=2))
+        return
+
     if args.command == "inspect-events":
         events = read_jsonl(engine.artifacts_dir / "events.jsonl")
         if not events:
@@ -268,6 +310,7 @@ def main() -> None:
         payload = {
             "branches": engine.branch_snapshot(),
             "memory": engine.memory.stats(),
+            "user_profiles": len(engine.memory._user_profiles),  # noqa: SLF001
             "routing_histogram": engine.routing_histogram(),
             "runtime": {
                 "evaluator_llm_enabled": engine.config.agent_runtimes.evaluator.enabled,

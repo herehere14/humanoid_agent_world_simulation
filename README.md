@@ -163,7 +163,43 @@ prompt-forest inspect-events --limit 8 --visibility full
 
 This prints per-task routing path, branch-level evaluation signals, and optimizer updates (weight delta, advantage, decay, rewrites, candidate lifecycle actions).
 
-### 1d) Enable real API-backed Evaluator Agent and Optimizer Agent
+### 1d) User feedback loop (personal adaptation)
+
+After a task is answered, send explicit feedback by task id:
+
+```bash
+prompt-forest feedback \
+  --task-id "<task_id_from_run_output>" \
+  --score 0.2 \
+  --rejected \
+  --corrected-answer "Preferred corrected answer" \
+  --feedback-text "What was wrong" \
+  --user-id alice
+```
+
+Optional profile updates with feedback:
+
+```bash
+prompt-forest feedback \
+  --task-id "<task_id>" \
+  --score 0.9 \
+  --accepted \
+  --user-id alice \
+  --style bullet \
+  --verbosity concise \
+  --domain-preferences planning,ops \
+  --hard-constraints confidence,rollback
+```
+
+Feedback reward blend:
+- `0.50 * user_feedback`
+- `0.25 * verifier`
+- `0.15 * task_rules`
+- `0.10 * llm_judge`
+
+If corrected answer is provided on rejection, reward is strongly anchored to user feedback.
+
+### 1e) Enable real API-backed Evaluator Agent and Optimizer Agent
 
 By default, Agent 1 and Agent 2 run with deterministic local logic.  
 To run them as model-backed agents, enable `agent_runtimes` in config and set API keys.
@@ -323,6 +359,7 @@ For quick human-readable visibility:
 - Branch-level reward assignment
 - Branch-local updates (weights, prompt variants)
 - Memory-influenced future routing
+- User-specific routing via `(user_id, task_type)` memory partition + global fallback
 - Evaluator/optimizer separation
 - Candidate branch creation policy with trial lifecycle
 - Optional API-backed Evaluator/Optimizer agents with strict JSON contracts

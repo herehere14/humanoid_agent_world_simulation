@@ -9,10 +9,10 @@ from ..types import BranchStatus, RoutingDecision, TaskInput
 
 
 class MemoryRoutingView(Protocol):
-    def branch_success_bias(self, task_type: str) -> dict[str, float]:
+    def branch_success_bias(self, task_type: str, user_id: str | None = None) -> dict[str, float]:
         ...
 
-    def branch_visit_counts(self, task_type: str) -> dict[str, int]:
+    def branch_visit_counts(self, task_type: str, user_id: str | None = None) -> dict[str, int]:
         ...
 
 
@@ -54,8 +54,9 @@ class HierarchicalRouter:
         memory: MemoryRoutingView,
     ) -> RoutingDecision:
         task_type = self.classify_task_type(task)
-        history_bias = memory.branch_success_bias(task_type)
-        visit_counts = memory.branch_visit_counts(task_type)
+        user_id = str(task.metadata.get("user_id", "global")).strip() or "global"
+        history_bias = memory.branch_success_bias(task_type, user_id=user_id)
+        visit_counts = memory.branch_visit_counts(task_type, user_id=user_id)
 
         active_path: list[str] = []
         flattened_scores: dict[str, float] = {}

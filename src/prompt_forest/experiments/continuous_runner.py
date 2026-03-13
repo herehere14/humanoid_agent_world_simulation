@@ -16,6 +16,7 @@ class CycleMetrics:
     full_minus_frozen: float
     full_minus_memory_only: float
     full_win_rate_vs_frozen: float
+    full_ci95_low: float
     fairness_gap: float
     tests_passed: bool
 
@@ -79,6 +80,7 @@ class ContinuousImprover:
                 full_minus_frozen=float(best_candidate["full_minus_frozen"]),
                 full_minus_memory_only=float(best_candidate["full_minus_memory_only"]),
                 full_win_rate_vs_frozen=float(best_candidate["full_win_rate_vs_frozen"]),
+                full_ci95_low=float(best_candidate.get("full_ci95_low", -1.0)),
                 fairness_gap=float(best_candidate["fairness_gap"]),
                 tests_passed=tests_passed,
             )
@@ -104,6 +106,7 @@ class ContinuousImprover:
                     "full_minus_frozen": round(metrics.full_minus_frozen, 6),
                     "full_minus_memory_only": round(metrics.full_minus_memory_only, 6),
                     "full_win_rate_vs_frozen": round(metrics.full_win_rate_vs_frozen, 6),
+                    "full_ci95_low": round(metrics.full_ci95_low, 6),
                     "fairness_gap": round(metrics.fairness_gap, 6),
                     "tests_passed": metrics.tests_passed,
                 },
@@ -146,6 +149,8 @@ class ContinuousImprover:
         if metrics.full_minus_memory_only <= 0.0:
             return False
         if metrics.full_win_rate_vs_frozen < 0.5:
+            return False
+        if metrics.full_ci95_low < 0.0:
             return False
         if metrics.fairness_gap > 0.3:
             return False

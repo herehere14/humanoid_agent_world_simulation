@@ -17,6 +17,7 @@ from ..branches.hierarchical import HierarchicalPromptForest, create_default_hie
 from ..config import EngineConfig, load_config
 from ..evaluator.judge import OutputJudge
 from ..memory.store import MemoryStore
+from ..rewards.modes import KeywordReward, RuleBasedReward, TaskSpecificReward
 from ..router.hierarchical_router import HierarchicalRouter
 from ..types import MemoryRecord, RoutingDecision, TaskInput
 from ..utils.io import append_jsonl, ensure_parent
@@ -67,7 +68,13 @@ class PromptForestEngine:
         adapt: bool = True,
         update_memory: bool = True,
     ) -> dict[str, Any]:
-        task = TaskInput(task_id=str(uuid4()), text=text, task_type=task_type, metadata=metadata or {})
+        task_metadata = dict(metadata or {})
+        user_id = str(task_metadata.get("user_id", "global")).strip() or "global"
+        task_metadata["user_id"] = user_id
+        user_profile = self.memory.get_user_profile(user_id)
+        if user_profile:
+            task_metadata["user_preferences"] = user_profile
+        task = TaskInput(task_id=str(uuid4()), text=text, task_type=task_type, metadata=task_metadata)
 
         route = self.router.route(task, self.forest, self.memory)
         task.task_type = route.task_type
@@ -86,6 +93,7 @@ class PromptForestEngine:
             branch_outputs={k: v.output for k, v in outputs.items()},
         )
         self._propagate_rewards_along_path(route, signal, gamma=0.9, local_mix=0.55)
+        reward_components = self._compute_reward_components(task, signal.selected_output, signal.reward_score)
 
         if adapt:
             optimize_event: OptimizationEvent = self.optimizer_agent.optimize(
@@ -121,6 +129,9 @@ class PromptForestEngine:
             confidence=signal.confidence,
             useful_patterns=self.memory.useful_patterns(route.task_type),
             branch_rewards={name: fb.reward for name, fb in signal.branch_feedback.items()},
+            user_id=user_id,
+            task_metadata=task.metadata,
+            reward_components=reward_components,
         )
         if update_memory:
             self.memory.add(record)
@@ -140,6 +151,7 @@ class PromptForestEngine:
                 "aggregator_notes": signal.aggregator_notes,
             },
             "optimization": asdict(optimize_event),
+            "reward_components": reward_components,
             "runtime": {
                 "evaluator_llm_enabled": self.config.agent_runtimes.evaluator.enabled,
                 "optimizer_llm_enabled": self.config.agent_runtimes.optimizer.enabled,
@@ -151,6 +163,82 @@ class PromptForestEngine:
         append_jsonl(self._event_log, payload)
 
         return payload
+
+    def apply_feedback(
+        self,
+        task_id: str,
+        score: float,
+        accepted: bool | None = None,
+        corrected_answer: str = "",
+        feedback_text: str = "",
+        user_id: str | None = None,
+        style: str | None = None,
+        verbosity: str | None = None,
+        domain_preferences: list[str] | None = None,
+        hard_constraints: list[str] | None = None,
+    ) -> dict[str, Any]:
+        record = self.memory.update_feedback(
+            task_id=task_id,
+            feedback_score=score,
+            accepted=accepted,
+            corrected_answer=corrected_answer,
+            feedback_text=feedback_text,
+            user_id=user_id,
+        )
+        if record is None:
+            return {"ok": False, "reason": "task_not_found", "task_id": task_id}
+
+        uid = user_id or record.user_id or "global"
+        profile = self.memory.get_user_profile(uid)
+        if any(v is not None for v in (style, verbosity, domain_preferences, hard_constraints)):
+            profile = self.memory.upsert_user_profile(
+                uid,
+                style=style,
+                verbosity=verbosity,
+                domain_preferences=domain_preferences,
+                hard_constraints=hard_constraints,
+            )
+
+        old_reward = record.reward_score
+        blended, components = self._blend_feedback_reward(record, profile)
+        record.reward_score = blended
+        record.reward_components.update(components)
+        record.user_id = uid
+
+        updated_branch_rewards: dict[str, float] = {}
+        path = record.activated_branches or list(record.branch_rewards.keys())
+        n = len(path)
+        for idx, branch_name in enumerate(path):
+            prev = record.branch_rewards.get(branch_name, old_reward)
+            target = blended * (0.9 ** max(0, n - 1 - idx))
+            new_reward = (0.4 * prev) + (0.6 * target)
+            new_reward = max(0.0, min(1.0, new_reward))
+            record.branch_rewards[branch_name] = new_reward
+            updated_branch_rewards[branch_name] = round(new_reward, 4)
+
+            branch = self.branches.get(branch_name)
+            if branch is None or not branch.is_active:
+                continue
+            branch.apply_reward(new_reward)
+            delta = 0.5 * self.config.optimizer.learning_rate * (new_reward - 0.5)
+            new_weight = branch.state.weight + delta
+            branch.state.weight = max(self.config.optimizer.min_weight, min(self.config.optimizer.max_weight, new_weight))
+
+        # Persist record updates.
+        self.memory.persist_records()
+
+        payload = {
+            "type": "feedback",
+            "task_id": task_id,
+            "user_id": uid,
+            "old_reward": round(old_reward, 4),
+            "new_reward": round(blended, 4),
+            "reward_components": components,
+            "updated_branch_rewards": updated_branch_rewards,
+            "profile": profile,
+        }
+        append_jsonl(self._event_log, payload)
+        return {"ok": True, **payload}
 
     def _run_path(self, route: RoutingDecision, task: TaskInput) -> dict[str, Any]:
         outputs = {}
@@ -261,5 +349,82 @@ class PromptForestEngine:
             "expected_keywords": trajectory_event.get("expected_keywords", []),
             "required_substrings": trajectory_event.get("required_checks", []),
             "trajectory": trajectory_event,
+            "user_id": trajectory_event.get("user_id", "global"),
         }
         return self.run_task(text=task_text, task_type=task_type, metadata=metadata)
+
+    def _compute_reward_components(self, task: TaskInput, output: str, llm_judge_score: float) -> dict[str, float]:
+        verifier_score, _ = RuleBasedReward(weight=1.0).score(output, task)
+        keyword_score, _ = KeywordReward(weight=1.0).score(output, task)
+        task_specific_score, _ = TaskSpecificReward(weight=1.0).score(output, task)
+        task_rules = 0.5 * (keyword_score + task_specific_score)
+        return {
+            "verifier": round(verifier_score, 4),
+            "task_rules": round(task_rules, 4),
+            "llm_judge": round(max(0.0, min(1.0, llm_judge_score)), 4),
+        }
+
+    def _blend_feedback_reward(self, record: MemoryRecord, profile: dict[str, Any]) -> tuple[float, dict[str, float]]:
+        metadata = dict(record.task_metadata or {})
+        if profile:
+            metadata["user_preferences"] = profile
+        task = TaskInput(
+            task_id=record.task_id,
+            text=record.input_text,
+            task_type=record.task_type,
+            metadata=metadata,
+        )
+        output = record.selected_output
+        verifier_score, _ = RuleBasedReward(weight=1.0).score(output, task)
+        keyword_score, _ = KeywordReward(weight=1.0).score(output, task)
+        task_specific_score, _ = TaskSpecificReward(weight=1.0).score(output, task)
+        task_rules_score = 0.5 * (keyword_score + task_specific_score)
+        llm_judge_score = float(record.reward_components.get("llm_judge", record.reward_score))
+
+        user_feedback = float(record.feedback_score if record.feedback_score is not None else 0.5)
+        user_feedback = max(0.0, min(1.0, user_feedback))
+
+        if record.corrected_answer and record.accepted is False:
+            user_feedback = min(user_feedback, 0.2)
+            blended = (
+                self.config.feedback.correction_anchor_weight * user_feedback
+                + (1.0 - self.config.feedback.correction_anchor_weight) * (0.6 * verifier_score + 0.4 * llm_judge_score)
+            )
+        else:
+            blended = (
+                self.config.feedback.user_feedback_weight * user_feedback
+                + self.config.feedback.verifier_weight * verifier_score
+                + self.config.feedback.task_rules_weight * task_rules_score
+                + self.config.feedback.llm_judge_weight * llm_judge_score
+            )
+
+        pref_penalty = self._preference_penalty(output, profile)
+        blended = max(0.0, min(1.0, blended - pref_penalty))
+        components = {
+            "user_feedback": round(user_feedback, 4),
+            "verifier": round(verifier_score, 4),
+            "task_rules": round(task_rules_score, 4),
+            "llm_judge": round(llm_judge_score, 4),
+            "preference_penalty": round(pref_penalty, 4),
+            "blended_reward": round(blended, 4),
+        }
+        return blended, components
+
+    def _preference_penalty(self, output: str, profile: dict[str, Any]) -> float:
+        if not profile:
+            return 0.0
+        output_l = output.lower()
+        penalty = 0.0
+        constraints = profile.get("hard_constraints", [])
+        if isinstance(constraints, list):
+            missing = [c for c in constraints if str(c).lower() not in output_l]
+            penalty += 0.05 * len(missing)
+
+        verbosity = str(profile.get("verbosity", "")).lower()
+        token_count = len(output.split())
+        if verbosity == "concise" and token_count > 140:
+            penalty += 0.08
+        elif verbosity in {"detailed", "high"} and token_count < 50:
+            penalty += 0.06
+
+        return min(self.config.feedback.preference_penalty_cap, penalty)

@@ -95,6 +95,13 @@ class MemoryRecord:
     confidence: float
     useful_patterns: list[str]
     branch_rewards: dict[str, float] = field(default_factory=dict)
+    user_id: str = "global"
+    task_metadata: dict[str, Any] = field(default_factory=dict)
+    reward_components: dict[str, float] = field(default_factory=dict)
+    feedback_score: float | None = None
+    accepted: bool | None = None
+    corrected_answer: str = ""
+    feedback_text: str = ""
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
     def to_dict(self) -> dict[str, Any]:

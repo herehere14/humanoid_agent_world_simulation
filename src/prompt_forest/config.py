@@ -43,6 +43,12 @@ class OptimizerConfig:
     candidate_max_children_per_parent: int = 8
     advisor_weight_delta_cap: float = 0.06
     advisor_rewrite_confidence_threshold: float = 0.62
+    rewrite_cooldown_episodes: int = 8
+    rewrite_failure_streak_trigger: int = 3
+    update_acceptance_window: int = 8
+    update_acceptance_min_gain: float = 0.002
+    candidate_parent_win_rate_threshold: float = 0.55
+    candidate_parent_min_comparisons: int = 3
 
 
 @dataclass
@@ -53,6 +59,17 @@ class MemoryConfig:
     bias_cap: float = 0.15
     shrinkage_k: float = 20.0
     recency_decay: float = 0.98
+    user_bias_mix: float = 0.7
+
+
+@dataclass
+class FeedbackConfig:
+    user_feedback_weight: float = 0.5
+    verifier_weight: float = 0.25
+    task_rules_weight: float = 0.15
+    llm_judge_weight: float = 0.1
+    correction_anchor_weight: float = 0.7
+    preference_penalty_cap: float = 0.25
 
 
 @dataclass
@@ -84,6 +101,7 @@ class EngineConfig:
     router: RouterConfig = field(default_factory=RouterConfig)
     optimizer: OptimizerConfig = field(default_factory=OptimizerConfig)
     memory: MemoryConfig = field(default_factory=MemoryConfig)
+    feedback: FeedbackConfig = field(default_factory=FeedbackConfig)
     evaluator: EvaluatorConfig = field(default_factory=EvaluatorConfig)
     agent_runtimes: AgentRuntimesConfig = field(default_factory=AgentRuntimesConfig)
     artifacts_dir: str = "artifacts"

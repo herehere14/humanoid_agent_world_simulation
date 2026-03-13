@@ -19,6 +19,7 @@ class PolicyRunMetrics:
     holdout_rewards: list[float]
     train_task_types: list[str]
     holdout_task_types: list[str]
+    holdout_user_ids: list[str]
     selected_train: list[str]
     selected_holdout: list[str]
     optimal_train: list[str]
@@ -100,6 +101,7 @@ class RLLearningValidator:
 
         policy_aggregate: dict[str, dict[str, float]] = {}
         policy_task_breakdown: dict[str, dict[str, float]] = {}
+        policy_user_breakdown: dict[str, dict[str, float]] = {}
         policy_branch_concentration: dict[str, float] = {}
         for policy in policies:
             runs = [trial.policy_metrics[policy] for trial in all_results]
@@ -111,6 +113,7 @@ class RLLearningValidator:
                 "mean_holdout_hit_rate": round(mean(r.holdout_hit_rate for r in runs), 4),
             }
             policy_task_breakdown[policy] = self._mean_holdout_reward_by_task(runs)
+            policy_user_breakdown[policy] = self._mean_holdout_reward_by_user(runs)
             policy_branch_concentration[policy] = round(mean(self._hhi(r.selected_holdout) for r in runs), 4)
 
         gains_vs_frozen: dict[str, dict[str, float | list[float]]] = {}
@@ -148,6 +151,7 @@ class RLLearningValidator:
             "aggregate": {
                 "policy_metrics": policy_aggregate,
                 "policy_holdout_by_task": policy_task_breakdown,
+                "policy_holdout_by_user": policy_user_breakdown,
                 "policy_branch_concentration_hhi": policy_branch_concentration,
                 "gains_vs_frozen": gains_vs_frozen,
                 "full_minus_frozen_holdout": round(mean(full_minus_frozen), 4),
@@ -282,6 +286,7 @@ class RLLearningValidator:
                         "required_substrings": required_substrings,
                         "distribution_phase": phase_idx,
                         "split": "holdout" if holdout else "train",
+                        "user_id": rng.choice(["user_alpha", "user_beta", "user_gamma"]),
                     },
                 )
             )
@@ -337,6 +342,7 @@ class RLLearningValidator:
 
         holdout_rewards: list[float] = []
         holdout_task_types: list[str] = []
+        holdout_user_ids: list[str] = []
         selected_holdout: list[str] = []
         optimal_holdout: list[str] = []
 
@@ -350,6 +356,7 @@ class RLLearningValidator:
             )
             holdout_rewards.append(result["evaluation_signal"]["reward_score"])
             holdout_task_types.append(task.task_type)
+            holdout_user_ids.append(str(task.metadata.get("user_id", "global")))
             selected_holdout.append(result["evaluation_signal"]["selected_branch"])
             optimal_holdout.append(backend.best_branch(task.task_type, candidates=self._active_terminal_nodes(engine)))
 
@@ -358,6 +365,7 @@ class RLLearningValidator:
             holdout_rewards=holdout_rewards,
             train_task_types=train_task_types,
             holdout_task_types=holdout_task_types,
+            holdout_user_ids=holdout_user_ids,
             selected_train=selected_train,
             selected_holdout=selected_holdout,
             optimal_train=optimal_train,
@@ -378,6 +386,7 @@ class RLLearningValidator:
         cfg.memory.bias_cap = 0.15
         cfg.memory.shrinkage_k = 20.0
         cfg.memory.recency_decay = 0.97
+        cfg.memory.user_bias_mix = 0.0
 
         cfg.router.weight_coef = 1.0
         cfg.router.affinity_coef = 0.6
@@ -390,6 +399,9 @@ class RLLearningValidator:
         cfg.optimizer.candidate_trial_episodes = 10
         cfg.optimizer.candidate_failure_trigger = 999
         cfg.optimizer.max_active_candidates = 0
+        cfg.optimizer.rewrite_cooldown_episodes = 1
+        cfg.optimizer.rewrite_failure_streak_trigger = 1
+        cfg.optimizer.update_acceptance_min_gain = -1.0
 
         if policy == "full":
             cfg.router.exploration = 0.08
@@ -497,11 +509,25 @@ class RLLearningValidator:
                 merged.setdefault(task_type, []).append(val)
         return {task_type: round(mean(vals), 4) for task_type, vals in sorted(merged.items())}
 
+    def _mean_holdout_reward_by_user(self, runs: list[PolicyRunMetrics]) -> dict[str, float]:
+        merged: dict[str, list[float]] = {}
+        for run in runs:
+            local = self._holdout_reward_by_user(run)
+            for user_id, val in local.items():
+                merged.setdefault(user_id, []).append(val)
+        return {user_id: round(mean(vals), 4) for user_id, vals in sorted(merged.items())}
+
     def _holdout_reward_by_task(self, run: PolicyRunMetrics) -> dict[str, float]:
         grouped: dict[str, list[float]] = {}
         for task_type, reward in zip(run.holdout_task_types, run.holdout_rewards):
             grouped.setdefault(task_type, []).append(reward)
         return {task_type: round(mean(vals), 4) for task_type, vals in sorted(grouped.items())}
+
+    def _holdout_reward_by_user(self, run: PolicyRunMetrics) -> dict[str, float]:
+        grouped: dict[str, list[float]] = {}
+        for user_id, reward in zip(run.holdout_user_ids, run.holdout_rewards):
+            grouped.setdefault(user_id, []).append(reward)
+        return {user_id: round(mean(vals), 4) for user_id, vals in sorted(grouped.items())}
 
     def _hhi(self, selections: list[str]) -> float:
         if not selections:

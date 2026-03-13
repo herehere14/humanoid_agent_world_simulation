@@ -98,6 +98,8 @@ class HybridReward:
         total_weight = self.exact.weight + self.keyword.weight + self.rule.weight + self.task_specific.weight
         score = (s1 + s2 + s3 + s4) / max(1e-8, total_weight)
         score -= self._shallow_keyword_penalty(output, task, s1=s1, s2=s2, s3=s3)
+        pref_penalty, pref_reason = self._preference_penalty(output, task)
+        score -= pref_penalty
         score = max(0.0, min(1.0, score))
 
         if score >= 0.75:
@@ -107,7 +109,7 @@ class HybridReward:
         else:
             top_reason = "low_quality"
 
-        reason = f"{top_reason}|{r1}|{r2}|{r3}|{r4}"
+        reason = f"{top_reason}|{r1}|{r2}|{r3}|{r4}|{pref_reason}"
         return score, reason
 
     def _shallow_keyword_penalty(self, output: str, task: TaskInput, s1: float, s2: float, s3: float) -> float:
@@ -122,3 +124,38 @@ class HybridReward:
         if keyword_ratio >= 0.7 and token_count < 24:
             return 0.08
         return 0.0
+
+    def _preference_penalty(self, output: str, task: TaskInput) -> tuple[float, str]:
+        prefs = task.metadata.get("user_preferences", {})
+        if not isinstance(prefs, dict) or not prefs:
+            return 0.0, "no_user_preference_profile"
+
+        output_n = _norm(output)
+        penalty = 0.0
+        reasons: list[str] = []
+
+        hard_constraints = prefs.get("hard_constraints", [])
+        if isinstance(hard_constraints, list) and hard_constraints:
+            missing = [c for c in hard_constraints if _norm(str(c)) not in output_n]
+            if missing:
+                penalty += min(0.2, 0.05 * len(missing))
+                reasons.append(f"missing_constraints:{len(missing)}")
+
+        verbosity = str(prefs.get("verbosity", "")).strip().lower()
+        token_count = len(re.findall(r"\w+", output_n))
+        if verbosity == "concise" and token_count > 140:
+            penalty += 0.08
+            reasons.append("verbosity_mismatch:too_long")
+        elif verbosity in {"detailed", "high"} and token_count < 50:
+            penalty += 0.06
+            reasons.append("verbosity_mismatch:too_short")
+
+        style = str(prefs.get("style", "")).strip().lower()
+        if style in {"bullet", "list"} and "-" not in output and "*" not in output:
+            penalty += 0.04
+            reasons.append("style_mismatch:missing_bullets")
+
+        penalty = min(0.25, penalty)
+        if not reasons:
+            return 0.0, "preferences_aligned"
+        return penalty, ",".join(reasons)
