@@ -544,3 +544,59 @@ def test_candidate_parent_gate_blocks_promotion_without_enough_comparisons(tmp_p
 
     # Strong rewards but not enough parent comparisons, so promotion is blocked.
     assert branches["candidate_x"].state.status.value != "active"
+
+
+def test_candidate_parent_gate_requires_positive_reward_gap(tmp_path):
+    branches = create_default_branches()
+    branches["candidate_x"] = make_candidate_branch(
+        name="candidate_x",
+        purpose="extra verifier",
+        prompt_template="Task {task}",
+        trial_episodes=3,
+        metadata={"parent_hint": "verification"},
+    )
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    optimizer = OptimizerAgent(
+        OptimizerConfig(
+            candidate_failure_trigger=99,
+            candidate_trial_episodes=3,
+            candidate_promote_threshold=0.6,
+            candidate_parent_min_comparisons=3,
+            candidate_parent_win_rate_threshold=0.6,
+            candidate_parent_min_reward_gap=0.02,
+            learning_rate=0.1,
+        )
+    )
+
+    route = RoutingDecision(task_type="general", activated_branches=["verification", "candidate_x"], branch_scores={})
+
+    for i in range(3):
+        feedback = {
+            "verification": BranchFeedback(
+                branch_name="verification",
+                reward=0.74,
+                confidence=0.7,
+                failure_reason="ok",
+                suggested_improvement_direction="",
+            ),
+            "candidate_x": BranchFeedback(
+                branch_name="candidate_x",
+                reward=0.75,
+                confidence=0.7,
+                failure_reason="ok",
+                suggested_improvement_direction="",
+            ),
+        }
+        signal = EvaluationSignal(
+            reward_score=0.75,
+            confidence=0.7,
+            selected_branch="candidate_x",
+            selected_output="x",
+            failure_reason="ok",
+            suggested_improvement_direction="",
+            branch_feedback=feedback,
+        )
+        optimizer.optimize(TaskInput(str(i), "x", "general"), route, signal, branches, memory)
+
+    # Candidate is slightly better but does not clear minimum reward-gap gate.
+    assert branches["candidate_x"].state.status.value != "active"

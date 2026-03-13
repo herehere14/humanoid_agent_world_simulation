@@ -308,7 +308,10 @@ class OptimizerAgent:
             return
 
         active_rewards = [signal.branch_feedback[b].reward for b in route.activated_branches if b in signal.branch_feedback]
-        if not active_rewards or max(active_rewards) > 0.55:
+        if not active_rewards:
+            return
+        dominant_fail_count = max(failure_map.values()) if failure_map else 0
+        if max(active_rewards) > 0.55 and dominant_fail_count < (self.config.candidate_failure_trigger + 2):
             return
 
         active_non_archived = [b for b in branches.values() if b.state.status != BranchStatus.ARCHIVED]
@@ -606,10 +609,13 @@ class OptimizerAgent:
 
         compare_n = int(branch.state.metadata.get("parent_compare_count", 0)) + 1
         win_n = int(branch.state.metadata.get("parent_win_count", 0))
-        if candidate_fb.reward > parent_fb.reward + 0.02:
+        reward_gap = candidate_fb.reward - parent_fb.reward
+        if reward_gap > 0.02:
             win_n += 1
+        gap_sum = float(branch.state.metadata.get("parent_reward_gap_sum", 0.0)) + reward_gap
         branch.state.metadata["parent_compare_count"] = compare_n
         branch.state.metadata["parent_win_count"] = win_n
+        branch.state.metadata["parent_reward_gap_sum"] = gap_sum
 
     def _passes_parent_gate(self, branch: PromptBranch) -> bool:
         parent_hint = str(branch.state.metadata.get("parent_hint", "")).strip()
@@ -617,10 +623,14 @@ class OptimizerAgent:
             return True
         compares = int(branch.state.metadata.get("parent_compare_count", 0))
         wins = int(branch.state.metadata.get("parent_win_count", 0))
+        gap_sum = float(branch.state.metadata.get("parent_reward_gap_sum", 0.0))
         if compares < self.config.candidate_parent_min_comparisons:
             return False
         win_rate = wins / max(1, compares)
-        return win_rate >= self.config.candidate_parent_win_rate_threshold
+        avg_gap = gap_sum / max(1, compares)
+        return (win_rate >= self.config.candidate_parent_win_rate_threshold) and (
+            avg_gap >= self.config.candidate_parent_min_reward_gap
+        )
 
     def _has_clustered_failures(self, failure_map: dict[str, int]) -> bool:
         if not failure_map:

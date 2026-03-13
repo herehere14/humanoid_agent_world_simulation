@@ -101,9 +101,32 @@ class MemoryStore:
         return bias
 
     def repeated_failures(self, min_count: int = 3) -> dict[str, int]:
-        fails = [r.failure_reason for r in self.recent(200) if r.reward_score < 0.45 and r.failure_reason]
+        fails: list[str] = []
+        for record in self.recent(200):
+            if not record.failure_reason:
+                continue
+            reason = record.failure_reason.lower()
+            if record.reward_score < 0.45 or "rule_miss" in reason or "low_quality" in reason:
+                fails.append(self._canonical_failure_reason(record.failure_reason))
         counts = Counter(fails)
         return {k: v for k, v in counts.items() if v >= min_count}
+
+    @staticmethod
+    def _canonical_failure_reason(reason: str) -> str:
+        reason_l = reason.lower()
+        parts: list[str] = []
+        if "rule_miss" in reason_l:
+            parts.append("rule_miss")
+        if "keyword_coverage" in reason_l:
+            parts.append("keyword_coverage")
+        if "low_quality" in reason_l:
+            parts.append("low_quality")
+        if "medium_quality" in reason_l:
+            parts.append("medium_quality")
+        if not parts:
+            token = reason_l.split("|", 1)[0].strip()
+            return token or "unknown_failure"
+        return "|".join(parts)
 
     def branch_failure_counts(self, branch_name: str, threshold: float = 0.45) -> int:
         count = 0
@@ -123,9 +146,30 @@ class MemoryStore:
         return dict(counts)
 
     def branch_bandit_stats(self, task_type: str, user_id: str | None = None) -> dict[str, dict[str, float]]:
-        records = self.retrieve_similar(task_type, limit=self.config.similarity_window, user_id=user_id)
-        if not records and user_id:
-            records = self.retrieve_similar(task_type, limit=self.config.similarity_window, user_id=None)
+        global_records = self.retrieve_similar(task_type, limit=self.config.similarity_window, user_id=None)
+        user_records = self.retrieve_similar(task_type, limit=self.config.similarity_window, user_id=user_id) if user_id else []
+        if not global_records and not user_records:
+            return {}
+
+        global_stats = self._compute_bandit_stats(global_records)
+        if not user_records:
+            return global_stats
+
+        user_stats = self._compute_bandit_stats(user_records)
+        mix = max(0.0, min(1.0, self.config.user_bias_mix))
+        out: dict[str, dict[str, float]] = {}
+        all_branches = set(global_stats) | set(user_stats)
+        for branch_name in all_branches:
+            gs = global_stats.get(branch_name, {"mean_reward": 0.5, "count": 0.0})
+            us = user_stats.get(branch_name, {"mean_reward": 0.5, "count": 0.0})
+            mean_reward = ((1.0 - mix) * gs["mean_reward"]) + (mix * us["mean_reward"])
+            count = ((1.0 - mix) * gs["count"]) + (mix * us["count"])
+            if count <= 0.0:
+                continue
+            out[branch_name] = {"mean_reward": mean_reward, "count": count}
+        return out
+
+    def _compute_bandit_stats(self, records: list[MemoryRecord]) -> dict[str, dict[str, float]]:
         if not records:
             return {}
 
@@ -150,10 +194,7 @@ class MemoryStore:
             count = weight_sum[branch_name]
             if count <= 0.0:
                 continue
-            out[branch_name] = {
-                "mean_reward": total / count,
-                "count": count,
-            }
+            out[branch_name] = {"mean_reward": total / count, "count": count}
         return out
 
     def useful_patterns(self, task_type: str) -> list[str]:

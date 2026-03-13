@@ -24,11 +24,12 @@ It is **not** an AGI claim.
 For each task:
 1. Root router classifies task type and activates a sequential branch path.
 2. Branches execute one-by-one (hierarchical): macro branch -> niche sub-branch.
-3. Judge scores branch outputs.
-4. Aggregator selects the final output (default: leaf node output).
-5. Evaluator Agent (Agent 1) emits structured reward and failure signals.
-6. Optimizer Agent (Agent 2) performs constrained local updates to active path branches only.
-7. Memory records trajectories and biases future routing.
+3. Final Composer fuses branch features into the final leaf output (feature-level prompt augmentation).
+4. Judge scores branch outputs.
+5. Aggregator selects the final output (default: leaf node output).
+6. Evaluator Agent (Agent 1) emits structured reward and failure signals.
+7. Optimizer Agent (Agent 2) performs constrained local updates to active path branches only.
+8. Memory records trajectories and biases future routing.
 
 ## Architecture
 
@@ -85,6 +86,12 @@ Not allowed:
 - Global architecture rewrite
 - Unlimited branch creation
 - Global uncontrolled prompt mutation
+
+### Router policy modes
+
+- Default routing uses weight + affinity + conservative memory terms.
+- Contextual bandit terms (`bandit_value_coef`, `bandit_bonus_coef`) are available and can be enabled for stronger exploration/exploitation routing.
+- Validation reports include explicit relative-gain gates vs frozen baseline, including a `20%` target flag.
 
 ## Candidate branch lifecycle
 

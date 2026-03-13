@@ -36,6 +36,8 @@ class AutoImprover:
 
         self.search_space: dict[str, tuple[float, float]] = {
             "router.memory_coef": (0.1, 0.3),
+            "router.bandit_value_coef": (0.05, 0.35),
+            "router.bandit_bonus_coef": (0.02, 0.12),
             "router.exploration": (0.08, 0.18),
             "router.exploration_decay": (0.994, 0.999),
             "memory.bias_scale": (0.2, 0.6),

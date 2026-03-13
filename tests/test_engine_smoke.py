@@ -17,3 +17,5 @@ def test_engine_runs_single_task(tmp_path):
     assert result["routing"]["activated_branches"]
     assert 0.0 <= result["evaluation_signal"]["reward_score"] <= 1.0
     assert result["evaluation_signal"]["selected_branch"] in result["routing"]["activated_branches"]
+    assert "composer-fusion" in result["evaluation_signal"]["selected_output"]
+    assert result["composer"].get("composer_enabled") is True

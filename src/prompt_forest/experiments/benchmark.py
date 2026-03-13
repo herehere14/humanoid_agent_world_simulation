@@ -39,11 +39,26 @@ class BenchmarkRunner:
                     "adaptive": adaptive_train.to_dict(),
                     "frozen": frozen_train.to_dict(),
                     "average_reward_gain": round(adaptive_train.average_reward - frozen_train.average_reward, 4),
+                    "relative_gain": round(
+                        (adaptive_train.average_reward - frozen_train.average_reward)
+                        / max(1e-8, abs(frozen_train.average_reward)),
+                        4,
+                    ),
                 },
                 "holdout": {
                     "adaptive_average_reward": adaptive_holdout.average_reward,
                     "frozen_average_reward": frozen_holdout.average_reward,
                     "average_reward_gain": round(adaptive_holdout.average_reward - frozen_holdout.average_reward, 4),
+                    "relative_gain": round(
+                        (adaptive_holdout.average_reward - frozen_holdout.average_reward)
+                        / max(1e-8, abs(frozen_holdout.average_reward)),
+                        4,
+                    ),
+                    "target_relative_gain": 0.2,
+                    "passes_target_relative_gain": (
+                        ((adaptive_holdout.average_reward - frozen_holdout.average_reward) / max(1e-8, abs(frozen_holdout.average_reward)))
+                        >= 0.2
+                    ),
                 },
                 "evaluation_design": {
                     "train": "non-stationary stream with task-type drift by phase",

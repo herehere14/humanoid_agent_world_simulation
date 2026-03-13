@@ -7,6 +7,10 @@
     "affinity_coef": 0.6,
     "memory_coef": 0.221801,
     "memory_term_cap": 0.15,
+    "bandit_value_coef": 0.0,
+    "bandit_bonus_coef": 0.0,
+    "bandit_bonus_cap": 0.12,
+    "bandit_shrinkage_k": 12.0,
     "exploration_min": 0.03,
     "exploration_decay": 0.994593
   },
@@ -38,6 +42,7 @@
     "update_acceptance_min_gain": 0.002,
     "candidate_parent_win_rate_threshold": 0.55,
     "candidate_parent_min_comparisons": 3,
+    "candidate_parent_min_reward_gap": 0.0,
     "branch_advantage_mix": 0.1,
     "branch_baseline_beta": 0.05,
     "llm_variance_sensitivity": 8.0,
@@ -63,6 +68,12 @@
   "evaluator": {
     "aggregation_strategy": "leaf_select",
     "reward_mode": "hybrid"
+  },
+  "composer": {
+    "enabled": true,
+    "min_branches_for_compose": 2,
+    "max_feature_items": 14,
+    "force_required_substrings": false
   },
   "agent_runtimes": {
     "evaluator": {

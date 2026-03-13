@@ -53,6 +53,7 @@ class OptimizerConfig:
     update_acceptance_min_gain: float = 0.002
     candidate_parent_win_rate_threshold: float = 0.55
     candidate_parent_min_comparisons: int = 3
+    candidate_parent_min_reward_gap: float = 0.0
     branch_advantage_mix: float = 0.1
     branch_baseline_beta: float = 0.05
     llm_variance_sensitivity: float = 8.0
@@ -76,7 +77,7 @@ class FeedbackConfig:
     verifier_weight: float = 0.25
     task_rules_weight: float = 0.15
     llm_judge_weight: float = 0.1
-    correction_anchor_weight: float = 0.7
+    correction_anchor_weight: float = 0.82
     preference_penalty_cap: float = 0.25
 
 
@@ -84,6 +85,14 @@ class FeedbackConfig:
 class EvaluatorConfig:
     aggregation_strategy: str = "leaf_select"
     reward_mode: str = "hybrid"
+
+
+@dataclass
+class ComposerConfig:
+    enabled: bool = True
+    min_branches_for_compose: int = 2
+    max_feature_items: int = 14
+    force_required_substrings: bool = False
 
 
 @dataclass
@@ -112,6 +121,7 @@ class EngineConfig:
     memory: MemoryConfig = field(default_factory=MemoryConfig)
     feedback: FeedbackConfig = field(default_factory=FeedbackConfig)
     evaluator: EvaluatorConfig = field(default_factory=EvaluatorConfig)
+    composer: ComposerConfig = field(default_factory=ComposerConfig)
     agent_runtimes: AgentRuntimesConfig = field(default_factory=AgentRuntimesConfig)
     artifacts_dir: str = "artifacts"
 

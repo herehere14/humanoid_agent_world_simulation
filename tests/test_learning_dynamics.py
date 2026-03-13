@@ -26,3 +26,15 @@ def test_full_policy_gain_is_stable_across_seeds():
 
     assert win_rate >= 0.75
     assert pstdev(full_gains) < 0.08
+
+
+def test_validation_report_exposes_relative_gain_target_gate():
+    root = Path(__file__).resolve().parents[1]
+    validator = RLLearningValidator(root)
+    report = validator.run(seeds=[3, 5], episodes_per_seed=80)
+
+    agg = report["aggregate"]
+    assert "full_over_frozen_relative_gain" in agg
+    assert "target_relative_gain" in agg
+    assert "passes_target_relative_gain" in agg
+    assert agg["target_relative_gain"] == 0.2

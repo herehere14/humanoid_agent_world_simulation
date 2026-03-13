@@ -21,6 +21,7 @@ from ..rewards.modes import KeywordReward, RuleBasedReward, TaskSpecificReward
 from ..router.hierarchical_router import HierarchicalRouter
 from ..types import MemoryRecord, RoutingDecision, TaskInput
 from ..utils.io import append_jsonl, ensure_parent
+from .composer import FinalComposer
 from .executor import PromptExecutor
 
 
@@ -42,6 +43,7 @@ class PromptForestEngine:
 
         self.backend = backend or MockLLMBackend()
         self.executor = PromptExecutor(self.backend)
+        self.composer = FinalComposer(self.backend, self.config.composer)
 
         self.memory = MemoryStore(self.config.memory, memory_path=self.artifacts_dir / "memory_records.jsonl")
         self.router = HierarchicalRouter(self.config.router)
@@ -84,6 +86,13 @@ class PromptForestEngine:
         self._route_history.append(route)
 
         outputs = self._run_path(route, task)
+        composer_notes: dict[str, Any] = {}
+        composed = self.composer.compose(task=task, route=route, outputs=outputs)
+        if composed is not None and route.activated_branches:
+            leaf = route.activated_branches[-1]
+            outputs[leaf] = composed.output
+            composer_notes = composed.notes
+
         branch_scores = self.judge.score_all(outputs, task)
         numeric_scores = {k: v.reward for k, v in branch_scores.items()}
 
@@ -95,6 +104,8 @@ class PromptForestEngine:
             aggregation,
             branch_outputs={k: v.output for k, v in outputs.items()},
         )
+        if composer_notes:
+            signal.aggregator_notes["composer"] = composer_notes
         self._propagate_rewards_along_path(route, signal, gamma=0.9, local_mix=0.55)
         reward_components = self._compute_reward_components(task, signal.selected_output, signal.reward_score)
 
@@ -161,6 +172,7 @@ class PromptForestEngine:
                 "evaluator_provider": self.config.agent_runtimes.evaluator.provider,
                 "optimizer_provider": self.config.agent_runtimes.optimizer.provider,
             },
+            "composer": composer_notes,
             "branch_weights": {name: round(branch.state.weight, 4) for name, branch in self.branches.items()},
         }
         append_jsonl(self._event_log, payload)
@@ -386,20 +398,26 @@ class PromptForestEngine:
 
         user_feedback = float(record.feedback_score if record.feedback_score is not None else 0.5)
         user_feedback = max(0.0, min(1.0, user_feedback))
+        blended = (
+            self.config.feedback.user_feedback_weight * user_feedback
+            + self.config.feedback.verifier_weight * verifier_score
+            + self.config.feedback.task_rules_weight * task_rules_score
+            + self.config.feedback.llm_judge_weight * llm_judge_score
+        )
 
-        if record.corrected_answer and record.accepted is False:
-            user_feedback = min(user_feedback, 0.2)
-            blended = (
-                self.config.feedback.correction_anchor_weight * user_feedback
-                + (1.0 - self.config.feedback.correction_anchor_weight) * (0.6 * verifier_score + 0.4 * llm_judge_score)
-            )
-        else:
-            blended = (
-                self.config.feedback.user_feedback_weight * user_feedback
-                + self.config.feedback.verifier_weight * verifier_score
-                + self.config.feedback.task_rules_weight * task_rules_score
-                + self.config.feedback.llm_judge_weight * llm_judge_score
-            )
+        correction_alignment = 0.0
+        correction_signal = user_feedback
+        if record.corrected_answer:
+            correction_alignment = self._correction_alignment(output, record.corrected_answer)
+            if record.accepted is False:
+                correction_signal = max(0.0, min(1.0, min(user_feedback, correction_alignment)))
+            elif record.accepted is True:
+                correction_signal = max(user_feedback, correction_alignment)
+            else:
+                correction_signal = 0.5 * (user_feedback + correction_alignment)
+
+            anchor = max(0.75, min(0.95, self.config.feedback.correction_anchor_weight))
+            blended = (anchor * correction_signal) + ((1.0 - anchor) * blended)
 
         pref_penalty = self._preference_penalty(output, profile)
         blended = max(0.0, min(1.0, blended - pref_penalty))
@@ -408,10 +426,21 @@ class PromptForestEngine:
             "verifier": round(verifier_score, 4),
             "task_rules": round(task_rules_score, 4),
             "llm_judge": round(llm_judge_score, 4),
+            "correction_alignment": round(correction_alignment, 4),
+            "correction_signal": round(correction_signal, 4),
             "preference_penalty": round(pref_penalty, 4),
             "blended_reward": round(blended, 4),
         }
         return blended, components
+
+    @staticmethod
+    def _correction_alignment(output: str, corrected_answer: str) -> float:
+        out_tokens = {tok for tok in output.lower().split() if tok}
+        corr_tokens = {tok for tok in corrected_answer.lower().split() if tok}
+        if not corr_tokens:
+            return 0.0
+        overlap = len(out_tokens & corr_tokens)
+        return overlap / len(corr_tokens)
 
     def _preference_penalty(self, output: str, profile: dict[str, Any]) -> float:
         if not profile:

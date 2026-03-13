@@ -210,6 +210,7 @@ class DetailedHierarchicalValidator:
         cfg.optimizer.update_acceptance_min_gain = -1.0
         cfg.optimizer.candidate_failure_trigger = 999
         cfg.optimizer.max_active_candidates = 0
+        cfg.composer.enabled = False
 
         mode = "adaptive" if adaptive else "frozen"
         task_key = tasks[0].task_type if tasks else "unknown"
@@ -321,6 +322,7 @@ class DetailedHierarchicalValidator:
             cfg.optimizer.max_active_candidates = 6
             cfg.optimizer.max_active_branches = 40
             cfg.memory.bias_scale = 0.5
+            cfg.composer.enabled = False
 
             run_dir = self.root_dir / "artifacts" / "growth_probe_runs" / f"seed_{seed}"
             if run_dir.exists():

@@ -82,6 +82,7 @@ class HierarchicalRouter:
                 history_bias=history_bias,
                 bandit_stats=bandit_stats,
                 bandit_total_count=bandit_total_count,
+                exploration_rate=exploration_rate,
             )
             if not scores:
                 break
@@ -103,6 +104,7 @@ class HierarchicalRouter:
         history_bias: dict[str, float],
         bandit_stats: dict[str, dict[str, float]],
         bandit_total_count: float,
+        exploration_rate: float,
     ) -> dict[str, float]:
         out: dict[str, float] = {}
 
@@ -129,7 +131,8 @@ class HierarchicalRouter:
 
             bonus_term = 0.0
             if self.config.bandit_bonus_coef > 0.0 and bandit_total_count > 0.0:
-                bonus_term = self.config.bandit_bonus_coef * math.sqrt(
+                dynamic_bonus = self.config.bandit_bonus_coef * (0.7 + exploration_rate)
+                bonus_term = dynamic_bonus * math.sqrt(
                     math.log1p(bandit_total_count) / (1.0 + count)
                 )
                 bonus_term = min(self.config.bandit_bonus_cap, bonus_term)

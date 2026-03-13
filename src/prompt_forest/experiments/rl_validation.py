@@ -139,6 +139,10 @@ class RLLearningValidator:
             trial.policy_metrics["full"].avg_holdout_reward - trial.policy_metrics["memory_only"].avg_holdout_reward
             for trial in all_results
         ]
+        frozen_holdout = policy_aggregate["frozen"]["mean_holdout_reward"]
+        full_holdout = policy_aggregate["full"]["mean_holdout_reward"]
+        full_over_frozen_relative_gain = (full_holdout - frozen_holdout) / max(1e-8, abs(frozen_holdout))
+        target_relative_gain = 0.2
 
         report = {
             "seeds": seeds,
@@ -162,6 +166,9 @@ class RLLearningValidator:
                 "full_over_memory_only_holdout_win_rate": round(
                     sum(1 for g in full_minus_memory if g > 0) / max(1, len(full_minus_memory)), 4
                 ),
+                "full_over_frozen_relative_gain": round(full_over_frozen_relative_gain, 4),
+                "target_relative_gain": target_relative_gain,
+                "passes_target_relative_gain": full_over_frozen_relative_gain >= target_relative_gain,
             },
             "per_trial": [
                 {
@@ -186,6 +193,14 @@ class RLLearningValidator:
                             ),
                             "holdout_reward_gain": round(
                                 trial.policy_metrics[policy].avg_holdout_reward - trial.policy_metrics["frozen"].avg_holdout_reward,
+                                4,
+                            ),
+                            "holdout_relative_gain": round(
+                                (
+                                    trial.policy_metrics[policy].avg_holdout_reward
+                                    - trial.policy_metrics["frozen"].avg_holdout_reward
+                                )
+                                / max(1e-8, abs(trial.policy_metrics["frozen"].avg_holdout_reward)),
                                 4,
                             ),
                         }
@@ -396,6 +411,7 @@ class RLLearningValidator:
         cfg.router.bandit_bonus_coef = 0.0
         cfg.router.bandit_bonus_cap = 0.12
         cfg.router.bandit_shrinkage_k = 12.0
+        cfg.composer.enabled = False
 
         cfg.optimizer.learning_rate = 0.1
         cfg.optimizer.weight_decay = 0.03
@@ -447,6 +463,8 @@ class RLLearningValidator:
         if policy == "frozen":
             cfg.router.exploration = 0.02
             cfg.router.memory_coef = 0.0
+            cfg.router.bandit_value_coef = 0.0
+            cfg.router.bandit_bonus_coef = 0.0
             cfg.memory.bias_scale = 0.2
             if config_patch:
                 self._apply_config_patch(cfg, config_patch)
@@ -455,6 +473,8 @@ class RLLearningValidator:
         if policy == "memory_only":
             cfg.router.exploration = 0.08
             cfg.router.memory_coef = 0.3
+            cfg.router.bandit_value_coef = 0.0
+            cfg.router.bandit_bonus_coef = 0.0
             cfg.memory.bias_scale = 0.5
             if config_patch:
                 self._apply_config_patch(cfg, config_patch)
@@ -463,6 +483,8 @@ class RLLearningValidator:
         if policy == "weight_only":
             cfg.router.exploration = 0.12
             cfg.router.memory_coef = 0.0
+            cfg.router.bandit_value_coef = 0.0
+            cfg.router.bandit_bonus_coef = 0.0
             cfg.memory.bias_scale = 0.2
             if config_patch:
                 self._apply_config_patch(cfg, config_patch)
@@ -473,6 +495,8 @@ class RLLearningValidator:
             cfg.router.exploration_min = 0.12
             cfg.router.exploration_decay = 0.998
             cfg.router.memory_coef = 0.0
+            cfg.router.bandit_value_coef = 0.0
+            cfg.router.bandit_bonus_coef = 0.0
             cfg.memory.bias_scale = 0.2
             if config_patch:
                 self._apply_config_patch(cfg, config_patch)
