@@ -285,6 +285,20 @@ or via CLI:
 prompt-forest rl-validate --episodes 240 --seeds 11,17,19,23,29,31,37,41,43,47
 ```
 
+### 6b) Hard-slice validation (verifier-grounded)
+
+```bash
+PYTHONPATH=src python -m prompt_forest.cli hard-validate --episodes 220 --seeds 11,17,19,23,29,31,37,41
+```
+
+Optional simulated correction signal:
+
+```bash
+PYTHONPATH=src python -m prompt_forest.cli hard-validate --episodes 220 --oracle-feedback
+```
+
+Hard-slice tasks include strict `verifier_spec` metadata and use reward mode `hybrid_verifier`, which adds external verifier checks (`must_include`, `must_exclude`, regex constraints, confidence range, length floor) on top of keyword/rule/task rewards.
+
 ### 7) Detailed hierarchical validation (learning + ablations)
 
 ```bash

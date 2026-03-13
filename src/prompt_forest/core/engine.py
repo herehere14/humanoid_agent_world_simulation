@@ -18,6 +18,7 @@ from ..config import EngineConfig, load_config
 from ..evaluator.judge import OutputJudge
 from ..memory.store import MemoryStore
 from ..rewards.modes import KeywordReward, RuleBasedReward, TaskSpecificReward
+from ..rewards.verifiers import ExternalVerifierReward
 from ..router.hierarchical_router import HierarchicalRouter
 from ..types import MemoryRecord, RoutingDecision, TaskInput
 from ..utils.io import append_jsonl, ensure_parent
@@ -369,12 +370,16 @@ class PromptForestEngine:
         return self.run_task(text=task_text, task_type=task_type, metadata=metadata)
 
     def _compute_reward_components(self, task: TaskInput, output: str, llm_judge_score: float) -> dict[str, float]:
-        verifier_score, _ = RuleBasedReward(weight=1.0).score(output, task)
+        rule_verifier_score, _ = RuleBasedReward(weight=1.0).score(output, task)
+        external_verifier_score, _ = ExternalVerifierReward(weight=1.0).score(output, task)
+        verifier_score = 0.5 * (rule_verifier_score + external_verifier_score)
         keyword_score, _ = KeywordReward(weight=1.0).score(output, task)
         task_specific_score, _ = TaskSpecificReward(weight=1.0).score(output, task)
         task_rules = 0.5 * (keyword_score + task_specific_score)
         return {
             "verifier": round(verifier_score, 4),
+            "rule_verifier": round(rule_verifier_score, 4),
+            "external_verifier": round(external_verifier_score, 4),
             "task_rules": round(task_rules, 4),
             "llm_judge": round(max(0.0, min(1.0, llm_judge_score)), 4),
         }
@@ -390,7 +395,9 @@ class PromptForestEngine:
             metadata=metadata,
         )
         output = record.selected_output
-        verifier_score, _ = RuleBasedReward(weight=1.0).score(output, task)
+        rule_verifier_score, _ = RuleBasedReward(weight=1.0).score(output, task)
+        external_verifier_score, _ = ExternalVerifierReward(weight=1.0).score(output, task)
+        verifier_score = 0.5 * (rule_verifier_score + external_verifier_score)
         keyword_score, _ = KeywordReward(weight=1.0).score(output, task)
         task_specific_score, _ = TaskSpecificReward(weight=1.0).score(output, task)
         task_rules_score = 0.5 * (keyword_score + task_specific_score)
@@ -424,6 +431,8 @@ class PromptForestEngine:
         components = {
             "user_feedback": round(user_feedback, 4),
             "verifier": round(verifier_score, 4),
+            "rule_verifier": round(rule_verifier_score, 4),
+            "external_verifier": round(external_verifier_score, 4),
             "task_rules": round(task_rules_score, 4),
             "llm_judge": round(llm_judge_score, 4),
             "correction_alignment": round(correction_alignment, 4),

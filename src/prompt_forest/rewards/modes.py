@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from ..types import TaskInput
+from .verifiers import ExternalVerifierReward
 
 
 def _norm(text: str) -> str:
@@ -88,15 +89,21 @@ class HybridReward:
     keyword: KeywordReward
     rule: RuleBasedReward
     task_specific: TaskSpecificReward
+    external: ExternalVerifierReward | None = None
 
     def score(self, output: str, task: TaskInput) -> tuple[float, str]:
         s1, r1 = self.exact.score(output, task)
         s2, r2 = self.keyword.score(output, task)
         s3, r3 = self.rule.score(output, task)
         s4, r4 = self.task_specific.score(output, task)
+        s5, r5 = (0.0, "no_external_verifier")
+        if self.external and self.external.weight > 0:
+            s5, r5 = self.external.score(output, task)
 
         total_weight = self.exact.weight + self.keyword.weight + self.rule.weight + self.task_specific.weight
-        score = (s1 + s2 + s3 + s4) / max(1e-8, total_weight)
+        if self.external:
+            total_weight += self.external.weight
+        score = (s1 + s2 + s3 + s4 + s5) / max(1e-8, total_weight)
         score -= self._shallow_keyword_penalty(output, task, s1=s1, s2=s2, s3=s3)
         pref_penalty, pref_reason = self._preference_penalty(output, task)
         score -= pref_penalty
@@ -109,7 +116,7 @@ class HybridReward:
         else:
             top_reason = "low_quality"
 
-        reason = f"{top_reason}|{r1}|{r2}|{r3}|{r4}|{pref_reason}"
+        reason = f"{top_reason}|{r1}|{r2}|{r3}|{r4}|{r5}|{pref_reason}"
         return score, reason
 
     def _shallow_keyword_penalty(self, output: str, task: TaskInput, s1: float, s2: float, s3: float) -> float:

@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from ..rewards.modes import ExactMatchReward, HybridReward, KeywordReward, RuleBasedReward, TaskSpecificReward
+from ..rewards.verifiers import ExternalVerifierReward
 from ..types import BranchOutput, TaskInput
 
 
@@ -24,11 +25,20 @@ class OutputJudge:
             return RuleBasedReward(weight=1.0)
         if reward_mode == "keyword":
             return KeywordReward(weight=1.0)
+        if reward_mode == "hybrid_verifier":
+            return HybridReward(
+                exact=ExactMatchReward(weight=0.15),
+                keyword=KeywordReward(weight=0.2),
+                rule=RuleBasedReward(weight=0.15),
+                task_specific=TaskSpecificReward(weight=0.15),
+                external=ExternalVerifierReward(weight=0.35),
+            )
         return HybridReward(
             exact=ExactMatchReward(weight=0.25),
             keyword=KeywordReward(weight=0.35),
             rule=RuleBasedReward(weight=0.2),
             task_specific=TaskSpecificReward(weight=0.2),
+            external=ExternalVerifierReward(weight=0.0),
         )
 
     def score_output(self, output: str, task: TaskInput) -> BranchScore:

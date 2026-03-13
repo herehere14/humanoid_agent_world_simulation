@@ -11,6 +11,7 @@ from .experiments.auto_improve import AutoImprover
 from .experiments.benchmark import BenchmarkRunner
 from .experiments.continuous_runner import ContinuousImprover
 from .experiments.detailed_validation import DetailedHierarchicalValidator
+from .experiments.hard_slice_validation import HardSliceValidator
 from .experiments.rl_validation import RLLearningValidator
 from .observability.trace import format_turn_trace
 from .utils.io import read_json, read_jsonl
@@ -60,6 +61,11 @@ def build_parser() -> argparse.ArgumentParser:
     detail_cmd = sub.add_parser("detailed-validate", help="Run detailed hierarchical learning + ablation validation")
     detail_cmd.add_argument("--episodes", type=int, default=240)
     detail_cmd.add_argument("--seeds", type=str, default="11,17,19,23,29")
+
+    hard_cmd = sub.add_parser("hard-validate", help="Run hard-slice verifier-grounded adaptive validation")
+    hard_cmd.add_argument("--episodes", type=int, default=220)
+    hard_cmd.add_argument("--seeds", type=str, default="11,17,19,23,29,31,37,41")
+    hard_cmd.add_argument("--oracle-feedback", action="store_true", help="Simulate oracle correction feedback during full-policy training")
 
     improve_cmd = sub.add_parser("auto-improve", help="Run multi-round config tuning with anti-bias objective")
     improve_cmd.add_argument("--rounds", type=int, default=3)
@@ -223,6 +229,17 @@ def main() -> None:
         seeds = [int(x.strip()) for x in args.seeds.split(",") if x.strip()]
         validator = DetailedHierarchicalValidator(Path.cwd())
         report = validator.run(seeds=seeds, episodes_per_seed=args.episodes)
+        print(json.dumps(report, indent=2))
+        return
+
+    if args.command == "hard-validate":
+        seeds = [int(x.strip()) for x in args.seeds.split(",") if x.strip()]
+        validator = HardSliceValidator(Path.cwd())
+        report = validator.run(
+            seeds=seeds,
+            episodes_per_seed=args.episodes,
+            simulate_oracle_feedback=args.oracle_feedback,
+        )
         print(json.dumps(report, indent=2))
         return
 
