@@ -1,0 +1,314 @@
+{
+  "seeds": [
+    11,
+    17,
+    19,
+    23,
+    29,
+    31,
+    37,
+    41
+  ],
+  "aggregate": {
+    "full": {
+      "avg_reward": 0.4857,
+      "contract_pass_rate": 1.0
+    },
+    "frozen": {
+      "avg_reward": 0.4643,
+      "contract_pass_rate": 1.0
+    },
+    "memory_only": {
+      "avg_reward": 0.4636,
+      "contract_pass_rate": 1.0
+    }
+  },
+  "gains": {
+    "full_minus_frozen_reward": 0.0214,
+    "full_minus_frozen_contract_pass": 0.0,
+    "full_minus_memory_reward": 0.0221,
+    "full_minus_memory_contract_pass": 0.0
+  },
+  "per_seed": [
+    {
+      "seed": 11,
+      "policies": {
+        "full": {
+          "avg_reward": 0.4967,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "frozen": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "memory_only": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        }
+      }
+    },
+    {
+      "seed": 17,
+      "policies": {
+        "full": {
+          "avg_reward": 0.5,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "frozen": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "memory_only": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        }
+      }
+    },
+    {
+      "seed": 19,
+      "policies": {
+        "full": {
+          "avg_reward": 0.4967,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "frozen": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "memory_only": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        }
+      }
+    },
+    {
+      "seed": 23,
+      "policies": {
+        "full": {
+          "avg_reward": 0.5,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "frozen": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "memory_only": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        }
+      }
+    },
+    {
+      "seed": 29,
+      "policies": {
+        "full": {
+          "avg_reward": 0.4967,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "frozen": {
+          "avg_reward": 0.4673,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "memory_only": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        }
+      }
+    },
+    {
+      "seed": 31,
+      "policies": {
+        "full": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "frozen": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "memory_only": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        }
+      }
+    },
+    {
+      "seed": 37,
+      "policies": {
+        "full": {
+          "avg_reward": 0.4656,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "frozen": {
+          "avg_reward": 0.4676,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "memory_only": {
+          "avg_reward": 0.4656,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policies": {
+        "full": {
+          "avg_reward": 0.4667,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "frozen": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        },
+        "memory_only": {
+          "avg_reward": 0.4633,
+          "contract_pass_rate": 1.0,
+          "by_contract": {
+            "json_lock": 1.0,
+            "csv_lock": 1.0,
+            "code_patch_lock": 1.0,
+            "bullet_lock": 1.0
+          }
+        }
+      }
+    }
+  ]
+}

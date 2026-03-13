@@ -197,6 +197,8 @@ class DetailedHierarchicalValidator:
 
     def _run_policy(self, tasks: list[TaskInput], seed: int, adaptive: bool, ablation: str) -> PolicyMetrics:
         cfg = load_config(self.config_path)
+        cfg.agent_runtimes.evaluator.enabled = False
+        cfg.agent_runtimes.optimizer.enabled = False
         cfg.router.top_k = 1
         cfg.router.min_candidates = 1
         cfg.router.exploration = 0.12 if adaptive else 0.02

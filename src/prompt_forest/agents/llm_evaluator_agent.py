@@ -82,6 +82,8 @@ class LLMEvaluatorAgent:
         try:
             raw = self.runtime.generate_json(system_prompt, payload)
             llm_signal = self._to_signal(raw, base, route, aggregation)
+            if self.runtime.config.proposal_only:
+                return self._proposal_only_signal(base, llm_signal, route)
             return self._stabilize_signal(base, llm_signal, route, aggregation)
         except Exception as exc:  # pragma: no cover - runtime path depends on external APIs
             base.aggregator_notes = dict(base.aggregator_notes or {})
@@ -229,6 +231,48 @@ class LLMEvaluatorAgent:
             failure_reason=final_failure_reason,
             suggested_improvement_direction=final_improvement,
             branch_feedback=feedback,
+            aggregator_notes=notes,
+        )
+
+    def _proposal_only_signal(
+        self,
+        base: EvaluationSignal,
+        llm_signal: EvaluationSignal,
+        route: RoutingDecision,
+    ) -> EvaluationSignal:
+        feedback: dict[str, BranchFeedback] = {}
+        for branch_name in route.activated_branches:
+            base_fb = base.branch_feedback.get(branch_name)
+            llm_fb = llm_signal.branch_feedback.get(branch_name)
+            if base_fb is None:
+                continue
+
+            use_llm_text = bool(llm_fb and llm_fb.confidence >= self._override_conf_threshold)
+            feedback[branch_name] = BranchFeedback(
+                branch_name=branch_name,
+                reward=base_fb.reward,
+                confidence=base_fb.confidence,
+                failure_reason=(llm_fb.failure_reason if use_llm_text else base_fb.failure_reason) if llm_fb else base_fb.failure_reason,
+                suggested_improvement_direction=(
+                    llm_fb.suggested_improvement_direction if use_llm_text else base_fb.suggested_improvement_direction
+                )
+                if llm_fb
+                else base_fb.suggested_improvement_direction,
+            )
+
+        notes = dict(base.aggregator_notes or {})
+        notes["evaluator_runtime"] = "llm_proposal_only"
+        notes["evaluator_selected_branch_llm"] = llm_signal.selected_branch
+        notes["evaluator_reward_llm"] = round(llm_signal.reward_score, 4)
+
+        return EvaluationSignal(
+            reward_score=base.reward_score,
+            confidence=base.confidence,
+            selected_branch=base.selected_branch,
+            selected_output=base.selected_output,
+            failure_reason=base.failure_reason,
+            suggested_improvement_direction=base.suggested_improvement_direction,
+            branch_feedback=feedback or base.branch_feedback,
             aggregator_notes=notes,
         )
 

@@ -235,6 +235,8 @@ class HardSliceValidator:
             branch.state.weight = min(branch.state.weight, 0.55)
 
     def _configure_policy(self, cfg: EngineConfig, policy: str) -> None:
+        cfg.agent_runtimes.evaluator.enabled = False
+        cfg.agent_runtimes.optimizer.enabled = False
         cfg.evaluator.reward_mode = "hybrid_verifier"
         cfg.composer.enabled = False
         cfg.router.top_k = 1

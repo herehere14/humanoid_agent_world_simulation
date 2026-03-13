@@ -79,6 +79,8 @@ class RLLearningValidator:
         episodes_per_seed: int = 240,
         policies: list[str] | None = None,
         config_patch: dict[str, float] | None = None,
+        start_mode: str = "anti_prior",
+        simulate_oracle_feedback: bool = False,
     ) -> dict:
         seeds = seeds or [11, 17, 19, 23, 29, 31, 37, 41, 43, 47]
         policies = policies or ["full", "frozen", "memory_only", "weight_only", "exploration_only"]
@@ -96,6 +98,8 @@ class RLLearningValidator:
                     seed=seed,
                     policy=policy,
                     config_patch=config_patch,
+                    start_mode=start_mode,
+                    simulate_oracle_feedback=simulate_oracle_feedback,
                 )
             all_results.append(TrialResult(seed=seed, policy_metrics=policy_metrics))
 
@@ -151,6 +155,8 @@ class RLLearningValidator:
             "evaluation_design": {
                 "train_stream": "mixed non-stationary distribution with phase drift",
                 "holdout_stream": "unseen prompts/keywords; no adaptation during holdout scoring",
+                "start_mode": start_mode,
+                "simulate_oracle_feedback": simulate_oracle_feedback,
             },
             "aggregate": {
                 "policy_metrics": policy_aggregate,
@@ -323,6 +329,8 @@ class RLLearningValidator:
         seed: int,
         policy: str,
         config_patch: dict[str, float] | None = None,
+        start_mode: str = "anti_prior",
+        simulate_oracle_feedback: bool = False,
     ) -> PolicyRunMetrics:
         cfg = load_config(self.config_path)
         self._configure_for_validation(cfg, policy, config_patch=config_patch)
@@ -334,6 +342,8 @@ class RLLearningValidator:
 
         backend = DomainShiftBackend(shifted_quality_matrix(), noise=0.03, seed=seed)
         engine = PromptForestEngine(config=cfg, backend=backend)
+        if start_mode == "anti_prior":
+            self._initialize_anti_prior_weights(engine)
 
         adapt_train, memory_train = self._policy_flags(policy)
 
@@ -353,7 +363,21 @@ class RLLearningValidator:
             train_rewards.append(result["evaluation_signal"]["reward_score"])
             train_task_types.append(task.task_type)
             selected_train.append(result["evaluation_signal"]["selected_branch"])
-            optimal_train.append(backend.best_branch(task.task_type, candidates=self._active_terminal_nodes(engine)))
+            optimal = self._best_branch_for_task(backend, task, engine)
+            optimal_train.append(optimal)
+            if simulate_oracle_feedback and policy == "full":
+                accepted = result["evaluation_signal"]["selected_branch"] == optimal
+                corrected_answer = ""
+                if not accepted:
+                    corrected_answer, _ = backend.generate("oracle_feedback", task, optimal)
+                engine.apply_feedback(
+                    task_id=result["task"]["task_id"],
+                    score=1.0 if accepted else 0.0,
+                    accepted=accepted,
+                    corrected_answer=corrected_answer,
+                    feedback_text="oracle_feedback",
+                    user_id=str(task.metadata.get("user_id", "global")),
+                )
 
         holdout_rewards: list[float] = []
         holdout_task_types: list[str] = []
@@ -373,7 +397,7 @@ class RLLearningValidator:
             holdout_task_types.append(task.task_type)
             holdout_user_ids.append(str(task.metadata.get("user_id", "global")))
             selected_holdout.append(result["evaluation_signal"]["selected_branch"])
-            optimal_holdout.append(backend.best_branch(task.task_type, candidates=self._active_terminal_nodes(engine)))
+            optimal_holdout.append(self._best_branch_for_task(backend, task, engine))
 
         return PolicyRunMetrics(
             train_rewards=train_rewards,
@@ -387,16 +411,46 @@ class RLLearningValidator:
             optimal_holdout=optimal_holdout,
         )
 
+    def _best_branch_for_task(self, backend: DomainShiftBackend, task: TaskInput, engine: PromptForestEngine) -> str:
+        terminals = self._active_terminal_nodes(engine)
+        if hasattr(backend, "best_branch_for_task"):
+            return backend.best_branch_for_task(task, candidates=terminals)
+        return backend.best_branch(task.task_type, candidates=terminals)
+
+    @staticmethod
+    def _initialize_anti_prior_weights(engine: PromptForestEngine) -> None:
+        # Strongly misaligned initialization to evaluate whether adaptation can recover.
+        macro_targets = {
+            "analytical": 1.9,
+            "verification": 1.8,
+            "planner": 0.35,
+            "retrieval": 0.35,
+            "critique": 0.35,
+            "creative": 0.3,
+        }
+        for name, weight in macro_targets.items():
+            branch = engine.branches.get(name)
+            if branch is not None:
+                branch.state.weight = weight
+
+        for node_id, branch in engine.branches.items():
+            if node_id in macro_targets:
+                continue
+            branch.state.weight = min(branch.state.weight, 0.38)
+
     def _configure_for_validation(
         self,
         cfg: EngineConfig,
         policy: str,
         config_patch: dict[str, float] | None = None,
     ) -> None:
+        # Validation harness uses deterministic/simulated backends; disable external runtimes to avoid noise.
+        cfg.agent_runtimes.evaluator.enabled = False
+        cfg.agent_runtimes.optimizer.enabled = False
         cfg.router.top_k = 1
         cfg.router.min_candidates = 1
 
-        # Use fixed validation defaults to avoid benchmark drift from config mutations.
+        # Fixed defaults for reproducibility.
         cfg.memory.bias_scale = 0.4
         cfg.memory.bias_cap = 0.15
         cfg.memory.shrinkage_k = 20.0
@@ -411,6 +465,9 @@ class RLLearningValidator:
         cfg.router.bandit_bonus_coef = 0.0
         cfg.router.bandit_bonus_cap = 0.12
         cfg.router.bandit_shrinkage_k = 12.0
+        cfg.router.exploration = 0.22
+        cfg.router.exploration_min = 0.04
+        cfg.router.exploration_decay = 0.9983
         cfg.composer.enabled = False
 
         cfg.optimizer.learning_rate = 0.1
@@ -421,6 +478,8 @@ class RLLearningValidator:
         cfg.optimizer.candidate_trial_episodes = 10
         cfg.optimizer.candidate_failure_trigger = 999
         cfg.optimizer.max_active_candidates = 0
+        cfg.optimizer.max_active_branches = 24
+        cfg.optimizer.candidate_spawn_per_event = 1
         # Keep API-runtime evaluations conservative; LLM noise can otherwise amplify unstable updates.
         llm_runtime_on = cfg.agent_runtimes.evaluator.enabled or cfg.agent_runtimes.optimizer.enabled
         if llm_runtime_on:
@@ -446,16 +505,32 @@ class RLLearningValidator:
                 cfg.optimizer.branch_advantage_mix = 0.1
                 cfg.optimizer.branch_baseline_beta = 0.05
             else:
-                cfg.router.exploration = 0.08
-                cfg.router.exploration_min = 0.03
-                cfg.router.exploration_decay = 0.995
-                cfg.router.memory_coef = 0.12
-                cfg.memory.bias_scale = 0.4
-                cfg.router.bandit_value_coef = 0.0
-                cfg.router.bandit_bonus_coef = 0.0
-                cfg.optimizer.learning_rate = 0.1
+                # High-adaptation regime: full policy can use memory, bandit routing,
+                # candidate growth, and prompt rewrites.
+                cfg.router.exploration = 0.23
+                cfg.router.exploration_min = 0.045
+                cfg.router.exploration_decay = 0.998
+                cfg.router.memory_coef = 0.48
+                cfg.router.bandit_value_coef = 0.68
+                cfg.router.bandit_bonus_coef = 0.23
+                cfg.memory.bias_scale = 1.04
+                cfg.memory.shrinkage_k = 6.0
+                cfg.memory.user_bias_mix = 0.52
+                cfg.composer.enabled = True
+                cfg.optimizer.learning_rate = 0.237
+                cfg.optimizer.weight_decay = 0.0035
                 cfg.optimizer.branch_advantage_mix = 0.1
                 cfg.optimizer.branch_baseline_beta = 0.05
+                cfg.optimizer.prompt_rewrite_threshold = 0.595
+                cfg.optimizer.rewrite_failure_streak_trigger = 1
+                cfg.optimizer.rewrite_cooldown_episodes = 1
+                cfg.optimizer.update_acceptance_min_gain = -1.0
+                cfg.optimizer.candidate_failure_trigger = 2
+                cfg.optimizer.max_active_candidates = 10
+                cfg.optimizer.max_active_branches = 52
+                cfg.optimizer.candidate_spawn_per_event = 1
+                cfg.optimizer.candidate_trial_episodes = 10
+                cfg.optimizer.candidate_promote_threshold = 0.551
             if config_patch:
                 self._apply_config_patch(cfg, config_patch)
             return
@@ -466,26 +541,30 @@ class RLLearningValidator:
             cfg.router.bandit_value_coef = 0.0
             cfg.router.bandit_bonus_coef = 0.0
             cfg.memory.bias_scale = 0.2
+            cfg.composer.enabled = False
             if config_patch:
                 self._apply_config_patch(cfg, config_patch)
             return
 
         if policy == "memory_only":
-            cfg.router.exploration = 0.08
+            cfg.router.exploration = 0.18
             cfg.router.memory_coef = 0.3
             cfg.router.bandit_value_coef = 0.0
             cfg.router.bandit_bonus_coef = 0.0
             cfg.memory.bias_scale = 0.5
+            cfg.memory.user_bias_mix = 0.52
+            cfg.composer.enabled = False
             if config_patch:
                 self._apply_config_patch(cfg, config_patch)
             return
 
         if policy == "weight_only":
-            cfg.router.exploration = 0.12
+            cfg.router.exploration = 0.18
             cfg.router.memory_coef = 0.0
             cfg.router.bandit_value_coef = 0.0
             cfg.router.bandit_bonus_coef = 0.0
             cfg.memory.bias_scale = 0.2
+            cfg.composer.enabled = False
             if config_patch:
                 self._apply_config_patch(cfg, config_patch)
             return

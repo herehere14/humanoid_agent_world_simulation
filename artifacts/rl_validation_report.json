@@ -1,818 +1,396 @@
 {
   "seeds": [
-    11,
-    17,
-    19,
-    23,
-    29,
-    31,
-    37,
-    41,
-    43,
-    47
+    3,
+    5
   ],
-  "task_types": [
-    "math",
-    "planning",
-    "factual",
-    "code",
-    "creative",
-    "general"
+  "episodes_per_seed": 80,
+  "policies": [
+    "full",
+    "frozen",
+    "memory_only",
+    "weight_only",
+    "exploration_only"
   ],
-  "episodes_per_seed": 240,
-  "num_trials": 60,
+  "evaluation_design": {
+    "train_stream": "mixed non-stationary distribution with phase drift",
+    "holdout_stream": "unseen prompts/keywords; no adaptation during holdout scoring",
+    "start_mode": "anti_prior",
+    "simulate_oracle_feedback": false
+  },
   "aggregate": {
-    "mean_adaptive_reward": 0.7241,
-    "mean_frozen_reward": 0.4977,
-    "mean_reward_gain": 0.2263,
-    "reward_gain_win_rate": 1.0,
-    "mean_adaptive_reward_trend": 0.043,
-    "mean_adaptive_optimal_hit_trend": 0.0936,
-    "reward_gain_bootstrap_ci95": [
-      0.2222,
-      0.2307
-    ]
+    "policy_metrics": {
+      "full": {
+        "mean_train_reward": 0.7345,
+        "mean_holdout_reward": 0.6876,
+        "mean_train_reward_trend": 0.0094,
+        "mean_train_hit_rate": 0.0688,
+        "mean_holdout_hit_rate": 0.0875
+      },
+      "frozen": {
+        "mean_train_reward": 0.6117,
+        "mean_holdout_reward": 0.5679,
+        "mean_train_reward_trend": 0.035,
+        "mean_train_hit_rate": 0.0,
+        "mean_holdout_hit_rate": 0.0125
+      },
+      "memory_only": {
+        "mean_train_reward": 0.6068,
+        "mean_holdout_reward": 0.5648,
+        "mean_train_reward_trend": 0.0346,
+        "mean_train_hit_rate": 0.0125,
+        "mean_holdout_hit_rate": 0.05
+      },
+      "weight_only": {
+        "mean_train_reward": 0.6147,
+        "mean_holdout_reward": 0.5622,
+        "mean_train_reward_trend": 0.0286,
+        "mean_train_hit_rate": 0.0375,
+        "mean_holdout_hit_rate": 0.0063
+      },
+      "exploration_only": {
+        "mean_train_reward": 0.6039,
+        "mean_holdout_reward": 0.5612,
+        "mean_train_reward_trend": 0.0193,
+        "mean_train_hit_rate": 0.075,
+        "mean_holdout_hit_rate": 0.0562
+      }
+    },
+    "policy_holdout_by_task": {
+      "full": {
+        "code": 0.6417,
+        "creative": 0.6946,
+        "factual": 0.7084,
+        "general": 0.675,
+        "math": 0.7448,
+        "planning": 0.6717
+      },
+      "frozen": {
+        "code": 0.519,
+        "creative": 0.6852,
+        "factual": 0.5536,
+        "general": 0.545,
+        "math": 0.6255,
+        "planning": 0.515
+      },
+      "memory_only": {
+        "code": 0.5165,
+        "creative": 0.6709,
+        "factual": 0.5587,
+        "general": 0.545,
+        "math": 0.6108,
+        "planning": 0.5192
+      },
+      "weight_only": {
+        "code": 0.5141,
+        "creative": 0.6246,
+        "factual": 0.5826,
+        "general": 0.5458,
+        "math": 0.5591,
+        "planning": 0.5573
+      },
+      "exploration_only": {
+        "code": 0.5182,
+        "creative": 0.6611,
+        "factual": 0.5509,
+        "general": 0.5524,
+        "math": 0.5691,
+        "planning": 0.5349
+      }
+    },
+    "policy_holdout_by_user": {
+      "full": {
+        "user_alpha": 0.6923,
+        "user_beta": 0.6835,
+        "user_gamma": 0.6892
+      },
+      "frozen": {
+        "user_alpha": 0.5635,
+        "user_beta": 0.5603,
+        "user_gamma": 0.5813
+      },
+      "memory_only": {
+        "user_alpha": 0.5603,
+        "user_beta": 0.559,
+        "user_gamma": 0.5761
+      },
+      "weight_only": {
+        "user_alpha": 0.5663,
+        "user_beta": 0.5454,
+        "user_gamma": 0.5785
+      },
+      "exploration_only": {
+        "user_alpha": 0.5726,
+        "user_beta": 0.5415,
+        "user_gamma": 0.5742
+      }
+    },
+    "policy_branch_concentration_hhi": {
+      "full": 0.3169,
+      "frozen": 0.5138,
+      "memory_only": 0.4298,
+      "weight_only": 0.2369,
+      "exploration_only": 0.2733
+    },
+    "gains_vs_frozen": {
+      "full": {
+        "mean_train_reward_gain": 0.1228,
+        "mean_holdout_reward_gain": 0.1196,
+        "holdout_gain_win_rate": 1.0,
+        "holdout_gain_bootstrap_ci95": [
+          0.1176,
+          0.1216
+        ]
+      },
+      "memory_only": {
+        "mean_train_reward_gain": -0.005,
+        "mean_holdout_reward_gain": -0.0031,
+        "holdout_gain_win_rate": 0.0,
+        "holdout_gain_bootstrap_ci95": [
+          -0.0042,
+          -0.0021
+        ]
+      },
+      "weight_only": {
+        "mean_train_reward_gain": 0.003,
+        "mean_holdout_reward_gain": -0.0058,
+        "holdout_gain_win_rate": 0.0,
+        "holdout_gain_bootstrap_ci95": [
+          -0.0068,
+          -0.0048
+        ]
+      },
+      "exploration_only": {
+        "mean_train_reward_gain": -0.0078,
+        "mean_holdout_reward_gain": -0.0067,
+        "holdout_gain_win_rate": 0.0,
+        "holdout_gain_bootstrap_ci95": [
+          -0.0072,
+          -0.0062
+        ]
+      }
+    },
+    "full_minus_frozen_holdout": 0.1196,
+    "full_minus_memory_only_holdout": 0.1228,
+    "full_over_frozen_holdout_win_rate": 1.0,
+    "full_over_memory_only_holdout_win_rate": 1.0,
+    "full_over_frozen_relative_gain": 0.2108,
+    "target_relative_gain": 0.2,
+    "passes_target_relative_gain": true
   },
   "per_trial": [
     {
-      "seed": 11,
-      "task_type": "math",
-      "adaptive_avg_reward": 0.7241,
-      "frozen_avg_reward": 0.4896,
-      "reward_gain": 0.2345,
-      "adaptive_first_quarter_reward": 0.7056,
-      "adaptive_last_quarter_reward": 0.7319,
-      "adaptive_reward_trend": 0.0264,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7167,
-      "adaptive_hit_trend": 0.0333
+      "seed": 3,
+      "policy_metrics": {
+        "full": {
+          "avg_train_reward": 0.7335,
+          "avg_holdout_reward": 0.688,
+          "holdout_by_task": {
+            "code": 0.6417,
+            "creative": 0.6926,
+            "factual": 0.7042,
+            "general": 0.6772,
+            "math": 0.7545,
+            "planning": 0.669
+          },
+          "train_reward_trend": 0.0088,
+          "train_hit_rate": 0.0625,
+          "holdout_hit_rate": 0.0875,
+          "selected_branch_hhi": 0.2688
+        },
+        "frozen": {
+          "avg_train_reward": 0.6145,
+          "avg_holdout_reward": 0.5704,
+          "holdout_by_task": {
+            "code": 0.515,
+            "creative": 0.6768,
+            "factual": 0.5565,
+            "general": 0.5439,
+            "math": 0.6276,
+            "planning": 0.5128
+          },
+          "train_reward_trend": 0.0299,
+          "train_hit_rate": 0.0,
+          "holdout_hit_rate": 0.0125,
+          "selected_branch_hhi": 0.4981
+        },
+        "memory_only": {
+          "avg_train_reward": 0.6065,
+          "avg_holdout_reward": 0.5662,
+          "holdout_by_task": {
+            "code": 0.51,
+            "creative": 0.6687,
+            "factual": 0.5683,
+            "general": 0.5439,
+            "math": 0.6058,
+            "planning": 0.5128
+          },
+          "train_reward_trend": 0.0311,
+          "train_hit_rate": 0.025,
+          "holdout_hit_rate": 0.0625,
+          "selected_branch_hhi": 0.4278
+        },
+        "weight_only": {
+          "avg_train_reward": 0.6115,
+          "avg_holdout_reward": 0.5656,
+          "holdout_by_task": {
+            "code": 0.5133,
+            "creative": 0.6064,
+            "factual": 0.5944,
+            "general": 0.5439,
+            "math": 0.5981,
+            "planning": 0.5532
+          },
+          "train_reward_trend": 0.0216,
+          "train_hit_rate": 0.0375,
+          "holdout_hit_rate": 0.0125,
+          "selected_branch_hhi": 0.2109
+        },
+        "exploration_only": {
+          "avg_train_reward": 0.6033,
+          "avg_holdout_reward": 0.5632,
+          "holdout_by_task": {
+            "code": 0.5173,
+            "creative": 0.6545,
+            "factual": 0.547,
+            "general": 0.5456,
+            "math": 0.5824,
+            "planning": 0.5395
+          },
+          "train_reward_trend": 0.0172,
+          "train_hit_rate": 0.0875,
+          "holdout_hit_rate": 0.0875,
+          "selected_branch_hhi": 0.2647
+        }
+      },
+      "gains_vs_frozen": {
+        "full": {
+          "train_reward_gain": 0.1191,
+          "holdout_reward_gain": 0.1176,
+          "holdout_relative_gain": 0.2062
+        },
+        "memory_only": {
+          "train_reward_gain": -0.0079,
+          "holdout_reward_gain": -0.0042,
+          "holdout_relative_gain": -0.0073
+        },
+        "weight_only": {
+          "train_reward_gain": -0.0029,
+          "holdout_reward_gain": -0.0048,
+          "holdout_relative_gain": -0.0084
+        },
+        "exploration_only": {
+          "train_reward_gain": -0.0112,
+          "holdout_reward_gain": -0.0072,
+          "holdout_relative_gain": -0.0126
+        }
+      }
     },
     {
-      "seed": 11,
-      "task_type": "planning",
-      "adaptive_avg_reward": 0.7205,
-      "frozen_avg_reward": 0.4882,
-      "reward_gain": 0.2323,
-      "adaptive_first_quarter_reward": 0.6965,
-      "adaptive_last_quarter_reward": 0.741,
-      "adaptive_reward_trend": 0.0444,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1333
-    },
-    {
-      "seed": 11,
-      "task_type": "factual",
-      "adaptive_avg_reward": 0.7392,
-      "frozen_avg_reward": 0.4814,
-      "reward_gain": 0.2578,
-      "adaptive_first_quarter_reward": 0.6944,
-      "adaptive_last_quarter_reward": 0.7618,
-      "adaptive_reward_trend": 0.0674,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7167,
-      "adaptive_hit_trend": 0.0667
-    },
-    {
-      "seed": 11,
-      "task_type": "code",
-      "adaptive_avg_reward": 0.7207,
-      "frozen_avg_reward": 0.5175,
-      "reward_gain": 0.2031,
-      "adaptive_first_quarter_reward": 0.6924,
-      "adaptive_last_quarter_reward": 0.7479,
-      "adaptive_reward_trend": 0.0556,
-      "adaptive_first_quarter_hit_rate": 0.6333,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.15
-    },
-    {
-      "seed": 11,
-      "task_type": "creative",
-      "adaptive_avg_reward": 0.7186,
-      "frozen_avg_reward": 0.4951,
-      "reward_gain": 0.2234,
-      "adaptive_first_quarter_reward": 0.6924,
-      "adaptive_last_quarter_reward": 0.7229,
-      "adaptive_reward_trend": 0.0306,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7,
-      "adaptive_hit_trend": 0.05
-    },
-    {
-      "seed": 11,
-      "task_type": "general",
-      "adaptive_avg_reward": 0.7269,
-      "frozen_avg_reward": 0.5167,
-      "reward_gain": 0.2102,
-      "adaptive_first_quarter_reward": 0.7125,
-      "adaptive_last_quarter_reward": 0.7438,
-      "adaptive_reward_trend": 0.0312,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 17,
-      "task_type": "math",
-      "adaptive_avg_reward": 0.7255,
-      "frozen_avg_reward": 0.4898,
-      "reward_gain": 0.2358,
-      "adaptive_first_quarter_reward": 0.7049,
-      "adaptive_last_quarter_reward": 0.7389,
-      "adaptive_reward_trend": 0.034,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.75,
-      "adaptive_hit_trend": 0.0667
-    },
-    {
-      "seed": 17,
-      "task_type": "planning",
-      "adaptive_avg_reward": 0.7203,
-      "frozen_avg_reward": 0.4885,
-      "reward_gain": 0.2318,
-      "adaptive_first_quarter_reward": 0.6965,
-      "adaptive_last_quarter_reward": 0.7417,
-      "adaptive_reward_trend": 0.0451,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1333
-    },
-    {
-      "seed": 17,
-      "task_type": "factual",
-      "adaptive_avg_reward": 0.7312,
-      "frozen_avg_reward": 0.4802,
-      "reward_gain": 0.251,
-      "adaptive_first_quarter_reward": 0.6937,
-      "adaptive_last_quarter_reward": 0.7646,
-      "adaptive_reward_trend": 0.0708,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.75,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 17,
-      "task_type": "code",
-      "adaptive_avg_reward": 0.7234,
-      "frozen_avg_reward": 0.5177,
-      "reward_gain": 0.2057,
-      "adaptive_first_quarter_reward": 0.6931,
-      "adaptive_last_quarter_reward": 0.7396,
-      "adaptive_reward_trend": 0.0465,
-      "adaptive_first_quarter_hit_rate": 0.6333,
-      "adaptive_last_quarter_hit_rate": 0.75,
-      "adaptive_hit_trend": 0.1167
-    },
-    {
-      "seed": 17,
-      "task_type": "creative",
-      "adaptive_avg_reward": 0.7194,
-      "frozen_avg_reward": 0.495,
-      "reward_gain": 0.2245,
-      "adaptive_first_quarter_reward": 0.6944,
-      "adaptive_last_quarter_reward": 0.7236,
-      "adaptive_reward_trend": 0.0292,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7,
-      "adaptive_hit_trend": 0.05
-    },
-    {
-      "seed": 17,
-      "task_type": "general",
-      "adaptive_avg_reward": 0.7266,
-      "frozen_avg_reward": 0.5167,
-      "reward_gain": 0.2099,
-      "adaptive_first_quarter_reward": 0.7125,
-      "adaptive_last_quarter_reward": 0.7431,
-      "adaptive_reward_trend": 0.0306,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 19,
-      "task_type": "math",
-      "adaptive_avg_reward": 0.7241,
-      "frozen_avg_reward": 0.4865,
-      "reward_gain": 0.2377,
-      "adaptive_first_quarter_reward": 0.7042,
-      "adaptive_last_quarter_reward": 0.7438,
-      "adaptive_reward_trend": 0.0396,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 19,
-      "task_type": "planning",
-      "adaptive_avg_reward": 0.72,
-      "frozen_avg_reward": 0.4851,
-      "reward_gain": 0.2349,
-      "adaptive_first_quarter_reward": 0.6958,
-      "adaptive_last_quarter_reward": 0.7417,
-      "adaptive_reward_trend": 0.0458,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1333
-    },
-    {
-      "seed": 19,
-      "task_type": "factual",
-      "adaptive_avg_reward": 0.7333,
-      "frozen_avg_reward": 0.4799,
-      "reward_gain": 0.2535,
-      "adaptive_first_quarter_reward": 0.6924,
-      "adaptive_last_quarter_reward": 0.7597,
-      "adaptive_reward_trend": 0.0674,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7,
-      "adaptive_hit_trend": 0.05
-    },
-    {
-      "seed": 19,
-      "task_type": "code",
-      "adaptive_avg_reward": 0.7217,
-      "frozen_avg_reward": 0.5175,
-      "reward_gain": 0.2042,
-      "adaptive_first_quarter_reward": 0.6903,
-      "adaptive_last_quarter_reward": 0.7451,
-      "adaptive_reward_trend": 0.0549,
-      "adaptive_first_quarter_hit_rate": 0.6333,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.15
-    },
-    {
-      "seed": 19,
-      "task_type": "creative",
-      "adaptive_avg_reward": 0.7168,
-      "frozen_avg_reward": 0.4918,
-      "reward_gain": 0.225,
-      "adaptive_first_quarter_reward": 0.6924,
-      "adaptive_last_quarter_reward": 0.725,
-      "adaptive_reward_trend": 0.0326,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7,
-      "adaptive_hit_trend": 0.05
-    },
-    {
-      "seed": 19,
-      "task_type": "general",
-      "adaptive_avg_reward": 0.7264,
-      "frozen_avg_reward": 0.5167,
-      "reward_gain": 0.2097,
-      "adaptive_first_quarter_reward": 0.7139,
-      "adaptive_last_quarter_reward": 0.7389,
-      "adaptive_reward_trend": 0.025,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 23,
-      "task_type": "math",
-      "adaptive_avg_reward": 0.7233,
-      "frozen_avg_reward": 0.4889,
-      "reward_gain": 0.2344,
-      "adaptive_first_quarter_reward": 0.7035,
-      "adaptive_last_quarter_reward": 0.7396,
-      "adaptive_reward_trend": 0.0361,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7667,
-      "adaptive_hit_trend": 0.0833
-    },
-    {
-      "seed": 23,
-      "task_type": "planning",
-      "adaptive_avg_reward": 0.7201,
-      "frozen_avg_reward": 0.4875,
-      "reward_gain": 0.2326,
-      "adaptive_first_quarter_reward": 0.6979,
-      "adaptive_last_quarter_reward": 0.7396,
-      "adaptive_reward_trend": 0.0417,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1333
-    },
-    {
-      "seed": 23,
-      "task_type": "factual",
-      "adaptive_avg_reward": 0.7396,
-      "frozen_avg_reward": 0.48,
-      "reward_gain": 0.2595,
-      "adaptive_first_quarter_reward": 0.6924,
-      "adaptive_last_quarter_reward": 0.7597,
-      "adaptive_reward_trend": 0.0674,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7,
-      "adaptive_hit_trend": 0.05
-    },
-    {
-      "seed": 23,
-      "task_type": "code",
-      "adaptive_avg_reward": 0.7231,
-      "frozen_avg_reward": 0.5175,
-      "reward_gain": 0.2056,
-      "adaptive_first_quarter_reward": 0.6903,
-      "adaptive_last_quarter_reward": 0.7521,
-      "adaptive_reward_trend": 0.0618,
-      "adaptive_first_quarter_hit_rate": 0.6333,
-      "adaptive_last_quarter_hit_rate": 0.8,
-      "adaptive_hit_trend": 0.1667
-    },
-    {
-      "seed": 23,
-      "task_type": "creative",
-      "adaptive_avg_reward": 0.7165,
-      "frozen_avg_reward": 0.4955,
-      "reward_gain": 0.221,
-      "adaptive_first_quarter_reward": 0.6951,
-      "adaptive_last_quarter_reward": 0.7188,
-      "adaptive_reward_trend": 0.0236,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.6833,
-      "adaptive_hit_trend": 0.0333
-    },
-    {
-      "seed": 23,
-      "task_type": "general",
-      "adaptive_avg_reward": 0.7278,
-      "frozen_avg_reward": 0.5167,
-      "reward_gain": 0.2111,
-      "adaptive_first_quarter_reward": 0.7146,
-      "adaptive_last_quarter_reward": 0.7438,
-      "adaptive_reward_trend": 0.0292,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 29,
-      "task_type": "math",
-      "adaptive_avg_reward": 0.7233,
-      "frozen_avg_reward": 0.4898,
-      "reward_gain": 0.2335,
-      "adaptive_first_quarter_reward": 0.7028,
-      "adaptive_last_quarter_reward": 0.7458,
-      "adaptive_reward_trend": 0.0431,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 29,
-      "task_type": "planning",
-      "adaptive_avg_reward": 0.7189,
-      "frozen_avg_reward": 0.4884,
-      "reward_gain": 0.2306,
-      "adaptive_first_quarter_reward": 0.6965,
-      "adaptive_last_quarter_reward": 0.7403,
-      "adaptive_reward_trend": 0.0438,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1333
-    },
-    {
-      "seed": 29,
-      "task_type": "factual",
-      "adaptive_avg_reward": 0.7387,
-      "frozen_avg_reward": 0.4811,
-      "reward_gain": 0.2576,
-      "adaptive_first_quarter_reward": 0.6924,
-      "adaptive_last_quarter_reward": 0.759,
-      "adaptive_reward_trend": 0.0667,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7,
-      "adaptive_hit_trend": 0.05
-    },
-    {
-      "seed": 29,
-      "task_type": "code",
-      "adaptive_avg_reward": 0.7196,
-      "frozen_avg_reward": 0.5175,
-      "reward_gain": 0.2021,
-      "adaptive_first_quarter_reward": 0.6903,
-      "adaptive_last_quarter_reward": 0.734,
-      "adaptive_reward_trend": 0.0438,
-      "adaptive_first_quarter_hit_rate": 0.6333,
-      "adaptive_last_quarter_hit_rate": 0.7333,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 29,
-      "task_type": "creative",
-      "adaptive_avg_reward": 0.7194,
-      "frozen_avg_reward": 0.4941,
-      "reward_gain": 0.2253,
-      "adaptive_first_quarter_reward": 0.6937,
-      "adaptive_last_quarter_reward": 0.7347,
-      "adaptive_reward_trend": 0.041,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7333,
-      "adaptive_hit_trend": 0.0833
-    },
-    {
-      "seed": 29,
-      "task_type": "general",
-      "adaptive_avg_reward": 0.7281,
-      "frozen_avg_reward": 0.5167,
-      "reward_gain": 0.2115,
-      "adaptive_first_quarter_reward": 0.716,
-      "adaptive_last_quarter_reward": 0.7444,
-      "adaptive_reward_trend": 0.0285,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 31,
-      "task_type": "math",
-      "adaptive_avg_reward": 0.7248,
-      "frozen_avg_reward": 0.4885,
-      "reward_gain": 0.2363,
-      "adaptive_first_quarter_reward": 0.7042,
-      "adaptive_last_quarter_reward": 0.7375,
-      "adaptive_reward_trend": 0.0333,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.75,
-      "adaptive_hit_trend": 0.0667
-    },
-    {
-      "seed": 31,
-      "task_type": "planning",
-      "adaptive_avg_reward": 0.7193,
-      "frozen_avg_reward": 0.4872,
-      "reward_gain": 0.2321,
-      "adaptive_first_quarter_reward": 0.6965,
-      "adaptive_last_quarter_reward": 0.7389,
-      "adaptive_reward_trend": 0.0424,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1333
-    },
-    {
-      "seed": 31,
-      "task_type": "factual",
-      "adaptive_avg_reward": 0.7387,
-      "frozen_avg_reward": 0.4795,
-      "reward_gain": 0.2592,
-      "adaptive_first_quarter_reward": 0.691,
-      "adaptive_last_quarter_reward": 0.7597,
-      "adaptive_reward_trend": 0.0687,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7,
-      "adaptive_hit_trend": 0.05
-    },
-    {
-      "seed": 31,
-      "task_type": "code",
-      "adaptive_avg_reward": 0.7181,
-      "frozen_avg_reward": 0.5177,
-      "reward_gain": 0.2003,
-      "adaptive_first_quarter_reward": 0.691,
-      "adaptive_last_quarter_reward": 0.7333,
-      "adaptive_reward_trend": 0.0424,
-      "adaptive_first_quarter_hit_rate": 0.6167,
-      "adaptive_last_quarter_hit_rate": 0.75,
-      "adaptive_hit_trend": 0.1333
-    },
-    {
-      "seed": 31,
-      "task_type": "creative",
-      "adaptive_avg_reward": 0.7193,
-      "frozen_avg_reward": 0.4934,
-      "reward_gain": 0.2259,
-      "adaptive_first_quarter_reward": 0.6924,
-      "adaptive_last_quarter_reward": 0.7257,
-      "adaptive_reward_trend": 0.0333,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7,
-      "adaptive_hit_trend": 0.05
-    },
-    {
-      "seed": 31,
-      "task_type": "general",
-      "adaptive_avg_reward": 0.7267,
-      "frozen_avg_reward": 0.5167,
-      "reward_gain": 0.2101,
-      "adaptive_first_quarter_reward": 0.7146,
-      "adaptive_last_quarter_reward": 0.741,
-      "adaptive_reward_trend": 0.0264,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 37,
-      "task_type": "math",
-      "adaptive_avg_reward": 0.7264,
-      "frozen_avg_reward": 0.4877,
-      "reward_gain": 0.2387,
-      "adaptive_first_quarter_reward": 0.7035,
-      "adaptive_last_quarter_reward": 0.7424,
-      "adaptive_reward_trend": 0.0389,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7667,
-      "adaptive_hit_trend": 0.0833
-    },
-    {
-      "seed": 37,
-      "task_type": "planning",
-      "adaptive_avg_reward": 0.7203,
-      "frozen_avg_reward": 0.4865,
-      "reward_gain": 0.2339,
-      "adaptive_first_quarter_reward": 0.6979,
-      "adaptive_last_quarter_reward": 0.7403,
-      "adaptive_reward_trend": 0.0424,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1333
-    },
-    {
-      "seed": 37,
-      "task_type": "factual",
-      "adaptive_avg_reward": 0.7333,
-      "frozen_avg_reward": 0.4799,
-      "reward_gain": 0.2535,
-      "adaptive_first_quarter_reward": 0.6931,
-      "adaptive_last_quarter_reward": 0.7694,
-      "adaptive_reward_trend": 0.0764,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7667,
-      "adaptive_hit_trend": 0.1167
-    },
-    {
-      "seed": 37,
-      "task_type": "code",
-      "adaptive_avg_reward": 0.7194,
-      "frozen_avg_reward": 0.5177,
-      "reward_gain": 0.2017,
-      "adaptive_first_quarter_reward": 0.6931,
-      "adaptive_last_quarter_reward": 0.7417,
-      "adaptive_reward_trend": 0.0486,
-      "adaptive_first_quarter_hit_rate": 0.6333,
-      "adaptive_last_quarter_hit_rate": 0.7667,
-      "adaptive_hit_trend": 0.1333
-    },
-    {
-      "seed": 37,
-      "task_type": "creative",
-      "adaptive_avg_reward": 0.7191,
-      "frozen_avg_reward": 0.4957,
-      "reward_gain": 0.2234,
-      "adaptive_first_quarter_reward": 0.6931,
-      "adaptive_last_quarter_reward": 0.7396,
-      "adaptive_reward_trend": 0.0465,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.75,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 37,
-      "task_type": "general",
-      "adaptive_avg_reward": 0.7253,
-      "frozen_avg_reward": 0.5167,
-      "reward_gain": 0.2087,
-      "adaptive_first_quarter_reward": 0.7118,
-      "adaptive_last_quarter_reward": 0.741,
-      "adaptive_reward_trend": 0.0292,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 41,
-      "task_type": "math",
-      "adaptive_avg_reward": 0.7234,
-      "frozen_avg_reward": 0.4906,
-      "reward_gain": 0.2328,
-      "adaptive_first_quarter_reward": 0.7028,
-      "adaptive_last_quarter_reward": 0.7278,
-      "adaptive_reward_trend": 0.025,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7,
-      "adaptive_hit_trend": 0.0167
-    },
-    {
-      "seed": 41,
-      "task_type": "planning",
-      "adaptive_avg_reward": 0.7196,
-      "frozen_avg_reward": 0.4894,
-      "reward_gain": 0.2302,
-      "adaptive_first_quarter_reward": 0.6965,
-      "adaptive_last_quarter_reward": 0.7389,
-      "adaptive_reward_trend": 0.0424,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1333
-    },
-    {
-      "seed": 41,
-      "task_type": "factual",
-      "adaptive_avg_reward": 0.7389,
-      "frozen_avg_reward": 0.4813,
-      "reward_gain": 0.2576,
-      "adaptive_first_quarter_reward": 0.6903,
-      "adaptive_last_quarter_reward": 0.7604,
-      "adaptive_reward_trend": 0.0701,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7,
-      "adaptive_hit_trend": 0.05
-    },
-    {
-      "seed": 41,
-      "task_type": "code",
-      "adaptive_avg_reward": 0.721,
-      "frozen_avg_reward": 0.5177,
-      "reward_gain": 0.2033,
-      "adaptive_first_quarter_reward": 0.6917,
-      "adaptive_last_quarter_reward": 0.734,
-      "adaptive_reward_trend": 0.0424,
-      "adaptive_first_quarter_hit_rate": 0.6333,
-      "adaptive_last_quarter_hit_rate": 0.7333,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 41,
-      "task_type": "creative",
-      "adaptive_avg_reward": 0.7181,
-      "frozen_avg_reward": 0.4972,
-      "reward_gain": 0.2208,
-      "adaptive_first_quarter_reward": 0.6931,
-      "adaptive_last_quarter_reward": 0.7403,
-      "adaptive_reward_trend": 0.0472,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.75,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 41,
-      "task_type": "general",
-      "adaptive_avg_reward": 0.7269,
-      "frozen_avg_reward": 0.5167,
-      "reward_gain": 0.2102,
-      "adaptive_first_quarter_reward": 0.7132,
-      "adaptive_last_quarter_reward": 0.7444,
-      "adaptive_reward_trend": 0.0312,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 43,
-      "task_type": "math",
-      "adaptive_avg_reward": 0.7198,
-      "frozen_avg_reward": 0.4894,
-      "reward_gain": 0.2304,
-      "adaptive_first_quarter_reward": 0.7063,
-      "adaptive_last_quarter_reward": 0.7257,
-      "adaptive_reward_trend": 0.0194,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7,
-      "adaptive_hit_trend": 0.0167
-    },
-    {
-      "seed": 43,
-      "task_type": "planning",
-      "adaptive_avg_reward": 0.7196,
-      "frozen_avg_reward": 0.4882,
-      "reward_gain": 0.2314,
-      "adaptive_first_quarter_reward": 0.6965,
-      "adaptive_last_quarter_reward": 0.7403,
-      "adaptive_reward_trend": 0.0438,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1333
-    },
-    {
-      "seed": 43,
-      "task_type": "factual",
-      "adaptive_avg_reward": 0.7193,
-      "frozen_avg_reward": 0.4804,
-      "reward_gain": 0.2389,
-      "adaptive_first_quarter_reward": 0.6931,
-      "adaptive_last_quarter_reward": 0.7479,
-      "adaptive_reward_trend": 0.0549,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.75,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 43,
-      "task_type": "code",
-      "adaptive_avg_reward": 0.7245,
-      "frozen_avg_reward": 0.5177,
-      "reward_gain": 0.2068,
-      "adaptive_first_quarter_reward": 0.6924,
-      "adaptive_last_quarter_reward": 0.7493,
-      "adaptive_reward_trend": 0.0569,
-      "adaptive_first_quarter_hit_rate": 0.6333,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.15
-    },
-    {
-      "seed": 43,
-      "task_type": "creative",
-      "adaptive_avg_reward": 0.7172,
-      "frozen_avg_reward": 0.495,
-      "reward_gain": 0.2222,
-      "adaptive_first_quarter_reward": 0.6944,
-      "adaptive_last_quarter_reward": 0.7292,
-      "adaptive_reward_trend": 0.0347,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7167,
-      "adaptive_hit_trend": 0.0667
-    },
-    {
-      "seed": 43,
-      "task_type": "general",
-      "adaptive_avg_reward": 0.7276,
-      "frozen_avg_reward": 0.5167,
-      "reward_gain": 0.2109,
-      "adaptive_first_quarter_reward": 0.7132,
-      "adaptive_last_quarter_reward": 0.7451,
-      "adaptive_reward_trend": 0.0319,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 47,
-      "task_type": "math",
-      "adaptive_avg_reward": 0.7198,
-      "frozen_avg_reward": 0.4889,
-      "reward_gain": 0.2309,
-      "adaptive_first_quarter_reward": 0.7035,
-      "adaptive_last_quarter_reward": 0.7236,
-      "adaptive_reward_trend": 0.0201,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7,
-      "adaptive_hit_trend": 0.0167
-    },
-    {
-      "seed": 47,
-      "task_type": "planning",
-      "adaptive_avg_reward": 0.72,
-      "frozen_avg_reward": 0.4878,
-      "reward_gain": 0.2321,
-      "adaptive_first_quarter_reward": 0.6972,
-      "adaptive_last_quarter_reward": 0.7403,
-      "adaptive_reward_trend": 0.0431,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1333
-    },
-    {
-      "seed": 47,
-      "task_type": "factual",
-      "adaptive_avg_reward": 0.7396,
-      "frozen_avg_reward": 0.4811,
-      "reward_gain": 0.2585,
-      "adaptive_first_quarter_reward": 0.6951,
-      "adaptive_last_quarter_reward": 0.7611,
-      "adaptive_reward_trend": 0.066,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.7167,
-      "adaptive_hit_trend": 0.0667
-    },
-    {
-      "seed": 47,
-      "task_type": "code",
-      "adaptive_avg_reward": 0.7174,
-      "frozen_avg_reward": 0.5177,
-      "reward_gain": 0.1997,
-      "adaptive_first_quarter_reward": 0.691,
-      "adaptive_last_quarter_reward": 0.7382,
-      "adaptive_reward_trend": 0.0472,
-      "adaptive_first_quarter_hit_rate": 0.6333,
-      "adaptive_last_quarter_hit_rate": 0.75,
-      "adaptive_hit_trend": 0.1167
-    },
-    {
-      "seed": 47,
-      "task_type": "creative",
-      "adaptive_avg_reward": 0.7167,
-      "frozen_avg_reward": 0.4955,
-      "reward_gain": 0.2212,
-      "adaptive_first_quarter_reward": 0.6931,
-      "adaptive_last_quarter_reward": 0.7347,
-      "adaptive_reward_trend": 0.0417,
-      "adaptive_first_quarter_hit_rate": 0.65,
-      "adaptive_last_quarter_hit_rate": 0.75,
-      "adaptive_hit_trend": 0.1
-    },
-    {
-      "seed": 47,
-      "task_type": "general",
-      "adaptive_avg_reward": 0.7257,
-      "frozen_avg_reward": 0.5167,
-      "reward_gain": 0.209,
-      "adaptive_first_quarter_reward": 0.7132,
-      "adaptive_last_quarter_reward": 0.7424,
-      "adaptive_reward_trend": 0.0292,
-      "adaptive_first_quarter_hit_rate": 0.6833,
-      "adaptive_last_quarter_hit_rate": 0.7833,
-      "adaptive_hit_trend": 0.1
+      "seed": 5,
+      "policy_metrics": {
+        "full": {
+          "avg_train_reward": 0.7355,
+          "avg_holdout_reward": 0.6871,
+          "holdout_by_task": {
+            "code": 0.6417,
+            "creative": 0.6967,
+            "factual": 0.7125,
+            "general": 0.6728,
+            "math": 0.735,
+            "planning": 0.6743
+          },
+          "train_reward_trend": 0.0099,
+          "train_hit_rate": 0.075,
+          "holdout_hit_rate": 0.0875,
+          "selected_branch_hhi": 0.365
+        },
+        "frozen": {
+          "avg_train_reward": 0.609,
+          "avg_holdout_reward": 0.5655,
+          "holdout_by_task": {
+            "code": 0.5229,
+            "creative": 0.6937,
+            "factual": 0.5508,
+            "general": 0.5461,
+            "math": 0.6233,
+            "planning": 0.5172
+          },
+          "train_reward_trend": 0.0402,
+          "train_hit_rate": 0.0,
+          "holdout_hit_rate": 0.0125,
+          "selected_branch_hhi": 0.5294
+        },
+        "memory_only": {
+          "avg_train_reward": 0.607,
+          "avg_holdout_reward": 0.5634,
+          "holdout_by_task": {
+            "code": 0.5229,
+            "creative": 0.6732,
+            "factual": 0.549,
+            "general": 0.5461,
+            "math": 0.6158,
+            "planning": 0.5255
+          },
+          "train_reward_trend": 0.0381,
+          "train_hit_rate": 0.0,
+          "holdout_hit_rate": 0.0375,
+          "selected_branch_hhi": 0.4319
+        },
+        "weight_only": {
+          "avg_train_reward": 0.6179,
+          "avg_holdout_reward": 0.5587,
+          "holdout_by_task": {
+            "code": 0.515,
+            "creative": 0.6427,
+            "factual": 0.5708,
+            "general": 0.5478,
+            "math": 0.52,
+            "planning": 0.5613
+          },
+          "train_reward_trend": 0.0356,
+          "train_hit_rate": 0.0375,
+          "holdout_hit_rate": 0.0,
+          "selected_branch_hhi": 0.2628
+        },
+        "exploration_only": {
+          "avg_train_reward": 0.6046,
+          "avg_holdout_reward": 0.5593,
+          "holdout_by_task": {
+            "code": 0.5192,
+            "creative": 0.6677,
+            "factual": 0.5547,
+            "general": 0.5592,
+            "math": 0.5558,
+            "planning": 0.5302
+          },
+          "train_reward_trend": 0.0213,
+          "train_hit_rate": 0.0625,
+          "holdout_hit_rate": 0.025,
+          "selected_branch_hhi": 0.2819
+        }
+      },
+      "gains_vs_frozen": {
+        "full": {
+          "train_reward_gain": 0.1265,
+          "holdout_reward_gain": 0.1216,
+          "holdout_relative_gain": 0.2151
+        },
+        "memory_only": {
+          "train_reward_gain": -0.0021,
+          "holdout_reward_gain": -0.0021,
+          "holdout_relative_gain": -0.0037
+        },
+        "weight_only": {
+          "train_reward_gain": 0.0089,
+          "holdout_reward_gain": -0.0068,
+          "holdout_relative_gain": -0.012
+        },
+        "exploration_only": {
+          "train_reward_gain": -0.0044,
+          "holdout_reward_gain": -0.0062,
+          "holdout_relative_gain": -0.0111
+        }
+      }
     }
   ]
 }

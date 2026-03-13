@@ -57,6 +57,18 @@ def build_parser() -> argparse.ArgumentParser:
     val_cmd = sub.add_parser("rl-validate", help="Run adaptive-vs-frozen RL learning validation")
     val_cmd.add_argument("--episodes", type=int, default=240)
     val_cmd.add_argument("--seeds", type=str, default="11,17,19,23,29,31,37,41,43,47")
+    val_cmd.add_argument(
+        "--start-mode",
+        type=str,
+        default="anti_prior",
+        choices=["default", "anti_prior"],
+        help="Initialization regime for validation runs",
+    )
+    val_cmd.add_argument(
+        "--oracle-feedback",
+        action="store_true",
+        help="Inject oracle correction feedback during full-policy training",
+    )
 
     detail_cmd = sub.add_parser("detailed-validate", help="Run detailed hierarchical learning + ablation validation")
     detail_cmd.add_argument("--episodes", type=int, default=240)
@@ -221,7 +233,12 @@ def main() -> None:
     if args.command == "rl-validate":
         seeds = [int(x.strip()) for x in args.seeds.split(",") if x.strip()]
         validator = RLLearningValidator(Path.cwd())
-        report = validator.run(seeds=seeds, episodes_per_seed=args.episodes)
+        report = validator.run(
+            seeds=seeds,
+            episodes_per_seed=args.episodes,
+            start_mode=args.start_mode,
+            simulate_oracle_feedback=args.oracle_feedback,
+        )
         print(json.dumps(report, indent=2))
         return
 

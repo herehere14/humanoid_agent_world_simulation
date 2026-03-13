@@ -51,6 +51,9 @@ class OptimizerConfig:
     rewrite_failure_streak_trigger: int = 3
     update_acceptance_window: int = 8
     update_acceptance_min_gain: float = 0.002
+    acceptance_minibatch_size: int = 3
+    acceptance_minibatch_min_samples: int = 2
+    acceptance_min_delta_for_gate: float = 0.01
     candidate_parent_win_rate_threshold: float = 0.55
     candidate_parent_min_comparisons: int = 3
     candidate_parent_min_reward_gap: float = 0.0
@@ -98,6 +101,7 @@ class ComposerConfig:
 @dataclass
 class AgentRuntimeConfig:
     enabled: bool = False
+    proposal_only: bool = True
     provider: str = "openai_compatible"
     model: str = "gpt-4.1-mini"
     api_key_env: str = "OPENAI_API_KEY"

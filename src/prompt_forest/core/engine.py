@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from pathlib import Path
+from statistics import mean
 from typing import Any
 from uuid import uuid4
 
@@ -15,6 +16,7 @@ from ..backend.mock import MockLLMBackend
 from ..branches.base import PromptBranch
 from ..branches.hierarchical import HierarchicalPromptForest, create_default_hierarchical_forest
 from ..config import EngineConfig, load_config
+from ..contracts import infer_output_contract
 from ..evaluator.judge import OutputJudge
 from ..memory.store import MemoryStore
 from ..rewards.modes import KeywordReward, RuleBasedReward, TaskSpecificReward
@@ -88,16 +90,23 @@ class PromptForestEngine:
 
         outputs = self._run_path(route, task)
         composer_notes: dict[str, Any] = {}
-        composed = self.composer.compose(task=task, route=route, outputs=outputs)
+        contract_hint = infer_output_contract(task.text, task.metadata)
+        composed = None
+        if contract_hint is None:
+            composed = self.composer.compose(task=task, route=route, outputs=outputs)
         if composed is not None and route.activated_branches:
-            leaf = route.activated_branches[-1]
+            if route.activated_paths and route.activated_paths[0]:
+                leaf = route.activated_paths[0][-1]
+            else:
+                leaf = route.activated_branches[-1]
             outputs[leaf] = composed.output
             composer_notes = composed.notes
 
         branch_scores = self.judge.score_all(outputs, task)
-        numeric_scores = {k: v.reward for k, v in branch_scores.items()}
+        leaf_candidates = self._candidate_leaves(route, outputs)
+        numeric_scores = {k: v.reward for k, v in branch_scores.items() if k in leaf_candidates}
 
-        aggregation = self._aggregate(route, outputs, numeric_scores)
+        aggregation = self._aggregate(route, outputs, numeric_scores, candidate_branches=leaf_candidates)
         signal = self.evaluator_agent.evaluate(
             task,
             route,
@@ -117,8 +126,9 @@ class PromptForestEngine:
                 signal=signal,
                 branches=self.branches,
                 memory=self.memory,
+                acceptance_runner=self._mini_holdout_acceptance,
             )
-            self._attach_created_candidates(route, optimize_event)
+            self._attach_created_candidates(route, optimize_event, selected_branch=signal.selected_branch)
         else:
             optimize_event = OptimizationEvent(
                 updated_weights={},
@@ -257,50 +267,105 @@ class PromptForestEngine:
         return {"ok": True, **payload}
 
     def _run_path(self, route: RoutingDecision, task: TaskInput) -> dict[str, Any]:
-        outputs = {}
-        context = task.metadata.get("context_seed", "")
+        outputs: dict[str, Any] = {}
+        strict_contract = infer_output_contract(task.text, task.metadata)
+        strict_mode = strict_contract is not None
 
-        for branch_name in route.activated_branches:
-            branch = self.branches.get(branch_name)
-            if branch is None or not branch.is_active:
-                continue
+        paths = route.activated_paths or ([route.activated_branches] if route.activated_branches else [])
+        if not paths:
+            return outputs
 
-            branch_output = self.executor.run_branch(branch, task, route.task_type, context=context)
-            outputs[branch_name] = branch_output
-            context = self._roll_context(context, branch_output.output)
+        for path in paths:
+            context = task.metadata.get("context_seed", "")
+            for branch_name in path:
+                branch = self.branches.get(branch_name)
+                if branch is None or not branch.is_active:
+                    continue
 
+                if branch_name in outputs:
+                    context = self._roll_context(context, outputs[branch_name].output, strict_mode=strict_mode)
+                    continue
+
+                branch_output = self.executor.run_branch(branch, task, route.task_type, context=context)
+                outputs[branch_name] = branch_output
+                context = self._roll_context(context, branch_output.output, strict_mode=strict_mode)
         return outputs
+
+    @staticmethod
+    def _candidate_leaves(route: RoutingDecision, outputs: dict[str, Any]) -> list[str]:
+        leaves: list[str] = []
+        if route.activated_paths:
+            for path in route.activated_paths:
+                if not path:
+                    continue
+                leaf = path[-1]
+                if leaf in outputs and leaf not in leaves:
+                    leaves.append(leaf)
+        elif route.activated_branches:
+            leaf = route.activated_branches[-1]
+            if leaf in outputs:
+                leaves.append(leaf)
+        return leaves
 
     def _aggregate(
         self,
         route: RoutingDecision,
         outputs: dict[str, Any],
         numeric_scores: dict[str, float],
+        candidate_branches: list[str] | None = None,
     ) -> AggregationResult:
         if not outputs:
             return AggregationResult(selected_branch="none", selected_output="", notes={"reason": "no_outputs"})
 
-        if self.config.evaluator.aggregation_strategy == "leaf_select" and route.activated_branches:
-            leaf = route.activated_branches[-1]
-            if leaf in outputs:
+        candidates = [c for c in (candidate_branches or []) if c in outputs]
+        if not candidates:
+            candidates = list(outputs.keys())
+
+        if self.config.evaluator.aggregation_strategy == "leaf_select" and candidates:
+            if len(candidates) == 1:
+                leaf = candidates[0]
                 return AggregationResult(
                     selected_branch=leaf,
                     selected_output=outputs[leaf].output,
-                    notes={"strategy": "leaf_select", "path": route.activated_branches},
+                    notes={"strategy": "leaf_select", "path": route.activated_branches, "candidates": candidates},
                 )
+            ranked = sorted(
+                ((name, numeric_scores.get(name, 0.0)) for name in candidates),
+                key=lambda x: x[1],
+                reverse=True,
+            )
+            best = ranked[0][0]
+            return AggregationResult(
+                selected_branch=best,
+                selected_output=outputs[best].output,
+                notes={"strategy": "leaf_select_best_multi", "path": route.activated_branches, "ranked": ranked},
+            )
 
-        return self.aggregator.aggregate(outputs, numeric_scores)
+        scoped_outputs = {name: outputs[name] for name in candidates}
+        scoped_scores = {name: numeric_scores.get(name, 0.0) for name in candidates}
+        return self.aggregator.aggregate(scoped_outputs, scoped_scores)
 
     def _propagate_rewards_along_path(self, route: RoutingDecision, signal, gamma: float, local_mix: float) -> None:
-        if not route.activated_branches:
+        paths = route.activated_paths or ([route.activated_branches] if route.activated_branches else [])
+        if not paths:
             return
 
-        leaf = route.activated_branches[-1]
+        selected_path: list[str] | None = None
+        for path in paths:
+            if path and path[-1] == signal.selected_branch:
+                selected_path = path
+                break
+        if selected_path is None:
+            selected_path = paths[0]
+        if not selected_path:
+            return
+
+        leaf = selected_path[-1]
         leaf_feedback = signal.branch_feedback.get(leaf)
         leaf_reward = leaf_feedback.reward if leaf_feedback else signal.reward_score
 
-        path_len = len(route.activated_branches)
-        for idx, branch_name in enumerate(route.activated_branches):
+        path_len = len(selected_path)
+        for idx, branch_name in enumerate(selected_path):
             fb = signal.branch_feedback.get(branch_name)
             if fb is None:
                 continue
@@ -314,7 +379,12 @@ class PromptForestEngine:
         if signal.selected_branch == leaf:
             signal.reward_score = signal.branch_feedback[leaf].reward
 
-    def _attach_created_candidates(self, route: RoutingDecision, optimize_event: OptimizationEvent) -> None:
+    def _attach_created_candidates(
+        self,
+        route: RoutingDecision,
+        optimize_event: OptimizationEvent,
+        selected_branch: str | None = None,
+    ) -> None:
         for candidate_name in optimize_event.created_candidates:
             if candidate_name not in self.branches:
                 continue
@@ -326,6 +396,10 @@ class PromptForestEngine:
             requested_parent = str(meta.get("parent_hint", "")).strip()
             if requested_parent and self.forest.has_node(requested_parent):
                 parent_id = requested_parent
+            elif selected_branch and self.forest.has_node(selected_branch):
+                parent_id = selected_branch
+            elif route.activated_paths and route.activated_paths[0]:
+                parent_id = route.activated_paths[0][-1]
             elif route.activated_branches:
                 parent_id = route.activated_branches[-1]
 
@@ -341,11 +415,102 @@ class PromptForestEngine:
             )
 
     @staticmethod
-    def _roll_context(current_context: str, new_piece: str, max_chars: int = 800) -> str:
+    def _roll_context(current_context: str, new_piece: str, max_chars: int = 800, strict_mode: bool = False) -> str:
+        if strict_mode:
+            snippet = PromptForestEngine._compact_context_piece(new_piece, max_chars=120)
+            joined = f"{current_context}\n{snippet}".strip()
+            if len(joined) <= 120:
+                return joined
+            return joined[-120:]
+
         joined = f"{current_context}\n{new_piece}".strip()
         if len(joined) <= max_chars:
             return joined
         return joined[-max_chars:]
+
+    @staticmethod
+    def _compact_context_piece(text: str, max_chars: int = 120) -> str:
+        cleaned = text.replace("```", " ").replace("\n", " ").strip()
+        cleaned = " ".join(cleaned.split())
+        return cleaned[:max_chars].strip()
+
+    def _mini_holdout_acceptance(
+        self,
+        *,
+        task: TaskInput,
+        branch_name: str,
+        task_type: str,
+        user_id: str,
+        old_weight: float,
+        new_weight: float,
+        old_prompt: str,
+        new_prompt: str,
+        prompt_rewritten: bool,
+    ) -> bool:
+        branch = self.branches.get(branch_name)
+        if branch is None:
+            return True
+
+        # Skip expensive mini-batch replay for tiny weight nudges unless a rewrite happened.
+        if (not prompt_rewritten) and abs(new_weight - old_weight) < self.config.optimizer.acceptance_min_delta_for_gate:
+            return True
+
+        recent = self.memory.retrieve_similar(
+            task_type=task_type,
+            limit=max(self.config.optimizer.update_acceptance_window, self.config.optimizer.acceptance_minibatch_size * 2),
+            user_id=user_id,
+        )
+        if not recent and user_id:
+            recent = self.memory.retrieve_similar(
+                task_type=task_type,
+                limit=max(self.config.optimizer.update_acceptance_window, self.config.optimizer.acceptance_minibatch_size * 2),
+                user_id=None,
+            )
+        if not recent:
+            return True
+
+        candidates = [r for r in reversed(recent) if branch_name in r.activated_branches or branch_name in r.branch_rewards]
+        batch = candidates[: self.config.optimizer.acceptance_minibatch_size]
+        if len(batch) < self.config.optimizer.acceptance_minibatch_min_samples:
+            return True
+
+        original_weight = branch.state.weight
+        original_prompt = branch.state.prompt_template
+        old_scores: list[float] = []
+        new_scores: list[float] = []
+
+        try:
+            for record in batch:
+                replay_task = TaskInput(
+                    task_id=record.task_id,
+                    text=record.input_text,
+                    task_type=record.task_type,
+                    metadata=dict(record.task_metadata or {}),
+                )
+                context_seed = str(replay_task.metadata.get("context_seed", ""))
+
+                branch.state.weight = old_weight
+                branch.state.prompt_template = old_prompt
+                old_output = self.executor.run_branch(branch, replay_task, replay_task.task_type, context=context_seed)
+                old_score = self.judge.score_output(old_output.output, replay_task).reward
+
+                branch.state.weight = new_weight
+                branch.state.prompt_template = new_prompt
+                new_output = self.executor.run_branch(branch, replay_task, replay_task.task_type, context=context_seed)
+                new_score = self.judge.score_output(new_output.output, replay_task).reward
+
+                old_scores.append(old_score)
+                new_scores.append(new_score)
+        finally:
+            branch.state.weight = original_weight
+            branch.state.prompt_template = original_prompt
+
+        if not old_scores or not new_scores:
+            return True
+
+        before = mean(old_scores)
+        after = mean(new_scores)
+        return after >= (before + self.config.optimizer.update_acceptance_min_gain)
 
     def branch_snapshot(self) -> dict[str, dict[str, Any]]:
         return self.forest.branch_snapshot()

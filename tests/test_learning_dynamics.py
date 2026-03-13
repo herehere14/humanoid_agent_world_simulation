@@ -38,3 +38,13 @@ def test_validation_report_exposes_relative_gain_target_gate():
     assert "target_relative_gain" in agg
     assert "passes_target_relative_gain" in agg
     assert agg["target_relative_gain"] == 0.2
+
+
+def test_anti_prior_mode_hits_relative_gain_target():
+    root = Path(__file__).resolve().parents[1]
+    validator = RLLearningValidator(root)
+    report = validator.run(seeds=[3, 5], episodes_per_seed=80, start_mode="anti_prior")
+
+    agg = report["aggregate"]
+    assert agg["full_over_frozen_relative_gain"] >= agg["target_relative_gain"]
+    assert agg["passes_target_relative_gain"] is True

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import json
 import random
+import re
 from typing import Any
 
+from ..contracts import infer_output_contract
 from ..types import TaskInput
 from .base import LLMBackend
 
@@ -22,11 +25,23 @@ class DomainShiftBackend(LLMBackend):
         scores = self.quality_matrix[task_type]
         return max(scores.items(), key=lambda x: x[1])[0]
 
+    def best_branch_for_task(self, task: TaskInput, candidates: list[str] | None = None) -> str:
+        return self.best_branch(task.task_type, candidates=candidates)
+
     def generate(self, prompt: str, task: TaskInput, branch_name: str) -> tuple[str, dict[str, Any]]:
         task_type = task.task_type if task.task_type != "auto" else "general"
         quality = self._quality_for_branch(task_type, branch_name)
         quality += self._rng.uniform(-self.noise, self.noise)
         quality = max(0.01, min(0.99, quality))
+        contract = infer_output_contract(task.text, task.metadata)
+        contract_output = self._strict_contract_output(
+            task=task,
+            branch_name=branch_name,
+            quality=quality,
+            contract=contract,
+        )
+        if contract_output is not None:
+            return contract_output, {"quality": quality, "task_type": task_type, "branch": branch_name, "contract": contract}
 
         expected_keywords = task.metadata.get("expected_keywords", [])
         included_count = int(round(quality * len(expected_keywords))) if expected_keywords else 0
@@ -38,6 +53,63 @@ class DomainShiftBackend(LLMBackend):
             f"key-points={evidence} | confidence={quality:.2f}"
         )
         return answer, {"quality": quality, "task_type": task_type, "branch": branch_name}
+
+    def _strict_contract_output(
+        self,
+        task: TaskInput,
+        branch_name: str,
+        quality: float,
+        contract: str | None,
+    ) -> str | None:
+        if not contract or branch_name != contract:
+            return None
+        if contract == "json_lock":
+            payload = {
+                "answer": f"{task.task_type}_result",
+                "confidence": round(quality, 2),
+            }
+            return json.dumps(payload, separators=(",", ":"))
+        if contract == "csv_lock":
+            rows = self._csv_rows_from_task(task.text)
+            return "\n".join(rows)
+        if contract == "code_patch_lock":
+            return (
+                "FIX:\n"
+                "def solve(x):\n"
+                "    return x\n"
+                "TESTS:\n"
+                "- handles baseline case\n"
+                "- handles edge case"
+            )
+        if contract == "bullet_lock":
+            count = self._bullet_count(task.text)
+            return "\n".join(f"- item {i + 1}: verified step" for i in range(count))
+        return None
+
+    @staticmethod
+    def _csv_rows_from_task(text: str) -> list[str]:
+        rows: list[str] = []
+        for line in text.splitlines():
+            cleaned = line.strip()
+            if "," not in cleaned:
+                continue
+            if cleaned.lower().startswith(("output", "holdout", "train", "task")):
+                continue
+            left, right, *_ = [part.strip() for part in cleaned.split(",")] + ["ok"]
+            rows.append(f"{left},{right}")
+        if rows:
+            return rows
+        return ["a,ok", "b,ok"]
+
+    @staticmethod
+    def _bullet_count(text: str) -> int:
+        match = re.search(r"exactly\s+(\d+)\s+bullet", text, flags=re.IGNORECASE)
+        if not match:
+            return 3
+        try:
+            return max(1, min(8, int(match.group(1))))
+        except ValueError:
+            return 3
 
     def _quality_for_branch(self, task_type: str, branch_name: str) -> float:
         scores = self.quality_matrix.get(task_type, self.quality_matrix["general"])

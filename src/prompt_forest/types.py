@@ -58,6 +58,7 @@ class RoutingDecision:
     task_type: str
     activated_branches: list[str]
     branch_scores: dict[str, float]
+    activated_paths: list[list[str]] = field(default_factory=list)
 
 
 @dataclass

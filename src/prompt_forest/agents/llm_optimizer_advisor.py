@@ -19,6 +19,9 @@ class LLMOptimizerAdvisor:
     def is_enabled(self) -> bool:
         return self.runtime.is_enabled()
 
+    def is_proposal_only(self) -> bool:
+        return bool(self.runtime.config.proposal_only)
+
     def advise(
         self,
         task: TaskInput,

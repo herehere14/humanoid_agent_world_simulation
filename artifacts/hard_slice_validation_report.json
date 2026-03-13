@@ -1,0 +1,89 @@
+{
+  "seeds": [
+    3,
+    5
+  ],
+  "episodes_per_seed": 100,
+  "policies": [
+    "full",
+    "frozen",
+    "memory_only"
+  ],
+  "evaluation_design": {
+    "train": "hard-slice non-stationary distribution with strict verifier specs",
+    "holdout": "unseen hard prompts + stricter verifier requirements; no adaptation during scoring",
+    "reward_mode": "hybrid_verifier",
+    "simulate_oracle_feedback": false
+  },
+  "aggregate": {
+    "policy_metrics": {
+      "full": {
+        "mean_train_reward": 0.6843,
+        "mean_holdout_reward": 0.6781,
+        "mean_holdout_hit_rate": 0.095
+      },
+      "frozen": {
+        "mean_train_reward": 0.6751,
+        "mean_holdout_reward": 0.6688,
+        "mean_holdout_hit_rate": 0.0
+      },
+      "memory_only": {
+        "mean_train_reward": 0.6746,
+        "mean_holdout_reward": 0.6688,
+        "mean_holdout_hit_rate": 0.0
+      }
+    },
+    "full_minus_frozen_holdout": 0.0093,
+    "full_minus_memory_only_holdout": 0.0093,
+    "full_over_frozen_relative_gain": 0.0139,
+    "full_over_frozen_holdout_win_rate": 1.0,
+    "target_relative_gain": 0.2,
+    "passes_target_relative_gain": false
+  },
+  "per_seed": [
+    {
+      "seed": 3,
+      "full": {
+        "avg_train_reward": 0.6746,
+        "avg_holdout_reward": 0.6706,
+        "holdout_hit_rate": 0.0
+      },
+      "frozen": {
+        "avg_train_reward": 0.6724,
+        "avg_holdout_reward": 0.6683,
+        "holdout_hit_rate": 0.0
+      },
+      "memory_only": {
+        "avg_train_reward": 0.672,
+        "avg_holdout_reward": 0.6706,
+        "holdout_hit_rate": 0.0
+      },
+      "gains": {
+        "full_minus_frozen_holdout": 0.0023,
+        "full_over_frozen_relative_gain": 0.0034
+      }
+    },
+    {
+      "seed": 5,
+      "full": {
+        "avg_train_reward": 0.6939,
+        "avg_holdout_reward": 0.6857,
+        "holdout_hit_rate": 0.19
+      },
+      "frozen": {
+        "avg_train_reward": 0.6777,
+        "avg_holdout_reward": 0.6692,
+        "holdout_hit_rate": 0.0
+      },
+      "memory_only": {
+        "avg_train_reward": 0.6771,
+        "avg_holdout_reward": 0.667,
+        "holdout_hit_rate": 0.0
+      },
+      "gains": {
+        "full_minus_frozen_holdout": 0.0165,
+        "full_over_frozen_relative_gain": 0.0247
+      }
+    }
+  ]
+}

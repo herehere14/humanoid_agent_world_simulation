@@ -6,6 +6,7 @@ from typing import Protocol
 
 from ..branches.hierarchical import HierarchicalPromptForest
 from ..config import RouterConfig
+from ..contracts import infer_output_contract
 from ..types import BranchStatus, RoutingDecision, TaskInput
 
 
@@ -63,37 +64,120 @@ class HierarchicalRouter:
         visit_counts = memory.branch_visit_counts(task_type, user_id=user_id)
         bandit_stats = memory.branch_bandit_stats(task_type, user_id=user_id)
         bandit_total_count = sum(max(0.0, stat.get("count", 0.0)) for stat in bandit_stats.values())
-
-        active_path: list[str] = []
+        contract_hint = infer_output_contract(task.text, task.metadata)
+        beam_width = max(1, max(self.config.min_candidates, self.config.top_k))
         flattened_scores: dict[str, float] = {}
         exploration_rate = self._current_exploration()
 
-        current = forest.root_id
-        while True:
-            children = forest.children(current)
-            if not children:
+        # Beam search over the hierarchy so we can activate multiple terminal leaves per task.
+        frontier: list[tuple[str, list[str], float]] = [(forest.root_id, [], 0.0)]
+        completed_paths: list[tuple[list[str], float]] = []
+        max_depth = max((forest.depth(node_id) for node_id in forest.nodes), default=1) + 1
+
+        for _ in range(max_depth):
+            if not frontier:
                 break
 
-            scores = self._score_children(
-                task_type=task_type,
-                parent_id=current,
-                child_ids=children,
-                forest=forest,
-                history_bias=history_bias,
-                bandit_stats=bandit_stats,
-                bandit_total_count=bandit_total_count,
-                exploration_rate=exploration_rate,
-            )
-            if not scores:
+            next_frontier: list[tuple[str, list[str], float]] = []
+            for node_id, path, path_score in frontier:
+                children = forest.children(node_id)
+                if not children:
+                    completed_paths.append((path, path_score))
+                    continue
+
+                scores = self._score_children(
+                    task_type=task_type,
+                    parent_id=node_id,
+                    child_ids=children,
+                    forest=forest,
+                    history_bias=history_bias,
+                    bandit_stats=bandit_stats,
+                    bandit_total_count=bandit_total_count,
+                    exploration_rate=exploration_rate,
+                    contract_hint=contract_hint,
+                )
+                if not scores:
+                    completed_paths.append((path, path_score))
+                    continue
+
+                for child_id, score in scores.items():
+                    prev = flattened_scores.get(child_id)
+                    if prev is None or score > prev:
+                        flattened_scores[child_id] = score
+
+                selected_children = self._select_top_children(
+                    scores=scores,
+                    visit_counts=visit_counts,
+                    exploration_rate=exploration_rate,
+                    max_children=beam_width,
+                )
+                for child_id in selected_children:
+                    next_frontier.append((child_id, path + [child_id], path_score + scores[child_id]))
+
+            if not next_frontier:
+                break
+            frontier = self._prune_frontier(next_frontier, beam_width=beam_width)
+
+        for node_id, path, path_score in frontier:
+            if not forest.children(node_id):
+                completed_paths.append((path, path_score))
+
+        if not completed_paths and frontier:
+            completed_paths = [(path, score) for _, path, score in frontier]
+
+        ordered_paths = sorted(completed_paths, key=lambda x: x[1], reverse=True)
+        activated_paths: list[list[str]] = []
+        seen_leaves: set[str] = set()
+        for path, _ in ordered_paths:
+            if not path:
+                continue
+            leaf = path[-1]
+            if leaf in seen_leaves:
+                continue
+            activated_paths.append(path)
+            seen_leaves.add(leaf)
+            if len(activated_paths) >= beam_width:
                 break
 
-            selected = self._select_one(scores, visit_counts, exploration_rate)
-            active_path.append(selected)
-            flattened_scores.update(scores)
-            current = selected
+        if contract_hint:
+            contract_path = self._path_to_node(forest, contract_hint)
+            if contract_path and contract_path[-1] not in seen_leaves:
+                if len(activated_paths) >= beam_width:
+                    activated_paths[-1] = contract_path
+                else:
+                    activated_paths.append(contract_path)
+                seen_leaves.add(contract_path[-1])
+
+        activated_branches: list[str] = []
+        seen_branches: set[str] = set()
+        for path in activated_paths:
+            for branch_name in path:
+                if branch_name in seen_branches:
+                    continue
+                seen_branches.add(branch_name)
+                activated_branches.append(branch_name)
 
         self._route_calls += 1
-        return RoutingDecision(task_type=task_type, activated_branches=active_path, branch_scores=flattened_scores)
+        return RoutingDecision(
+            task_type=task_type,
+            activated_branches=activated_branches,
+            branch_scores=flattened_scores,
+            activated_paths=activated_paths,
+        )
+
+    @staticmethod
+    def _path_to_node(forest: HierarchicalPromptForest, node_id: str) -> list[str] | None:
+        if node_id not in forest.nodes:
+            return None
+        path: list[str] = []
+        cur = node_id
+        while cur and cur != forest.root_id:
+            path.append(cur)
+            cur = forest.parent(cur)
+        if not path:
+            return None
+        path.reverse()
+        return path
 
     def _score_children(
         self,
@@ -105,6 +189,7 @@ class HierarchicalRouter:
         bandit_stats: dict[str, dict[str, float]],
         bandit_total_count: float,
         exploration_rate: float,
+        contract_hint: str | None,
     ) -> dict[str, float]:
         out: dict[str, float] = {}
 
@@ -118,6 +203,7 @@ class HierarchicalRouter:
                 parent_id=parent_id,
                 child_id=child_id,
                 forest=forest,
+                contract_hint=contract_hint,
             )
             memory_bias = history_bias.get(child_id, 0.0)
             memory_bias = max(-self.config.memory_term_cap, min(self.config.memory_term_cap, memory_bias))
@@ -152,18 +238,37 @@ class HierarchicalRouter:
 
         return out
 
-    def _select_one(self, scores: dict[str, float], visit_counts: dict[str, int], exploration_rate: float) -> str:
+    def _select_top_children(
+        self,
+        scores: dict[str, float],
+        visit_counts: dict[str, int],
+        exploration_rate: float,
+        max_children: int,
+    ) -> list[str]:
         ordered = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-        selected = ordered[0][0]
+        take = max(1, min(len(ordered), max_children))
+        selected = [name for name, _ in ordered[:take]]
 
-        if self._rng.random() < exploration_rate and len(ordered) > 1:
-            underexplored = [name for name in scores if visit_counts.get(name, 0) <= 1]
-            if underexplored:
-                selected = self._rng.choice(underexplored)
-            else:
-                selected = self._rng.choice([name for name, _ in ordered[1:]])
+        if self._rng.random() < exploration_rate and len(ordered) > take:
+            underexplored = [name for name in scores if visit_counts.get(name, 0) <= 1 and name not in selected]
+            pool = underexplored or [name for name, _ in ordered if name not in selected]
+            if pool:
+                selected[-1] = self._rng.choice(pool)
 
-        return selected
+        # Preserve score ordering while deduplicating any exploration replacement.
+        seen: set[str] = set()
+        deduped: list[str] = []
+        for name in selected:
+            if name in seen:
+                continue
+            seen.add(name)
+            deduped.append(name)
+        return deduped
+
+    @staticmethod
+    def _prune_frontier(frontier: list[tuple[str, list[str], float]], beam_width: int) -> list[tuple[str, list[str], float]]:
+        ordered = sorted(frontier, key=lambda x: x[2], reverse=True)
+        return ordered[: max(1, beam_width)]
 
     def _current_exploration(self) -> float:
         decayed = self.config.exploration * (self.config.exploration_decay**self._route_calls)
@@ -175,13 +280,24 @@ class HierarchicalRouter:
         parent_id: str,
         child_id: str,
         forest: HierarchicalPromptForest,
+        contract_hint: str | None,
     ) -> float:
         if parent_id == forest.root_id:
-            return self._macro_affinity.get(task_type, {}).get(child_id, 0.0)
+            base = self._macro_affinity.get(task_type, {}).get(child_id, 0.0)
+            if contract_hint and child_id == "verification":
+                base += 0.25
+            return base
 
         node = forest.nodes[child_id]
+        base = 0.0
         if task_type in node.specialties:
-            return 0.3
-        if "general" in node.specialties:
-            return 0.08
-        return 0.0
+            base += 0.3
+        elif "general" in node.specialties:
+            base += 0.08
+
+        if contract_hint:
+            if child_id == contract_hint:
+                base += 0.75
+            elif contract_hint.replace("_lock", "") in child_id:
+                base += 0.35
+        return base

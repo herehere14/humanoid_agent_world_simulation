@@ -37,6 +37,12 @@ def format_turn_trace(payload: dict[str, Any], visibility: str = "full", top_bra
     path = routing.get("activated_branches", []) or []
     path_text = " -> ".join(path) if path else "(none)"
     lines.append(f"[routing] path={path_text}")
+    paths = routing.get("activated_paths", []) or []
+    if paths:
+        preview = " | ".join(" -> ".join(p) for p in paths[:3])
+        if len(paths) > 3:
+            preview = f"{preview} | ...(+{len(paths)-3})"
+        lines.append(f"[routing] activated_paths={preview}")
     if runtime:
         lines.append(
             "[runtime] "

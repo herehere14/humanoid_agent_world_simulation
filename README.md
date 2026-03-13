@@ -282,7 +282,19 @@ PYTHONPATH=src python examples/run_rl_validation.py
 or via CLI:
 
 ```bash
-prompt-forest rl-validate --episodes 240 --seeds 11,17,19,23,29,31,37,41,43,47
+prompt-forest rl-validate \
+  --episodes 240 \
+  --seeds 11,17,19,23,29,31,37,41,43,47 \
+  --start-mode anti_prior
+```
+
+Optional interactive-correction stress mode:
+
+```bash
+prompt-forest rl-validate \
+  --episodes 240 \
+  --start-mode anti_prior \
+  --oracle-feedback
 ```
 
 ### 6b) Hard-slice validation (verifier-grounded)

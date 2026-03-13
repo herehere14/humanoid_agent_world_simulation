@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Callable
 
 from ..branches.base import PromptBranch
 from ..branches.library import make_candidate_branch
@@ -42,6 +42,7 @@ class OptimizerAgent:
         signal: EvaluationSignal,
         branches: dict[str, PromptBranch],
         memory: MemoryStore,
+        acceptance_runner: Callable[..., bool] | None = None,
     ) -> OptimizationEvent:
         self._episode_idx += 1
         updated: dict[str, float] = {}
@@ -56,14 +57,17 @@ class OptimizerAgent:
 
         advisor_directives: dict[str, dict[str, Any]] = {}
         advisor_proposals: list[dict[str, str]] = []
+        advisor_rewrite_only = False
         advisor_error = ""
         advisor_used = False
         if self._advisor and self._advisor.is_enabled():
             advisor_used = True
+            advisor_rewrite_only = bool(getattr(self._advisor, "is_proposal_only", lambda: False)())
             try:
                 advisor_payload = self._advisor.advise(task, route, signal, branches)
                 advisor_directives = self._extract_advisor_directives(advisor_payload, route)
-                advisor_proposals = self._extract_advisor_candidate_proposals(advisor_payload, route)
+                if not advisor_rewrite_only:
+                    advisor_proposals = self._extract_advisor_candidate_proposals(advisor_payload, route)
             except Exception as exc:  # pragma: no cover - depends on external API runtime
                 advisor_error = str(exc)
 
@@ -78,6 +82,7 @@ class OptimizerAgent:
 
             status_before = branch.state.status.value
             old_weight = branch.state.weight
+            old_prompt = branch.state.prompt_template
             advice = advisor_directives.get(branch_name, {})
 
             branch_baseline_key = self._branch_baseline_key(route.task_type, branch_name)
@@ -103,13 +108,16 @@ class OptimizerAgent:
 
             advice_conf = self._clamp01(advice.get("confidence", 0.0))
             advice_weight_threshold = max(0.55, self.config.advisor_rewrite_confidence_threshold - 0.15)
-            advisory_extra_delta = self._bounded_advisory_delta(advice.get("extra_weight_delta", 0.0))
-            if advice_conf < advice_weight_threshold:
+            if advisor_rewrite_only:
                 advisory_extra_delta = 0.0
             else:
-                advisory_extra_delta *= ((advice_conf - advice_weight_threshold) / max(1e-8, 1.0 - advice_weight_threshold))
-                advisory_extra_delta *= confidence_scale
-                advisory_extra_delta *= variance_scale
+                advisory_extra_delta = self._bounded_advisory_delta(advice.get("extra_weight_delta", 0.0))
+                if advice_conf < advice_weight_threshold:
+                    advisory_extra_delta = 0.0
+                else:
+                    advisory_extra_delta *= ((advice_conf - advice_weight_threshold) / max(1e-8, 1.0 - advice_weight_threshold))
+                    advisory_extra_delta *= confidence_scale
+                    advisory_extra_delta *= variance_scale
 
             total_delta = delta + advisory_extra_delta
             decay = self.config.weight_decay * (old_weight - 1.0)
@@ -121,15 +129,13 @@ class OptimizerAgent:
             prompt_rewritten = False
             advice_rewrite_hint = str(advice.get("rewrite_hint", "")).strip()
             rewrite_hint = fb.suggested_improvement_direction if fb else "improve_clarity_and_verification"
-            if advice_rewrite_hint and advice_conf >= self.config.advisor_rewrite_confidence_threshold:
-                rewrite_hint = advice_rewrite_hint
 
             should_rewrite = self._should_rewrite_branch(
                 branch=branch,
                 reward=reward,
-                advice_rewrite_hint=advice_rewrite_hint,
-                advice_conf=advice_conf,
             )
+            if should_rewrite and advice_rewrite_hint and advice_conf >= self.config.advisor_rewrite_confidence_threshold:
+                rewrite_hint = advice_rewrite_hint
 
             if should_rewrite:
                 branch.rewrite_prompt(rewrite_hint, self.config.max_prompt_variants)
@@ -143,7 +149,11 @@ class OptimizerAgent:
                 user_id=user_id,
                 old_weight=old_weight,
                 new_weight=branch.state.weight,
+                old_prompt=old_prompt,
+                new_prompt=branch.state.prompt_template,
                 prompt_rewritten=prompt_rewritten,
+                acceptance_runner=acceptance_runner,
+                task=task,
             )
             if not accepted_update:
                 branch.state.weight = old_weight
@@ -548,8 +558,6 @@ class OptimizerAgent:
         self,
         branch: PromptBranch,
         reward: float,
-        advice_rewrite_hint: str,
-        advice_conf: float,
     ) -> bool:
         streak = int(branch.state.metadata.get("low_reward_streak", 0))
         if reward < self.config.prompt_rewrite_threshold:
@@ -561,9 +569,7 @@ class OptimizerAgent:
         last_rewrite_episode = int(branch.state.metadata.get("last_rewrite_episode", -10**9))
         cooldown_ok = (self._episode_idx - last_rewrite_episode) >= max(1, self.config.rewrite_cooldown_episodes)
         repeated_failures_ok = streak >= max(1, self.config.rewrite_failure_streak_trigger)
-        advisor_ok = bool(advice_rewrite_hint and advice_conf >= self.config.advisor_rewrite_confidence_threshold)
-
-        should = cooldown_ok and repeated_failures_ok and (reward < self.config.prompt_rewrite_threshold or advisor_ok)
+        should = cooldown_ok and repeated_failures_ok and (reward < self.config.prompt_rewrite_threshold)
         if should:
             branch.state.metadata["last_rewrite_episode"] = self._episode_idx
         return should
@@ -576,8 +582,27 @@ class OptimizerAgent:
         user_id: str,
         old_weight: float,
         new_weight: float,
+        old_prompt: str,
+        new_prompt: str,
         prompt_rewritten: bool,
+        acceptance_runner: Callable[..., bool] | None,
+        task: TaskInput,
     ) -> bool:
+        if acceptance_runner:
+            return bool(
+                acceptance_runner(
+                    task=task,
+                    branch_name=branch_name,
+                    task_type=task_type,
+                    user_id=user_id,
+                    old_weight=old_weight,
+                    new_weight=new_weight,
+                    old_prompt=old_prompt,
+                    new_prompt=new_prompt,
+                    prompt_rewritten=prompt_rewritten,
+                )
+            )
+
         before_est = memory.branch_expected_reward(
             branch_name=branch_name,
             task_type=task_type,

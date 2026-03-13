@@ -316,6 +316,54 @@ def create_default_hierarchical_forest() -> HierarchicalPromptForest:
                 0.95,
                 ["general", "planning", "factual"],
             ),
+            (
+                "json_lock",
+                "Strict JSON contract output with zero extra text.",
+                (
+                    "You are the JSON Lock niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "If JSON is requested, return ONLY valid JSON with no prose, no markdown fences, and no extra tokens."
+                ),
+                0.98,
+                ["math", "factual", "general", "code"],
+            ),
+            (
+                "csv_lock",
+                "Strict CSV row formatting with no explanatory text.",
+                (
+                    "You are the CSV Lock niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "If CSV is requested, return ONLY raw CSV lines in requested order and no additional commentary."
+                ),
+                0.98,
+                ["general", "planning"],
+            ),
+            (
+                "code_patch_lock",
+                "Strict code-patch contract (FIX/TESTS) with no contamination.",
+                (
+                    "You are the Code Patch Lock niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "When asked for FIX/TESTS format, output exactly that contract without extra verification prose."
+                ),
+                0.99,
+                ["code", "general"],
+            ),
+            (
+                "bullet_lock",
+                "Strict bullet-only contract following line-level constraints.",
+                (
+                    "You are the Bullet Lock niche branch. Task type: {task_type}.\\n"
+                    "Task: {task}\\n"
+                    "Parent context: {context}\\n"
+                    "If bullet output is requested, return only bullet lines that satisfy explicit count/format constraints."
+                ),
+                0.97,
+                ["general", "planning", "creative"],
+            ),
         ],
         "creative": [
             (

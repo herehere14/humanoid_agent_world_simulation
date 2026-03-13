@@ -17,6 +17,9 @@ class _FakeAdvisor:
     def is_enabled(self) -> bool:
         return True
 
+    def is_proposal_only(self) -> bool:
+        return False
+
     def advise(self, task, route, signal, branches):
         return {
             "branch_directives": [
@@ -600,3 +603,68 @@ def test_candidate_parent_gate_requires_positive_reward_gap(tmp_path):
 
     # Candidate is slightly better but does not clear minimum reward-gap gate.
     assert branches["candidate_x"].state.status.value != "active"
+
+
+def test_acceptance_runner_can_block_weight_update(tmp_path):
+    branches = create_default_branches()
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    optimizer = OptimizerAgent(OptimizerConfig(learning_rate=0.2, update_acceptance_min_gain=-1.0))
+
+    route = RoutingDecision(task_type="math", activated_branches=["analytical"], branch_scores={})
+    signal = _signal(["analytical"], reward=0.9, reason="high_quality")
+    old_weight = branches["analytical"].state.weight
+
+    event = optimizer.optimize(
+        TaskInput("1", "task", "math", metadata={"user_id": "global"}),
+        route,
+        signal,
+        branches,
+        memory,
+        acceptance_runner=lambda **_: False,
+    )
+
+    assert branches["analytical"].state.weight == old_weight
+    assert event.update_details["analytical"]["update_accepted"] is False
+
+
+def test_proposal_only_advisor_does_not_add_weight_delta(tmp_path):
+    class _ProposalOnlyAdvisor:
+        def is_enabled(self) -> bool:
+            return True
+
+        def is_proposal_only(self) -> bool:
+            return True
+
+        def advise(self, task, route, signal, branches):
+            return {
+                "branch_directives": [
+                    {
+                        "branch_name": "analytical",
+                        "extra_weight_delta": 0.2,
+                        "rewrite_hint": "tighten format",
+                        "confidence": 0.99,
+                    }
+                ],
+                "candidate_proposals": [],
+            }
+
+    branches = create_default_branches()
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    optimizer = OptimizerAgent(
+        OptimizerConfig(learning_rate=0.0, weight_decay=0.0, prompt_rewrite_threshold=0.0),
+        advisor=_ProposalOnlyAdvisor(),
+    )
+    route = RoutingDecision(task_type="math", activated_branches=["analytical"], branch_scores={})
+    signal = _signal(["analytical"], reward=0.5, reason="ok")
+    old_weight = branches["analytical"].state.weight
+
+    event = optimizer.optimize(
+        TaskInput("1", "task", "math", metadata={"user_id": "global"}),
+        route,
+        signal,
+        branches,
+        memory,
+    )
+
+    assert branches["analytical"].state.weight == old_weight
+    assert event.update_details["analytical"]["advisory_extra_delta"] == 0.0
