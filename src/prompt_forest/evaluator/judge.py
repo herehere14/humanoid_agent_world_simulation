@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..rewards.modes import ExactMatchReward, HybridReward, KeywordReward, RuleBasedReward
+from ..rewards.modes import ExactMatchReward, HybridReward, KeywordReward, RuleBasedReward, TaskSpecificReward
 from ..types import BranchOutput, TaskInput
 
 
@@ -25,9 +25,10 @@ class OutputJudge:
         if reward_mode == "keyword":
             return KeywordReward(weight=1.0)
         return HybridReward(
-            exact=ExactMatchReward(weight=0.3),
-            keyword=KeywordReward(weight=0.5),
+            exact=ExactMatchReward(weight=0.25),
+            keyword=KeywordReward(weight=0.35),
             rule=RuleBasedReward(weight=0.2),
+            task_specific=TaskSpecificReward(weight=0.2),
         )
 
     def score_output(self, output: str, task: TaskInput) -> BranchScore:

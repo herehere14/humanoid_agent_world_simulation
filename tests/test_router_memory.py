@@ -27,3 +27,72 @@ def test_memory_bias_reflects_success(tmp_path):
 
     bias = memory.branch_success_bias("math")
     assert bias["analytical"] > 0
+
+
+def test_memory_bias_is_capped_and_shrunk_for_small_samples(tmp_path):
+    memory = MemoryStore(
+        MemoryConfig(max_records=100, similarity_window=50, bias_scale=0.6, bias_cap=0.15, shrinkage_k=20.0),
+        memory_path=tmp_path / "m.jsonl",
+    )
+    memory.add(
+        MemoryRecord(
+            task_id="one",
+            task_type="math",
+            input_text="calc",
+            activated_branches=["verification"],
+            branch_outputs={"verification": "ok"},
+            selected_branch="verification",
+            selected_output="ok",
+            reward_score=1.0,
+            failure_reason="",
+            confidence=0.8,
+            useful_patterns=[],
+        )
+    )
+
+    bias = memory.branch_success_bias("math")
+    assert 0.0 < bias["verification"] < 0.15
+
+
+def test_memory_recency_decay_prioritizes_recent_records(tmp_path):
+    memory = MemoryStore(
+        MemoryConfig(max_records=100, similarity_window=50, bias_scale=0.6, recency_decay=0.9),
+        memory_path=tmp_path / "m.jsonl",
+    )
+
+    for i in range(8):
+        memory.add(
+            MemoryRecord(
+                task_id=f"old-{i}",
+                task_type="planning",
+                input_text="plan",
+                activated_branches=["planner"],
+                branch_outputs={"planner": "ok"},
+                selected_branch="planner",
+                selected_output="ok",
+                reward_score=0.95,
+                failure_reason="",
+                confidence=0.8,
+                useful_patterns=[],
+            )
+        )
+    for i in range(2):
+        memory.add(
+            MemoryRecord(
+                task_id=f"recent-{i}",
+                task_type="planning",
+                input_text="plan",
+                activated_branches=["planner"],
+                branch_outputs={"planner": "ok"},
+                selected_branch="planner",
+                selected_output="ok",
+                reward_score=0.1,
+                failure_reason="",
+                confidence=0.8,
+                useful_patterns=[],
+            )
+        )
+
+    bias = memory.branch_success_bias("planning")
+    # Un-decayed average would be strongly positive; recency decay should pull it downward.
+    assert bias["planner"] < 0.1

@@ -16,6 +16,8 @@ class OptimizationEvent:
     promoted_candidates: list[str]
     archived_candidates: list[str]
     created_candidates: list[str]
+    task_baseline_before: float = 0.5
+    task_baseline_after: float = 0.5
 
 
 class OptimizerAgent:
@@ -23,6 +25,7 @@ class OptimizerAgent:
 
     def __init__(self, config: OptimizerConfig) -> None:
         self.config = config
+        self._task_baselines: dict[str, float] = {}
 
     def optimize(
         self,
@@ -37,6 +40,7 @@ class OptimizerAgent:
         promoted: list[str] = []
         archived: list[str] = []
         created: list[str] = []
+        task_baseline_before = self._task_baselines.get(route.task_type, 0.5)
 
         for branch_name in route.activated_branches:
             branch = branches.get(branch_name)
@@ -47,10 +51,12 @@ class OptimizerAgent:
             reward = fb.reward if fb else 0.0
             branch.apply_reward(reward)
 
-            delta = self.config.learning_rate * (reward - 0.5)
+            advantage = reward - task_baseline_before
+            delta = self.config.learning_rate * advantage
             decay = self.config.weight_decay * (branch.state.weight - 1.0)
             new_weight = branch.state.weight + delta - decay
             branch.state.weight = max(self.config.min_weight, min(self.config.max_weight, new_weight))
+            branch.state.metadata["last_advantage"] = round(advantage, 6)
             updated[branch_name] = round(branch.state.weight, 4)
 
             if reward < self.config.prompt_rewrite_threshold and fb:
@@ -65,11 +71,14 @@ class OptimizerAgent:
                         branch.state.status = BranchStatus.ACTIVE
                         branch.state.weight = max(1.0, branch.state.weight)
                         promoted.append(branch_name)
+                    elif self._should_extend_candidate_trial(avg, branch):
+                        branch.state.trial_remaining = self.config.candidate_extension_episodes
                     else:
                         branch.state.status = BranchStatus.ARCHIVED
                         archived.append(branch_name)
 
         self._try_create_candidate(task, route, signal, branches, memory, created)
+        task_baseline_after = self._update_task_baseline(route.task_type, signal.reward_score)
 
         return OptimizationEvent(
             updated_weights=updated,
@@ -77,7 +86,29 @@ class OptimizerAgent:
             promoted_candidates=promoted,
             archived_candidates=archived,
             created_candidates=created,
+            task_baseline_before=round(task_baseline_before, 4),
+            task_baseline_after=round(task_baseline_after, 4),
         )
+
+    def _update_task_baseline(self, task_type: str, reward: float) -> float:
+        old = self._task_baselines.get(task_type, 0.5)
+        beta = self.config.advantage_baseline_beta
+        new = (1.0 - beta) * old + beta * reward
+        self._task_baselines[task_type] = new
+        return new
+
+    def _should_extend_candidate_trial(self, avg_reward: float, branch: PromptBranch) -> bool:
+        lower = self.config.candidate_promote_threshold - self.config.candidate_neutral_band
+        upper = self.config.candidate_promote_threshold + self.config.candidate_neutral_band
+        if not (lower <= avg_reward <= upper):
+            return False
+
+        used = int(branch.state.metadata.get("trial_extensions_used", 0))
+        if used >= self.config.candidate_max_extensions:
+            return False
+
+        branch.state.metadata["trial_extensions_used"] = used + 1
+        return True
 
     def _try_create_candidate(
         self,

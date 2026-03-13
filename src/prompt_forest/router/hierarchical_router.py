@@ -20,6 +20,7 @@ class HierarchicalRouter:
     def __init__(self, config: RouterConfig, seed: int = 7) -> None:
         self.config = config
         self._rng = random.Random(seed)
+        self._route_calls = 0
         self._macro_affinity = {
             "math": {"analytical": 0.35, "verification": 0.25, "critique": 0.1},
             "planning": {"planner": 0.35, "critique": 0.2, "verification": 0.1},
@@ -58,6 +59,7 @@ class HierarchicalRouter:
 
         active_path: list[str] = []
         flattened_scores: dict[str, float] = {}
+        exploration_rate = self._current_exploration()
 
         current = forest.root_id
         while True:
@@ -75,11 +77,12 @@ class HierarchicalRouter:
             if not scores:
                 break
 
-            selected = self._select_one(scores, visit_counts)
+            selected = self._select_one(scores, visit_counts, exploration_rate)
             active_path.append(selected)
             flattened_scores.update(scores)
             current = selected
 
+        self._route_calls += 1
         return RoutingDecision(task_type=task_type, activated_branches=active_path, branch_scores=flattened_scores)
 
     def _score_children(
@@ -97,18 +100,20 @@ class HierarchicalRouter:
             if branch.state.status == BranchStatus.ARCHIVED:
                 continue
 
-            node = forest.nodes[child_id]
-            score = branch.state.weight
+            affinity = self._affinity_for_child(
+                task_type=task_type,
+                parent_id=parent_id,
+                child_id=child_id,
+                forest=forest,
+            )
+            memory_bias = history_bias.get(child_id, 0.0)
+            memory_bias = max(-self.config.memory_term_cap, min(self.config.memory_term_cap, memory_bias))
 
-            if parent_id == forest.root_id:
-                score += self._macro_affinity.get(task_type, {}).get(child_id, 0.0)
-            else:
-                if task_type in node.specialties:
-                    score += 0.3
-                elif "general" in node.specialties:
-                    score += 0.08
-
-            score += history_bias.get(child_id, 0.0)
+            score = (
+                (self.config.weight_coef * branch.state.weight)
+                + (self.config.affinity_coef * affinity)
+                + (self.config.memory_coef * memory_bias)
+            )
 
             if branch.state.status == BranchStatus.CANDIDATE:
                 score *= 0.85
@@ -117,11 +122,11 @@ class HierarchicalRouter:
 
         return out
 
-    def _select_one(self, scores: dict[str, float], visit_counts: dict[str, int]) -> str:
+    def _select_one(self, scores: dict[str, float], visit_counts: dict[str, int], exploration_rate: float) -> str:
         ordered = sorted(scores.items(), key=lambda x: x[1], reverse=True)
         selected = ordered[0][0]
 
-        if self._rng.random() < self.config.exploration and len(ordered) > 1:
+        if self._rng.random() < exploration_rate and len(ordered) > 1:
             underexplored = [name for name in scores if visit_counts.get(name, 0) <= 1]
             if underexplored:
                 selected = self._rng.choice(underexplored)
@@ -129,3 +134,24 @@ class HierarchicalRouter:
                 selected = self._rng.choice([name for name, _ in ordered[1:]])
 
         return selected
+
+    def _current_exploration(self) -> float:
+        decayed = self.config.exploration * (self.config.exploration_decay**self._route_calls)
+        return max(self.config.exploration_min, decayed)
+
+    def _affinity_for_child(
+        self,
+        task_type: str,
+        parent_id: str,
+        child_id: str,
+        forest: HierarchicalPromptForest,
+    ) -> float:
+        if parent_id == forest.root_id:
+            return self._macro_affinity.get(task_type, {}).get(child_id, 0.0)
+
+        node = forest.nodes[child_id]
+        if task_type in node.specialties:
+            return 0.3
+        if "general" in node.specialties:
+            return 0.08
+        return 0.0

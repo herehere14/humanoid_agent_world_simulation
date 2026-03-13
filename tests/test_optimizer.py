@@ -109,3 +109,51 @@ def test_candidate_promotes_after_successful_trial(tmp_path):
     optimizer.optimize(TaskInput("2", "x", "general"), route, signal, branches, memory)
 
     assert branches["candidate_x"].state.status.value == "active"
+
+
+def test_advantage_updates_shrink_as_task_baseline_rises(tmp_path):
+    branches = create_default_branches()
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    optimizer = OptimizerAgent(OptimizerConfig(learning_rate=0.2, advantage_baseline_beta=0.3))
+
+    route = RoutingDecision(task_type="math", activated_branches=["analytical"], branch_scores={})
+    signal = _signal(["analytical"], reward=0.8, reason="medium_quality")
+
+    w0 = branches["analytical"].state.weight
+    optimizer.optimize(TaskInput("1", "task", "math"), route, signal, branches, memory)
+    w1 = branches["analytical"].state.weight
+    optimizer.optimize(TaskInput("2", "task", "math"), route, signal, branches, memory)
+    w2 = branches["analytical"].state.weight
+
+    first_gain = w1 - w0
+    second_gain = w2 - w1
+    assert first_gain > second_gain
+
+
+def test_candidate_trial_extends_near_promotion_threshold(tmp_path):
+    branches = create_default_branches()
+    branches["candidate_x"] = make_candidate_branch(
+        name="candidate_x",
+        purpose="extra verifier",
+        prompt_template="Task {task}",
+        trial_episodes=1,
+    )
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    optimizer = OptimizerAgent(
+        OptimizerConfig(
+            candidate_failure_trigger=99,
+            candidate_trial_episodes=1,
+            candidate_promote_threshold=0.62,
+            candidate_neutral_band=0.05,
+            candidate_extension_episodes=2,
+            candidate_max_extensions=1,
+            learning_rate=0.1,
+        )
+    )
+
+    route = RoutingDecision(task_type="general", activated_branches=["candidate_x"], branch_scores={})
+    signal = _signal(["candidate_x"], reward=0.6, reason="medium_quality")
+    optimizer.optimize(TaskInput("1", "x", "general"), route, signal, branches, memory)
+
+    assert branches["candidate_x"].state.status.value == "candidate"
+    assert branches["candidate_x"].state.trial_remaining == 2

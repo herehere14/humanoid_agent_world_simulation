@@ -41,19 +41,40 @@ class MemoryStore:
 
     def branch_success_bias(self, task_type: str) -> dict[str, float]:
         records = self.retrieve_similar(task_type, limit=self.config.similarity_window)
-        scores: dict[str, list[float]] = defaultdict(list)
-        for r in records:
-            if r.branch_rewards:
-                for b, val in r.branch_rewards.items():
-                    scores[b].append(val)
+        if not records:
+            return {}
+
+        weighted_sum: dict[str, float] = defaultdict(float)
+        weight_sum: dict[str, float] = defaultdict(float)
+        sample_count: dict[str, int] = defaultdict(int)
+
+        n_records = len(records)
+        for idx, record in enumerate(records):
+            age = n_records - 1 - idx
+            recency_weight = self.config.recency_decay**age
+            if record.branch_rewards:
+                for branch, reward in record.branch_rewards.items():
+                    weighted_sum[branch] += reward * recency_weight
+                    weight_sum[branch] += recency_weight
+                    sample_count[branch] += 1
             else:
-                for b in r.activated_branches:
-                    scores[b].append(r.reward_score)
+                for branch in record.activated_branches:
+                    weighted_sum[branch] += record.reward_score * recency_weight
+                    weight_sum[branch] += recency_weight
+                    sample_count[branch] += 1
 
         bias: dict[str, float] = {}
-        for branch, rewards in scores.items():
-            avg = sum(rewards) / len(rewards)
-            bias[branch] = (avg - 0.5) * self.config.bias_scale
+        for branch, total in weighted_sum.items():
+            avg = total / max(1e-8, weight_sum[branch])
+            raw_bias = (avg - 0.5) * self.config.bias_scale
+
+            # Conservative shrinkage keeps low-sample memory from dominating routing.
+            n = sample_count[branch]
+            shrink = n / (n + self.config.shrinkage_k)
+            shrunk = raw_bias * shrink
+
+            capped = max(-self.config.bias_cap, min(self.config.bias_cap, shrunk))
+            bias[branch] = capped
         return bias
 
     def repeated_failures(self, min_count: int = 3) -> dict[str, int]:

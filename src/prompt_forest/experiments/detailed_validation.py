@@ -199,10 +199,13 @@ class DetailedHierarchicalValidator:
         cfg = load_config(self.config_path)
         cfg.router.top_k = 1
         cfg.router.min_candidates = 1
-        cfg.router.exploration = 0.3 if adaptive else 0.02
-        cfg.memory.bias_scale = 2.0
-        cfg.optimizer.learning_rate = 0.24
-        cfg.optimizer.weight_decay = 0.02
+        cfg.router.exploration = 0.12 if adaptive else 0.02
+        cfg.router.memory_coef = 0.2
+        cfg.memory.bias_scale = max(0.2, min(0.6, cfg.memory.bias_scale))
+        cfg.optimizer.learning_rate = 0.08
+        cfg.optimizer.weight_decay = 0.03
+        cfg.optimizer.candidate_failure_trigger = 999
+        cfg.optimizer.max_active_candidates = 0
 
         mode = "adaptive" if adaptive else "frozen"
         task_key = tasks[0].task_type if tasks else "unknown"
@@ -302,11 +305,15 @@ class DetailedHierarchicalValidator:
             cfg.router.top_k = 1
             cfg.router.min_candidates = 1
             cfg.router.exploration = 0.35
+            cfg.router.memory_coef = 0.2
+            cfg.optimizer.learning_rate = 0.08
+            cfg.optimizer.weight_decay = 0.03
+            cfg.optimizer.advantage_baseline_beta = 0.1
             cfg.optimizer.candidate_failure_trigger = 2
             cfg.optimizer.candidate_trial_episodes = 4
             cfg.optimizer.max_active_candidates = 6
             cfg.optimizer.max_active_branches = 40
-            cfg.memory.bias_scale = 1.8
+            cfg.memory.bias_scale = 0.5
 
             run_dir = self.root_dir / "artifacts" / "growth_probe_runs" / f"seed_{seed}"
             if run_dir.exists():

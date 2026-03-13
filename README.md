@@ -146,6 +146,14 @@ prompt-forest run-task \
   --metadata '{"expected_keywords": ["derivative", "2x"], "required_substrings": ["confidence"]}'
 ```
 
+### 1b) Interactive chat with the RL agent
+
+```bash
+PYTHONPATH=src python -m prompt_forest.cli chat --task-type auto --show-route
+```
+
+Use `/type <task_type>` to pin type and `/auto` to restore auto-routing.
+
 ### 2) Benchmark demo
 
 ```bash
@@ -199,6 +207,48 @@ This detailed validation now also reports branch-growth metrics:
 - hierarchy depth gain
 - reward trend during growth-probe runs
 
+### 8) Multi-round auto-improvement loop (anti-bias objective)
+
+```bash
+PYTHONPATH=src python examples/run_auto_improve.py
+```
+
+or via CLI:
+
+```bash
+prompt-forest auto-improve \
+  --rounds 3 \
+  --candidates 12 \
+  --episodes 140 \
+  --final-episodes 220 \
+  --seeds 3,5,7,11 \
+  --final-seeds 11,17,19,23,29,31,37,41
+```
+
+The auto-improver only promotes configurations that improve holdout performance while penalizing instability, task-type unfairness, and branch-collapse concentration.
+
+### 9) Continuous improvement cycles (hours-scale)
+
+```bash
+PYTHONPATH=src python examples/run_continuous_improve.py
+```
+
+or via CLI:
+
+```bash
+prompt-forest continuous-improve \
+  --cycles 12 \
+  --rounds-per-cycle 2 \
+  --candidates 6 \
+  --episodes 180 \
+  --final-episodes 220 \
+  --seeds 11,17,19,23,29,31,37,41 \
+  --final-seeds 11,17,19,23,29,31,37,41 \
+  --patience 3
+```
+
+This loop runs repeated auto-improvement cycles, executes regression tests after each cycle, accepts only improving/no-bias candidates, and rolls back regressions automatically.
+
 ## Logged artifacts
 
 - `artifacts/events.jsonl`: per-task routing, branch rewards, optimization events
@@ -208,6 +258,9 @@ This detailed validation now also reports branch-growth metrics:
 - `artifacts/candidate_trial_report.json`: candidate branch creation/trial state snapshot
 - `artifacts/rl_validation_report.json`: multi-seed adaptive-vs-frozen learning evidence
 - `artifacts/detailed_validation_report.json`: branch inventory, improvement metrics, and branch-ablation effects
+- `artifacts/auto_improve/auto_improve_summary.json`: multi-round search log and selected best config
+- `artifacts/auto_improve/final_validation_report.json`: final unbiased validation for promoted config
+- `artifacts/continuous_improve/continuous_improve_summary.json`: multi-cycle long-run optimization trace with acceptance/rollback decisions
 
 ## What the MVP demonstrates
 

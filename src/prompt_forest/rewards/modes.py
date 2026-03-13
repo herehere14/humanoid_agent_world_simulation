@@ -62,18 +62,43 @@ class RuleBasedReward:
 
 
 @dataclass
+class TaskSpecificReward:
+    weight: float = 1.0
+
+    def score(self, output: str, task: TaskInput) -> tuple[float, str]:
+        output_n = _norm(output)
+        checks: dict[str, list[str]] = {
+            "math": ["symbolic", "equation", "derive", "constraint", "solve"],
+            "planning": ["plan", "timeline", "milestone", "deadline", "risk"],
+            "factual": ["fact", "evidence", "grounded", "source", "reference"],
+            "code": ["code", "bug", "algorithm", "test", "refactor"],
+            "creative": ["creative", "novel", "idea", "diverse", "option"],
+            "general": ["verification", "robust", "confidence", "check"],
+        }
+        expected = checks.get(task.task_type, checks["general"])
+        hit = sum(1 for token in expected if token in output_n)
+        ratio = hit / max(1, min(3, len(expected)))
+        clipped = max(0.0, min(1.0, ratio))
+        return clipped * self.weight, f"task_specific:{hit}/{len(expected)}"
+
+
+@dataclass
 class HybridReward:
     exact: ExactMatchReward
     keyword: KeywordReward
     rule: RuleBasedReward
+    task_specific: TaskSpecificReward
 
     def score(self, output: str, task: TaskInput) -> tuple[float, str]:
         s1, r1 = self.exact.score(output, task)
         s2, r2 = self.keyword.score(output, task)
         s3, r3 = self.rule.score(output, task)
+        s4, r4 = self.task_specific.score(output, task)
 
-        total_weight = self.exact.weight + self.keyword.weight + self.rule.weight
-        score = (s1 + s2 + s3) / max(1e-8, total_weight)
+        total_weight = self.exact.weight + self.keyword.weight + self.rule.weight + self.task_specific.weight
+        score = (s1 + s2 + s3 + s4) / max(1e-8, total_weight)
+        score -= self._shallow_keyword_penalty(output, task, s1=s1, s2=s2, s3=s3)
+        score = max(0.0, min(1.0, score))
 
         if score >= 0.75:
             top_reason = "high_quality"
@@ -82,5 +107,18 @@ class HybridReward:
         else:
             top_reason = "low_quality"
 
-        reason = f"{top_reason}|{r1}|{r2}|{r3}"
+        reason = f"{top_reason}|{r1}|{r2}|{r3}|{r4}"
         return score, reason
+
+    def _shallow_keyword_penalty(self, output: str, task: TaskInput, s1: float, s2: float, s3: float) -> float:
+        keywords = task.metadata.get("expected_keywords", [])
+        output_n = _norm(output)
+        keyword_hits = sum(1 for k in keywords if _norm(str(k)) in output_n) if keywords else 0
+        keyword_ratio = keyword_hits / max(1, len(keywords)) if keywords else 0.0
+
+        token_count = len(re.findall(r"\w+", output_n))
+        if keyword_ratio >= 0.8 and (s1 <= 0.3 and s3 <= 0.6):
+            return 0.12
+        if keyword_ratio >= 0.7 and token_count < 24:
+            return 0.08
+        return 0.0

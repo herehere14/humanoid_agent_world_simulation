@@ -1,18 +1,28 @@
 {
   "router": {
     "top_k": 3,
-    "exploration": 0.2,
-    "min_candidates": 2
+    "exploration": 0.141407,
+    "min_candidates": 2,
+    "weight_coef": 1.0,
+    "affinity_coef": 0.6,
+    "memory_coef": 0.221801,
+    "memory_term_cap": 0.15,
+    "exploration_min": 0.03,
+    "exploration_decay": 0.994593
   },
   "optimizer": {
-    "learning_rate": 0.08,
-    "weight_decay": 0.03,
+    "learning_rate": 0.131926,
+    "weight_decay": 0.040298,
+    "advantage_baseline_beta": 0.141565,
     "min_weight": 0.1,
     "max_weight": 3.0,
     "prompt_rewrite_threshold": 0.46,
     "max_prompt_variants": 5,
-    "candidate_trial_episodes": 6,
+    "candidate_trial_episodes": 10,
     "candidate_promote_threshold": 0.62,
+    "candidate_neutral_band": 0.05,
+    "candidate_extension_episodes": 3,
+    "candidate_max_extensions": 1,
     "candidate_failure_trigger": 4,
     "max_active_branches": 24,
     "max_active_candidates": 4,
@@ -22,7 +32,10 @@
   "memory": {
     "max_records": 5000,
     "similarity_window": 120,
-    "bias_scale": 0.6
+    "bias_scale": 0.526598,
+    "bias_cap": 0.15,
+    "shrinkage_k": 40.0,
+    "recency_decay": 0.982064
   },
   "evaluator": {
     "aggregation_strategy": "leaf_select",
