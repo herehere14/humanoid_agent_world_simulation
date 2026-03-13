@@ -89,6 +89,47 @@ def test_candidate_creation_after_repeated_failures(tmp_path):
     assert branches[created_name].state.trial_remaining == 2
 
 
+def test_optimizer_can_spawn_multiple_candidates_in_one_event(tmp_path):
+    branches = create_default_branches()
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    optimizer = OptimizerAgent(
+        OptimizerConfig(
+            candidate_failure_trigger=3,
+            candidate_trial_episodes=2,
+            learning_rate=0.1,
+            candidate_spawn_per_event=2,
+            max_active_candidates=6,
+            max_active_branches=40,
+        )
+    )
+
+    for i in range(4):
+        memory.add(
+            MemoryRecord(
+                task_id=f"mx{i}",
+                task_type="general",
+                input_text="x",
+                activated_branches=["analytical", "retrieval"],
+                branch_outputs={},
+                selected_branch="analytical",
+                selected_output="",
+                reward_score=0.2,
+                failure_reason="low_quality|keyword_coverage:0/3",
+                confidence=0.4,
+                useful_patterns=[],
+            )
+        )
+
+    route = RoutingDecision(task_type="general", activated_branches=["analytical", "retrieval"], branch_scores={})
+    signal = _signal(["analytical", "retrieval"], reward=0.2, reason="low_quality|keyword_coverage:0/3")
+    event = optimizer.optimize(TaskInput("m", "task", "general"), route, signal, branches, memory)
+
+    assert len(event.created_candidates) >= 2
+    for name in event.created_candidates:
+        assert branches[name].state.status.value == "candidate"
+        assert branches[name].state.trial_remaining == 2
+
+
 def test_candidate_promotes_after_successful_trial(tmp_path):
     branches = create_default_branches()
     branches["candidate_x"] = make_candidate_branch(

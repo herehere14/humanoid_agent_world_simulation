@@ -1,0 +1,27 @@
+{
+  "agent_runtimes": {
+    "evaluator": {
+      "enabled": true,
+      "provider": "gemini",
+      "model": "gemini-2.0-flash",
+      "api_key_env": "GEMINI_API_KEY",
+      "temperature": 0.1,
+      "max_output_tokens": 800,
+      "timeout_seconds": 45
+    },
+    "optimizer": {
+      "enabled": true,
+      "provider": "gemini",
+      "model": "gemini-2.0-flash",
+      "api_key_env": "GEMINI_API_KEY",
+      "temperature": 0.1,
+      "max_output_tokens": 900,
+      "timeout_seconds": 45
+    }
+  },
+  "optimizer": {
+    "candidate_spawn_per_event": 2,
+    "max_active_candidates": 8,
+    "max_active_branches": 48
+  }
+}

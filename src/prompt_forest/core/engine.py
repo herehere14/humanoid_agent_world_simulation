@@ -6,6 +6,8 @@ from typing import Any
 from uuid import uuid4
 
 from ..agents.evaluator_agent import EvaluatorAgent
+from ..agents.llm_evaluator_agent import LLMEvaluatorAgent
+from ..agents.llm_optimizer_advisor import LLMOptimizerAdvisor
 from ..agents.optimizer_agent import OptimizationEvent, OptimizerAgent
 from ..aggregator.strategies import AggregationResult, Aggregator
 from ..backend.base import LLMBackend
@@ -43,8 +45,12 @@ class PromptForestEngine:
         self.memory = MemoryStore(self.config.memory, memory_path=self.artifacts_dir / "memory_records.jsonl")
         self.router = HierarchicalRouter(self.config.router)
         self.judge = OutputJudge(self.config.evaluator.reward_mode)
-        self.evaluator_agent = EvaluatorAgent()
-        self.optimizer_agent = OptimizerAgent(self.config.optimizer)
+        self.evaluator_agent = LLMEvaluatorAgent(
+            runtime_config=self.config.agent_runtimes.evaluator,
+            fallback=EvaluatorAgent(),
+        )
+        optimizer_advisor = LLMOptimizerAdvisor(self.config.agent_runtimes.optimizer)
+        self.optimizer_agent = OptimizerAgent(self.config.optimizer, advisor=optimizer_advisor)
         self.aggregator = Aggregator(self.config.evaluator.aggregation_strategy)
 
         self._route_history: list[RoutingDecision] = []
@@ -72,7 +78,13 @@ class PromptForestEngine:
         numeric_scores = {k: v.reward for k, v in branch_scores.items()}
 
         aggregation = self._aggregate(route, outputs, numeric_scores)
-        signal = self.evaluator_agent.evaluate(task, route, branch_scores, aggregation)
+        signal = self.evaluator_agent.evaluate(
+            task,
+            route,
+            branch_scores,
+            aggregation,
+            branch_outputs={k: v.output for k, v in outputs.items()},
+        )
         self._propagate_rewards_along_path(route, signal, gamma=0.9, local_mix=0.55)
 
         if adapt:
@@ -92,6 +104,8 @@ class PromptForestEngine:
                 promoted_candidates=[],
                 archived_candidates=[],
                 created_candidates=[],
+                advisor_used=False,
+                advisor_error="",
             )
 
         record = MemoryRecord(
@@ -126,6 +140,12 @@ class PromptForestEngine:
                 "aggregator_notes": signal.aggregator_notes,
             },
             "optimization": asdict(optimize_event),
+            "runtime": {
+                "evaluator_llm_enabled": self.config.agent_runtimes.evaluator.enabled,
+                "optimizer_llm_enabled": self.config.agent_runtimes.optimizer.enabled,
+                "evaluator_provider": self.config.agent_runtimes.evaluator.provider,
+                "optimizer_provider": self.config.agent_runtimes.optimizer.provider,
+            },
             "branch_weights": {name: round(branch.state.weight, 4) for name, branch in self.branches.items()},
         }
         append_jsonl(self._event_log, payload)

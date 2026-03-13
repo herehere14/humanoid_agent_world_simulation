@@ -27,7 +27,11 @@
     "max_active_branches": 24,
     "max_active_candidates": 4,
     "candidate_initial_weight": 0.6,
-    "max_hierarchy_depth": 4
+    "max_hierarchy_depth": 4,
+    "candidate_spawn_per_event": 1,
+    "candidate_max_children_per_parent": 8,
+    "advisor_weight_delta_cap": 0.06,
+    "advisor_rewrite_confidence_threshold": 0.62
   },
   "memory": {
     "max_records": 5000,
@@ -40,6 +44,28 @@
   "evaluator": {
     "aggregation_strategy": "leaf_select",
     "reward_mode": "hybrid"
+  },
+  "agent_runtimes": {
+    "evaluator": {
+      "enabled": false,
+      "provider": "openai_compatible",
+      "model": "gpt-4.1-mini",
+      "api_key_env": "OPENAI_API_KEY",
+      "base_url": "https://api.openai.com/v1",
+      "temperature": 0.1,
+      "max_output_tokens": 800,
+      "timeout_seconds": 45
+    },
+    "optimizer": {
+      "enabled": false,
+      "provider": "openai_compatible",
+      "model": "gpt-4.1-mini",
+      "api_key_env": "OPENAI_API_KEY",
+      "base_url": "https://api.openai.com/v1",
+      "temperature": 0.1,
+      "max_output_tokens": 900,
+      "timeout_seconds": 45
+    }
   },
   "artifacts_dir": "artifacts"
 }

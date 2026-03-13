@@ -269,6 +269,12 @@ def main() -> None:
             "branches": engine.branch_snapshot(),
             "memory": engine.memory.stats(),
             "routing_histogram": engine.routing_histogram(),
+            "runtime": {
+                "evaluator_llm_enabled": engine.config.agent_runtimes.evaluator.enabled,
+                "optimizer_llm_enabled": engine.config.agent_runtimes.optimizer.enabled,
+                "evaluator_provider": engine.config.agent_runtimes.evaluator.provider,
+                "optimizer_provider": engine.config.agent_runtimes.optimizer.provider,
+            },
         }
         print(json.dumps(payload, indent=2))
         return

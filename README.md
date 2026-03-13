@@ -163,6 +163,47 @@ prompt-forest inspect-events --limit 8 --visibility full
 
 This prints per-task routing path, branch-level evaluation signals, and optimizer updates (weight delta, advantage, decay, rewrites, candidate lifecycle actions).
 
+### 1d) Enable real API-backed Evaluator Agent and Optimizer Agent
+
+By default, Agent 1 and Agent 2 run with deterministic local logic.  
+To run them as model-backed agents, enable `agent_runtimes` in config and set API keys.
+
+Config section:
+
+```json
+"agent_runtimes": {
+  "evaluator": {
+    "enabled": true,
+    "provider": "openai_compatible",
+    "model": "gpt-4.1-mini",
+    "api_key_env": "OPENAI_API_KEY",
+    "base_url": "https://api.openai.com/v1"
+  },
+  "optimizer": {
+    "enabled": true,
+    "provider": "openai_compatible",
+    "model": "gpt-4.1-mini",
+    "api_key_env": "OPENAI_API_KEY",
+    "base_url": "https://api.openai.com/v1"
+  }
+}
+```
+
+Environment variable example:
+
+```bash
+export OPENAI_API_KEY="your_key_here"
+PYTHONPATH=src python -m prompt_forest.cli --config configs/runtime_openai_example.json chat --task-type auto --visibility full
+```
+
+Supported runtime providers:
+- `openai_compatible` (OpenAI-compatible chat completions endpoint)
+- `gemini` (Google Gemini generateContent endpoint)
+
+Ready-to-use examples:
+- `configs/runtime_openai_example.json`
+- `configs/runtime_gemini_example.json`
+
 ### 2) Benchmark demo
 
 ```bash
@@ -284,6 +325,8 @@ For quick human-readable visibility:
 - Memory-influenced future routing
 - Evaluator/optimizer separation
 - Candidate branch creation policy with trial lifecycle
+- Optional API-backed Evaluator/Optimizer agents with strict JSON contracts
+- Multi-candidate branch spawning for deeper random-forest-like specialization
 
 ## Testing
 

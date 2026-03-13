@@ -28,6 +28,7 @@ def format_turn_trace(payload: dict[str, Any], visibility: str = "full", top_bra
     branch_scores = payload.get("branch_scores", {})
     signal = payload.get("evaluation_signal", {})
     optimization = payload.get("optimization", {})
+    runtime = payload.get("runtime", {})
 
     lines: list[str] = []
     task_id = str(task.get("task_id", ""))[:8]
@@ -36,6 +37,12 @@ def format_turn_trace(payload: dict[str, Any], visibility: str = "full", top_bra
     path = routing.get("activated_branches", []) or []
     path_text = " -> ".join(path) if path else "(none)"
     lines.append(f"[routing] path={path_text}")
+    if runtime:
+        lines.append(
+            "[runtime] "
+            f"evaluator_llm={runtime.get('evaluator_llm_enabled', False)} "
+            f"optimizer_llm={runtime.get('optimizer_llm_enabled', False)}"
+        )
 
     raw_scores = routing.get("branch_scores", {}) or {}
     if raw_scores:
@@ -78,6 +85,8 @@ def format_turn_trace(payload: dict[str, Any], visibility: str = "full", top_bra
             f"task_baseline={_fmt_float(optimization.get('task_baseline_before'))}"
             f"->{_fmt_float(optimization.get('task_baseline_after'))}"
         )
+        if "advisor_used" in optimization:
+            lines.append(f"[optimizer] advisor_used={optimization.get('advisor_used', False)}")
         update_details = optimization.get("update_details", {}) or {}
         if update_details and path:
             lines.append("[optimizer] branch_updates:")
@@ -105,5 +114,7 @@ def format_turn_trace(payload: dict[str, Any], visibility: str = "full", top_bra
             items = optimization.get(key, []) or []
             if items:
                 lines.append(f"[optimizer] {label}={items}")
+        if optimization.get("advisor_error"):
+            lines.append(f"[optimizer] advisor_error={_short_reason(str(optimization.get('advisor_error')))}")
 
     return "\n".join(lines)

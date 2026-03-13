@@ -14,7 +14,9 @@ class EvaluatorAgent:
         route: RoutingDecision,
         branch_scores: dict[str, BranchScore],
         aggregation: AggregationResult,
+        branch_outputs: dict[str, str] | None = None,
     ) -> EvaluationSignal:
+        _ = branch_outputs
         selected_branch = aggregation.selected_branch
         selected_score = branch_scores.get(selected_branch, BranchScore(reward=0.0, reason="missing_selected"))
 

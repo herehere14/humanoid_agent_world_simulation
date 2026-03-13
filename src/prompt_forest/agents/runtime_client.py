@@ -1,0 +1,138 @@
+from __future__ import annotations
+
+import json
+import os
+from typing import Any
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
+from ..config import AgentRuntimeConfig
+
+
+class AgentRuntimeClient:
+    """Thin JSON-generation client for evaluator/optimizer LLM runtime calls."""
+
+    def __init__(self, config: AgentRuntimeConfig) -> None:
+        self.config = config
+
+    def is_enabled(self) -> bool:
+        return bool(self.config.enabled)
+
+    def generate_json(self, system_prompt: str, user_payload: dict[str, Any]) -> dict[str, Any]:
+        if not self.is_enabled():
+            raise RuntimeError("Agent runtime is disabled.")
+
+        provider = self.config.provider.strip().lower()
+        if provider in {"openai", "openai_compatible", "openai-compatible"}:
+            text = self._call_openai_compatible(system_prompt, user_payload)
+        elif provider in {"gemini", "google_gemini"}:
+            text = self._call_gemini(system_prompt, user_payload)
+        else:
+            raise RuntimeError(f"Unsupported agent runtime provider: {self.config.provider}")
+
+        return self._parse_json_text(text)
+
+    def _call_openai_compatible(self, system_prompt: str, user_payload: dict[str, Any]) -> str:
+        key = os.getenv(self.config.api_key_env, "").strip()
+        if not key:
+            raise RuntimeError(f"Missing API key env var: {self.config.api_key_env}")
+
+        url = f"{self.config.base_url.rstrip('/')}/chat/completions"
+        body = {
+            "model": self.config.model,
+            "temperature": self.config.temperature,
+            "max_tokens": self.config.max_output_tokens,
+            "response_format": {"type": "json_object"},
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": json.dumps(user_payload, ensure_ascii=True)},
+            ],
+        }
+        payload = json.dumps(body, ensure_ascii=True).encode("utf-8")
+        req = Request(
+            url,
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {key}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        text = self._post(req)
+        data = json.loads(text)
+        choices = data.get("choices", [])
+        if not choices:
+            raise RuntimeError("No choices returned from openai-compatible runtime.")
+        content = choices[0].get("message", {}).get("content", "")
+        if isinstance(content, list):
+            parts = [p.get("text", "") for p in content if isinstance(p, dict)]
+            return "\n".join(parts).strip()
+        return str(content)
+
+    def _call_gemini(self, system_prompt: str, user_payload: dict[str, Any]) -> str:
+        key = os.getenv(self.config.api_key_env, "").strip()
+        if not key:
+            raise RuntimeError(f"Missing API key env var: {self.config.api_key_env}")
+
+        model = self.config.model.strip()
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+        body = {
+            "systemInstruction": {"parts": [{"text": system_prompt}]},
+            "contents": [{"parts": [{"text": json.dumps(user_payload, ensure_ascii=True)}]}],
+            "generationConfig": {
+                "temperature": self.config.temperature,
+                "maxOutputTokens": self.config.max_output_tokens,
+                "responseMimeType": "application/json",
+            },
+        }
+        payload = json.dumps(body, ensure_ascii=True).encode("utf-8")
+        req = Request(
+            url,
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        text = self._post(req)
+        data = json.loads(text)
+        candidates = data.get("candidates", [])
+        if not candidates:
+            raise RuntimeError("No candidates returned from Gemini runtime.")
+        parts = candidates[0].get("content", {}).get("parts", [])
+        joined = "\n".join(str(part.get("text", "")) for part in parts if isinstance(part, dict)).strip()
+        if not joined:
+            raise RuntimeError("Gemini runtime response missing text content.")
+        return joined
+
+    def _post(self, req: Request) -> str:
+        try:
+            with urlopen(req, timeout=self.config.timeout_seconds) as resp:
+                return resp.read().decode("utf-8")
+        except HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"HTTPError {exc.code}: {body}") from exc
+        except URLError as exc:
+            raise RuntimeError(f"Network error: {exc}") from exc
+
+    @staticmethod
+    def _parse_json_text(raw: str) -> dict[str, Any]:
+        text = raw.strip()
+        if not text:
+            raise RuntimeError("LLM runtime returned empty response.")
+        try:
+            parsed = json.loads(text)
+            if isinstance(parsed, dict):
+                return parsed
+        except json.JSONDecodeError:
+            pass
+
+        start = text.find("{")
+        end = text.rfind("}")
+        if start >= 0 and end > start:
+            candidate = text[start : end + 1]
+            try:
+                parsed = json.loads(candidate)
+            except json.JSONDecodeError as exc:
+                raise RuntimeError(f"Failed to parse JSON response: {exc}") from exc
+            if isinstance(parsed, dict):
+                return parsed
+        raise RuntimeError("LLM runtime response was not valid JSON object.")

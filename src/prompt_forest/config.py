@@ -39,6 +39,10 @@ class OptimizerConfig:
     max_active_candidates: int = 4
     candidate_initial_weight: float = 0.6
     max_hierarchy_depth: int = 4
+    candidate_spawn_per_event: int = 1
+    candidate_max_children_per_parent: int = 8
+    advisor_weight_delta_cap: float = 0.06
+    advisor_rewrite_confidence_threshold: float = 0.62
 
 
 @dataclass
@@ -58,11 +62,30 @@ class EvaluatorConfig:
 
 
 @dataclass
+class AgentRuntimeConfig:
+    enabled: bool = False
+    provider: str = "openai_compatible"
+    model: str = "gpt-4.1-mini"
+    api_key_env: str = "OPENAI_API_KEY"
+    base_url: str = "https://api.openai.com/v1"
+    temperature: float = 0.1
+    max_output_tokens: int = 800
+    timeout_seconds: int = 45
+
+
+@dataclass
+class AgentRuntimesConfig:
+    evaluator: AgentRuntimeConfig = field(default_factory=AgentRuntimeConfig)
+    optimizer: AgentRuntimeConfig = field(default_factory=AgentRuntimeConfig)
+
+
+@dataclass
 class EngineConfig:
     router: RouterConfig = field(default_factory=RouterConfig)
     optimizer: OptimizerConfig = field(default_factory=OptimizerConfig)
     memory: MemoryConfig = field(default_factory=MemoryConfig)
     evaluator: EvaluatorConfig = field(default_factory=EvaluatorConfig)
+    agent_runtimes: AgentRuntimesConfig = field(default_factory=AgentRuntimesConfig)
     artifacts_dir: str = "artifacts"
 
 
