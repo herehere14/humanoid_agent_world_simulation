@@ -87,6 +87,7 @@ class PromptForestEngine:
         else:
             optimize_event = OptimizationEvent(
                 updated_weights={},
+                update_details={},
                 rewritten_prompts=[],
                 promoted_candidates=[],
                 archived_candidates=[],
@@ -118,6 +119,7 @@ class PromptForestEngine:
                 "reward_score": signal.reward_score,
                 "confidence": signal.confidence,
                 "selected_branch": signal.selected_branch,
+                "selected_output": signal.selected_output,
                 "failure_reason": signal.failure_reason,
                 "suggested_improvement_direction": signal.suggested_improvement_direction,
                 "branch_feedback": {k: asdict(v) for k, v in signal.branch_feedback.items()},

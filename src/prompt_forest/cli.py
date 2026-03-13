@@ -12,7 +12,8 @@ from .experiments.benchmark import BenchmarkRunner
 from .experiments.continuous_runner import ContinuousImprover
 from .experiments.detailed_validation import DetailedHierarchicalValidator
 from .experiments.rl_validation import RLLearningValidator
-from .utils.io import read_json
+from .observability.trace import format_turn_trace
+from .utils.io import read_json, read_jsonl
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -25,10 +26,26 @@ def build_parser() -> argparse.ArgumentParser:
     task_cmd.add_argument("--task", type=str, required=True)
     task_cmd.add_argument("--task-type", type=str, default="auto")
     task_cmd.add_argument("--metadata", type=str, default="{}", help="JSON string metadata")
+    task_cmd.add_argument(
+        "--visibility",
+        type=str,
+        default="minimal",
+        choices=["minimal", "eval", "opt", "full"],
+        help="Human-readable trace level for evaluator/optimizer internals",
+    )
+    task_cmd.add_argument("--top-branches", type=int, default=5, help="How many routing scores to print in trace mode")
 
     chat_cmd = sub.add_parser("chat", help="Interactive chat with the adaptive RL prompt-forest agent")
     chat_cmd.add_argument("--task-type", type=str, default="auto")
     chat_cmd.add_argument("--show-route", action="store_true", help="Show activated route and reward after each turn")
+    chat_cmd.add_argument(
+        "--visibility",
+        type=str,
+        default="full",
+        choices=["minimal", "eval", "opt", "full"],
+        help="Trace verbosity for evaluator and optimizer details per turn",
+    )
+    chat_cmd.add_argument("--top-branches", type=int, default=5)
 
     bench_cmd = sub.add_parser("benchmark", help="Run benchmark dataset")
     bench_cmd.add_argument("--dataset", type=str, default="examples/demo_tasks.json")
@@ -67,6 +84,16 @@ def build_parser() -> argparse.ArgumentParser:
     oc_cmd = sub.add_parser("openclaw-event", help="Process OpenClaw-style trajectory event JSON")
     oc_cmd.add_argument("--event-file", type=str, required=True)
 
+    inspect_cmd = sub.add_parser("inspect-events", help="Inspect recent evaluator/optimizer traces from events log")
+    inspect_cmd.add_argument("--limit", type=int, default=10)
+    inspect_cmd.add_argument(
+        "--visibility",
+        type=str,
+        default="full",
+        choices=["minimal", "eval", "opt", "full"],
+    )
+    inspect_cmd.add_argument("--top-branches", type=int, default=5)
+
     sub.add_parser("state", help="Show branch state and memory stats")
 
     return parser
@@ -86,7 +113,13 @@ def _chat_metadata_from_text(text: str) -> dict:
     }
 
 
-def _run_chat_loop(engine: PromptForestEngine, default_task_type: str, show_route: bool) -> None:
+def _run_chat_loop(
+    engine: PromptForestEngine,
+    default_task_type: str,
+    show_route: bool,
+    visibility: str,
+    top_branches: int,
+) -> None:
     task_type = default_task_type
     print("Interactive RL chat started. Commands: /exit, /type <task_type>, /auto")
     while True:
@@ -116,7 +149,9 @@ def _run_chat_loop(engine: PromptForestEngine, default_task_type: str, show_rout
         result = engine.run_task(text=text, task_type=task_type, metadata=metadata)
         signal = result["evaluation_signal"]
         print(f"agent> {signal['selected_output']}")
-        if show_route:
+        if visibility != "minimal":
+            print(format_turn_trace(result, visibility=visibility, top_branches=top_branches))
+        elif show_route:
             path = " -> ".join(result["routing"]["activated_branches"])
             print(f"[route] {path}")
             print(
@@ -136,11 +171,20 @@ def main() -> None:
     if args.command == "run-task":
         metadata = json.loads(args.metadata)
         result = engine.run_task(text=args.task, task_type=args.task_type, metadata=metadata)
+        if args.visibility != "minimal":
+            print(format_turn_trace(result, visibility=args.visibility, top_branches=args.top_branches))
+            print()
         print(json.dumps(result, indent=2))
         return
 
     if args.command == "chat":
-        _run_chat_loop(engine, default_task_type=args.task_type, show_route=args.show_route)
+        _run_chat_loop(
+            engine,
+            default_task_type=args.task_type,
+            show_route=args.show_route,
+            visibility=args.visibility,
+            top_branches=args.top_branches,
+        )
         return
 
     if args.command == "benchmark":
@@ -203,6 +247,21 @@ def main() -> None:
         event = read_json(Path(args.event_file))
         result = engine.openclaw_ingest(event)
         print(json.dumps(result, indent=2))
+        return
+
+    if args.command == "inspect-events":
+        events = read_jsonl(engine.artifacts_dir / "events.jsonl")
+        if not events:
+            print("No events logged yet. Run tasks first.")
+            return
+
+        limit = max(1, args.limit)
+        start = max(0, len(events) - limit)
+        for idx, event in enumerate(events[start:], start=start + 1):
+            print(f"=== event #{idx} ===")
+            print(format_turn_trace(event, visibility=args.visibility, top_branches=args.top_branches))
+            if idx < len(events):
+                print()
         return
 
     if args.command == "state":

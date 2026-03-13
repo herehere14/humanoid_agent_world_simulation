@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 from ..branches.base import PromptBranch
 from ..branches.library import make_candidate_branch
@@ -12,6 +13,7 @@ from ..types import BranchStatus, EvaluationSignal, RoutingDecision, TaskInput
 @dataclass
 class OptimizationEvent:
     updated_weights: dict[str, float]
+    update_details: dict[str, dict[str, Any]]
     rewritten_prompts: list[str]
     promoted_candidates: list[str]
     archived_candidates: list[str]
@@ -36,6 +38,7 @@ class OptimizerAgent:
         memory: MemoryStore,
     ) -> OptimizationEvent:
         updated: dict[str, float] = {}
+        details: dict[str, dict[str, Any]] = {}
         rewritten: list[str] = []
         promoted: list[str] = []
         archived: list[str] = []
@@ -51,17 +54,22 @@ class OptimizerAgent:
             reward = fb.reward if fb else 0.0
             branch.apply_reward(reward)
 
+            status_before = branch.state.status.value
+            old_weight = branch.state.weight
             advantage = reward - task_baseline_before
             delta = self.config.learning_rate * advantage
-            decay = self.config.weight_decay * (branch.state.weight - 1.0)
-            new_weight = branch.state.weight + delta - decay
+            decay = self.config.weight_decay * (old_weight - 1.0)
+            raw_weight = old_weight + delta - decay
+            new_weight = raw_weight
             branch.state.weight = max(self.config.min_weight, min(self.config.max_weight, new_weight))
             branch.state.metadata["last_advantage"] = round(advantage, 6)
             updated[branch_name] = round(branch.state.weight, 4)
 
+            prompt_rewritten = False
             if reward < self.config.prompt_rewrite_threshold and fb:
                 branch.rewrite_prompt(fb.suggested_improvement_direction, self.config.max_prompt_variants)
                 rewritten.append(branch_name)
+                prompt_rewritten = True
 
             if branch.state.status == BranchStatus.CANDIDATE:
                 branch.state.trial_remaining -= 1
@@ -77,11 +85,26 @@ class OptimizerAgent:
                         branch.state.status = BranchStatus.ARCHIVED
                         archived.append(branch_name)
 
+            details[branch_name] = {
+                "status_before": status_before,
+                "status_after": branch.state.status.value,
+                "reward": round(reward, 4),
+                "advantage": round(advantage, 4),
+                "delta": round(delta, 4),
+                "decay": round(decay, 4),
+                "old_weight": round(old_weight, 4),
+                "raw_weight_after_update": round(raw_weight, 4),
+                "new_weight": round(branch.state.weight, 4),
+                "prompt_rewritten": prompt_rewritten,
+                "trial_remaining": branch.state.trial_remaining,
+            }
+
         self._try_create_candidate(task, route, signal, branches, memory, created)
         task_baseline_after = self._update_task_baseline(route.task_type, signal.reward_score)
 
         return OptimizationEvent(
             updated_weights=updated,
+            update_details=details,
             rewritten_prompts=rewritten,
             promoted_candidates=promoted,
             archived_candidates=archived,

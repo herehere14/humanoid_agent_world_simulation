@@ -44,11 +44,15 @@ def test_optimizer_updates_only_active_branches(tmp_path):
     signal = _signal(["analytical", "verification"], reward=0.9, reason="high_quality")
 
     before = {k: v.state.weight for k, v in branches.items()}
-    optimizer.optimize(TaskInput("1", "task", "math"), route, signal, branches, memory)
+    event = optimizer.optimize(TaskInput("1", "task", "math"), route, signal, branches, memory)
 
     assert branches["analytical"].state.weight > before["analytical"]
     assert branches["verification"].state.weight > before["verification"]
     assert branches["planner"].state.weight == before["planner"]
+    assert "analytical" in event.update_details
+    assert event.update_details["analytical"]["status_before"] == "active"
+    assert event.update_details["analytical"]["status_after"] == "active"
+    assert event.update_details["analytical"]["new_weight"] > event.update_details["analytical"]["old_weight"]
 
 
 def test_candidate_creation_after_repeated_failures(tmp_path):

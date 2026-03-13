@@ -149,10 +149,19 @@ prompt-forest run-task \
 ### 1b) Interactive chat with the RL agent
 
 ```bash
-PYTHONPATH=src python -m prompt_forest.cli chat --task-type auto --show-route
+PYTHONPATH=src python -m prompt_forest.cli chat --task-type auto --visibility full
 ```
 
 Use `/type <task_type>` to pin type and `/auto` to restore auto-routing.
+Use `--visibility minimal|eval|opt|full` to control how much of Agent 1/Agent 2 internals are shown.
+
+### 1c) Inspect recent evaluator/optimizer traces
+
+```bash
+prompt-forest inspect-events --limit 8 --visibility full
+```
+
+This prints per-task routing path, branch-level evaluation signals, and optimizer updates (weight delta, advantage, decay, rewrites, candidate lifecycle actions).
 
 ### 2) Benchmark demo
 
@@ -261,6 +270,11 @@ This loop runs repeated auto-improvement cycles, executes regression tests after
 - `artifacts/auto_improve/auto_improve_summary.json`: multi-round search log and selected best config
 - `artifacts/auto_improve/final_validation_report.json`: final unbiased validation for promoted config
 - `artifacts/continuous_improve/continuous_improve_summary.json`: multi-cycle long-run optimization trace with acceptance/rollback decisions
+
+For quick human-readable visibility:
+- `prompt-forest run-task ... --visibility full`
+- `prompt-forest chat --visibility full`
+- `prompt-forest inspect-events --limit 10 --visibility full`
 
 ## What the MVP demonstrates
 
