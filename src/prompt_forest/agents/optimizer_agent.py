@@ -31,6 +31,7 @@ class OptimizerAgent:
     def __init__(self, config: OptimizerConfig, advisor: LLMOptimizerAdvisor | None = None) -> None:
         self.config = config
         self._task_baselines: dict[str, float] = {}
+        self._branch_task_baselines: dict[str, float] = {}
         self._advisor = advisor
         self._episode_idx = 0
 
@@ -51,6 +52,7 @@ class OptimizerAgent:
         created: list[str] = []
         task_baseline_before = self._task_baselines.get(route.task_type, 0.5)
         user_id = str(task.metadata.get("user_id", "global")).strip() or "global"
+        llm_runtime_active = bool(task.metadata.get("llm_runtime_active", False))
 
         advisor_directives: dict[str, dict[str, Any]] = {}
         advisor_proposals: list[dict[str, str]] = []
@@ -78,12 +80,26 @@ class OptimizerAgent:
             old_weight = branch.state.weight
             advice = advisor_directives.get(branch_name, {})
 
-            advantage = reward - task_baseline_before
+            branch_baseline_key = self._branch_baseline_key(route.task_type, branch_name)
+            branch_baseline_before = self._branch_task_baselines.get(branch_baseline_key, task_baseline_before)
+            baseline_mix = self._clamp01(self.config.branch_advantage_mix)
+            combined_baseline_before = ((1.0 - baseline_mix) * task_baseline_before) + (
+                baseline_mix * branch_baseline_before
+            )
+
+            advantage = reward - combined_baseline_before
             fb_conf = self._clamp01(fb.confidence if fb else 0.5)
             confidence_scale = max(0.0, min(1.0, (fb_conf - 0.4) / 0.6))
+            variance_scale, reward_variance, reward_count = self._variance_scale_for_update(
+                memory=memory,
+                branch_name=branch_name,
+                task_type=route.task_type,
+                user_id=user_id,
+                llm_runtime_active=llm_runtime_active,
+            )
 
             # Damp noisy updates from low-confidence branch feedback.
-            delta = self.config.learning_rate * advantage * confidence_scale
+            delta = self.config.learning_rate * advantage * confidence_scale * variance_scale
 
             advice_conf = self._clamp01(advice.get("confidence", 0.0))
             advice_weight_threshold = max(0.55, self.config.advisor_rewrite_confidence_threshold - 0.15)
@@ -93,6 +109,7 @@ class OptimizerAgent:
             else:
                 advisory_extra_delta *= ((advice_conf - advice_weight_threshold) / max(1e-8, 1.0 - advice_weight_threshold))
                 advisory_extra_delta *= confidence_scale
+                advisory_extra_delta *= variance_scale
 
             total_delta = delta + advisory_extra_delta
             decay = self.config.weight_decay * (old_weight - 1.0)
@@ -136,6 +153,11 @@ class OptimizerAgent:
                         rewritten.remove(branch_name)
                 prompt_rewritten = False
             updated[branch_name] = round(branch.state.weight, 4)
+            branch_baseline_after = self._update_branch_baseline(
+                key=branch_baseline_key,
+                reward=reward,
+                default=combined_baseline_before,
+            )
 
             if branch.state.status == BranchStatus.CANDIDATE:
                 self._update_candidate_parent_comparison(branch_name, branch, route, signal)
@@ -156,6 +178,10 @@ class OptimizerAgent:
                 "status_before": status_before,
                 "status_after": branch.state.status.value,
                 "reward": round(reward, 4),
+                "task_baseline_before": round(task_baseline_before, 4),
+                "branch_baseline_before": round(branch_baseline_before, 4),
+                "combined_baseline_before": round(combined_baseline_before, 4),
+                "branch_baseline_after": round(branch_baseline_after, 4),
                 "advantage": round(advantage, 4),
                 "delta": round(delta, 4),
                 "advisory_extra_delta": round(advisory_extra_delta, 4),
@@ -163,6 +189,10 @@ class OptimizerAgent:
                 "decay": round(decay, 4),
                 "feedback_confidence": round(fb_conf, 4),
                 "confidence_scale": round(confidence_scale, 4),
+                "variance_scale": round(variance_scale, 4),
+                "reward_variance": round(reward_variance, 6),
+                "reward_count": round(reward_count, 4),
+                "llm_runtime_active": llm_runtime_active,
                 "advisor_confidence": round(advice_conf, 4),
                 "old_weight": round(old_weight, 4),
                 "raw_weight_after_update": round(raw_weight, 4),
@@ -204,6 +234,45 @@ class OptimizerAgent:
         new = (1.0 - beta) * old + beta * reward
         self._task_baselines[task_type] = new
         return new
+
+    def _update_branch_baseline(self, key: str, reward: float, default: float) -> float:
+        old = self._branch_task_baselines.get(key, default)
+        beta = self.config.branch_baseline_beta
+        new = (1.0 - beta) * old + beta * reward
+        self._branch_task_baselines[key] = new
+        return new
+
+    @staticmethod
+    def _branch_baseline_key(task_type: str, branch_name: str) -> str:
+        return f"{task_type}::{branch_name}"
+
+    def _variance_scale_for_update(
+        self,
+        memory: MemoryStore,
+        branch_name: str,
+        task_type: str,
+        user_id: str,
+        llm_runtime_active: bool,
+    ) -> tuple[float, float, float]:
+        if not llm_runtime_active:
+            return 1.0, 0.0, 0.0
+
+        moments = memory.branch_reward_moments(
+            branch_name=branch_name,
+            task_type=task_type,
+            user_id=user_id,
+            limit=self.config.update_acceptance_window * 3,
+        )
+        variance = max(0.0, float(moments.get("variance", 0.0)))
+        count = max(0.0, float(moments.get("count", 0.0)))
+        if count <= 0.0:
+            return 1.0, variance, count
+
+        raw_scale = 1.0 / (1.0 + (self.config.llm_variance_sensitivity * variance))
+        raw_scale = max(self.config.llm_min_variance_scale, min(1.0, raw_scale))
+        shrink = count / (count + 8.0)
+        scale = (1.0 - shrink) + (shrink * raw_scale)
+        return max(self.config.llm_min_variance_scale, min(1.0, scale)), variance, count
 
     def _should_extend_candidate_trial(self, avg_reward: float, branch: PromptBranch) -> bool:
         lower = self.config.candidate_promote_threshold - self.config.candidate_neutral_band

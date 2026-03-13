@@ -16,6 +16,10 @@ class RouterConfig:
     affinity_coef: float = 0.6
     memory_coef: float = 0.2
     memory_term_cap: float = 0.15
+    bandit_value_coef: float = 0.0
+    bandit_bonus_coef: float = 0.0
+    bandit_bonus_cap: float = 0.12
+    bandit_shrinkage_k: float = 12.0
     exploration_min: float = 0.03
     exploration_decay: float = 0.997
 
@@ -49,6 +53,10 @@ class OptimizerConfig:
     update_acceptance_min_gain: float = 0.002
     candidate_parent_win_rate_threshold: float = 0.55
     candidate_parent_min_comparisons: int = 3
+    branch_advantage_mix: float = 0.1
+    branch_baseline_beta: float = 0.05
+    llm_variance_sensitivity: float = 8.0
+    llm_min_variance_scale: float = 0.4
 
 
 @dataclass

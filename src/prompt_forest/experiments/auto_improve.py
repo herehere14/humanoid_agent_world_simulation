@@ -44,6 +44,8 @@ class AutoImprover:
             "optimizer.learning_rate": (0.06, 0.14),
             "optimizer.weight_decay": (0.02, 0.05),
             "optimizer.advantage_baseline_beta": (0.08, 0.2),
+            "optimizer.branch_advantage_mix": (0.15, 0.7),
+            "optimizer.branch_baseline_beta": (0.05, 0.25),
         }
 
     def run(

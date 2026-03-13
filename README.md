@@ -75,6 +75,8 @@ Outputs:
 ### Agent 2: Branch Optimizer / Prompt Updater
 Allowed actions:
 - Slight branch-weight updates (bounded)
+- Advantage-based updates with task baseline + branch-local baseline mixing
+- Variance-adaptive step scaling (for noisy API-runtime feedback)
 - Local prompt rewrite for weak branches
 - Candidate branch propose/trial/promote/archive under strict rules
 - Path-level reward propagation (leaf reward is propagated upstream with discount)

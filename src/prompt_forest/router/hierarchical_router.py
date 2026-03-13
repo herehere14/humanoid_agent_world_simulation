@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import random
 from typing import Protocol
 
@@ -13,6 +14,9 @@ class MemoryRoutingView(Protocol):
         ...
 
     def branch_visit_counts(self, task_type: str, user_id: str | None = None) -> dict[str, int]:
+        ...
+
+    def branch_bandit_stats(self, task_type: str, user_id: str | None = None) -> dict[str, dict[str, float]]:
         ...
 
 
@@ -57,6 +61,8 @@ class HierarchicalRouter:
         user_id = str(task.metadata.get("user_id", "global")).strip() or "global"
         history_bias = memory.branch_success_bias(task_type, user_id=user_id)
         visit_counts = memory.branch_visit_counts(task_type, user_id=user_id)
+        bandit_stats = memory.branch_bandit_stats(task_type, user_id=user_id)
+        bandit_total_count = sum(max(0.0, stat.get("count", 0.0)) for stat in bandit_stats.values())
 
         active_path: list[str] = []
         flattened_scores: dict[str, float] = {}
@@ -74,6 +80,8 @@ class HierarchicalRouter:
                 child_ids=children,
                 forest=forest,
                 history_bias=history_bias,
+                bandit_stats=bandit_stats,
+                bandit_total_count=bandit_total_count,
             )
             if not scores:
                 break
@@ -93,6 +101,8 @@ class HierarchicalRouter:
         child_ids: list[str],
         forest: HierarchicalPromptForest,
         history_bias: dict[str, float],
+        bandit_stats: dict[str, dict[str, float]],
+        bandit_total_count: float,
     ) -> dict[str, float]:
         out: dict[str, float] = {}
 
@@ -110,10 +120,26 @@ class HierarchicalRouter:
             memory_bias = history_bias.get(child_id, 0.0)
             memory_bias = max(-self.config.memory_term_cap, min(self.config.memory_term_cap, memory_bias))
 
+            bandit = bandit_stats.get(child_id, {})
+            mean_reward = float(bandit.get("mean_reward", 0.5))
+            count = max(0.0, float(bandit.get("count", 0.0)))
+
+            shrink = count / (count + max(1e-8, self.config.bandit_shrinkage_k))
+            value_term = self.config.bandit_value_coef * (mean_reward - 0.5) * shrink
+
+            bonus_term = 0.0
+            if self.config.bandit_bonus_coef > 0.0 and bandit_total_count > 0.0:
+                bonus_term = self.config.bandit_bonus_coef * math.sqrt(
+                    math.log1p(bandit_total_count) / (1.0 + count)
+                )
+                bonus_term = min(self.config.bandit_bonus_cap, bonus_term)
+
             score = (
                 (self.config.weight_coef * branch.state.weight)
                 + (self.config.affinity_coef * affinity)
                 + (self.config.memory_coef * memory_bias)
+                + value_term
+                + bonus_term
             )
 
             if branch.state.status == BranchStatus.CANDIDATE:

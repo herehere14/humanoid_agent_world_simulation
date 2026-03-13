@@ -196,6 +196,127 @@ def test_advantage_updates_shrink_as_task_baseline_rises(tmp_path):
     assert first_gain > second_gain
 
 
+def test_branch_specific_baseline_reduces_repeated_delta_even_with_fixed_task_baseline(tmp_path):
+    route = RoutingDecision(task_type="math", activated_branches=["analytical"], branch_scores={})
+    signal = _signal(["analytical"], reward=0.8, reason="medium_quality")
+
+    # No branch-specific baseline mixing: repeated gains stay roughly constant.
+    branches_plain = create_default_branches()
+    memory_plain = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m_plain.jsonl")
+    optimizer_plain = OptimizerAgent(
+        OptimizerConfig(
+            learning_rate=0.2,
+            weight_decay=0.0,
+            advantage_baseline_beta=0.0,
+            branch_advantage_mix=0.0,
+            update_acceptance_min_gain=-1.0,
+        )
+    )
+    p0 = branches_plain["analytical"].state.weight
+    optimizer_plain.optimize(TaskInput("1", "task", "math"), route, signal, branches_plain, memory_plain)
+    p1 = branches_plain["analytical"].state.weight
+    optimizer_plain.optimize(TaskInput("2", "task", "math"), route, signal, branches_plain, memory_plain)
+    p2 = branches_plain["analytical"].state.weight
+
+    # Full branch-specific baseline mixing: second gain should shrink due to raised branch baseline.
+    branches_mixed = create_default_branches()
+    memory_mixed = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m_mixed.jsonl")
+    optimizer_mixed = OptimizerAgent(
+        OptimizerConfig(
+            learning_rate=0.2,
+            weight_decay=0.0,
+            advantage_baseline_beta=0.0,
+            branch_advantage_mix=1.0,
+            branch_baseline_beta=0.5,
+            update_acceptance_min_gain=-1.0,
+        )
+    )
+    m0 = branches_mixed["analytical"].state.weight
+    optimizer_mixed.optimize(TaskInput("1", "task", "math"), route, signal, branches_mixed, memory_mixed)
+    m1 = branches_mixed["analytical"].state.weight
+    optimizer_mixed.optimize(TaskInput("2", "task", "math"), route, signal, branches_mixed, memory_mixed)
+    m2 = branches_mixed["analytical"].state.weight
+
+    plain_gain1 = p1 - p0
+    plain_gain2 = p2 - p1
+    mixed_gain1 = m1 - m0
+    mixed_gain2 = m2 - m1
+
+    assert abs(plain_gain1 - plain_gain2) < 1e-6
+    assert mixed_gain1 > mixed_gain2
+
+
+def test_llm_variance_scaling_dampens_updates_under_noisy_history(tmp_path):
+    route = RoutingDecision(task_type="math", activated_branches=["analytical"], branch_scores={})
+    signal = _signal(["analytical"], reward=0.8, reason="medium_quality")
+    task = TaskInput("live-1", "task", "math", metadata={"llm_runtime_active": True, "user_id": "global"})
+
+    cfg = OptimizerConfig(
+        learning_rate=0.2,
+        weight_decay=0.0,
+        advantage_baseline_beta=0.0,
+        branch_advantage_mix=0.0,
+        llm_variance_sensitivity=8.0,
+        llm_min_variance_scale=0.4,
+        update_acceptance_min_gain=-1.0,
+    )
+
+    stable_branches = create_default_branches()
+    stable_memory = MemoryStore(MemoryConfig(recency_decay=1.0), memory_path=tmp_path / "m_stable.jsonl")
+    for i in range(8):
+        stable_memory.add(
+            MemoryRecord(
+                task_id=f"s-{i}",
+                task_type="math",
+                input_text="x",
+                activated_branches=["analytical"],
+                branch_outputs={},
+                selected_branch="analytical",
+                selected_output="",
+                reward_score=0.75,
+                failure_reason="",
+                confidence=0.7,
+                useful_patterns=[],
+            )
+        )
+
+    noisy_branches = create_default_branches()
+    noisy_memory = MemoryStore(MemoryConfig(recency_decay=1.0), memory_path=tmp_path / "m_noisy.jsonl")
+    for i, reward in enumerate([0.1, 0.9, 0.2, 0.8, 0.15, 0.85, 0.25, 0.75]):
+        noisy_memory.add(
+            MemoryRecord(
+                task_id=f"n-{i}",
+                task_type="math",
+                input_text="x",
+                activated_branches=["analytical"],
+                branch_outputs={},
+                selected_branch="analytical",
+                selected_output="",
+                reward_score=reward,
+                failure_reason="",
+                confidence=0.7,
+                useful_patterns=[],
+            )
+        )
+
+    stable_opt = OptimizerAgent(cfg)
+    noisy_opt = OptimizerAgent(cfg)
+
+    s0 = stable_branches["analytical"].state.weight
+    stable_event = stable_opt.optimize(task, route, signal, stable_branches, stable_memory)
+    s1 = stable_branches["analytical"].state.weight
+
+    n0 = noisy_branches["analytical"].state.weight
+    noisy_event = noisy_opt.optimize(task, route, signal, noisy_branches, noisy_memory)
+    n1 = noisy_branches["analytical"].state.weight
+
+    stable_gain = s1 - s0
+    noisy_gain = n1 - n0
+
+    assert noisy_gain < stable_gain
+    assert noisy_event.update_details["analytical"]["variance_scale"] < stable_event.update_details["analytical"]["variance_scale"]
+
+
 def test_candidate_trial_extends_near_promotion_threshold(tmp_path):
     branches = create_default_branches()
     branches["candidate_x"] = make_candidate_branch(

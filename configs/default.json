@@ -37,7 +37,11 @@
     "update_acceptance_window": 8,
     "update_acceptance_min_gain": 0.002,
     "candidate_parent_win_rate_threshold": 0.55,
-    "candidate_parent_min_comparisons": 3
+    "candidate_parent_min_comparisons": 3,
+    "branch_advantage_mix": 0.1,
+    "branch_baseline_beta": 0.05,
+    "llm_variance_sensitivity": 8.0,
+    "llm_min_variance_scale": 0.4
   },
   "memory": {
     "max_records": 5000,

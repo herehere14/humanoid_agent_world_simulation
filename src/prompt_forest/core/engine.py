@@ -71,6 +71,9 @@ class PromptForestEngine:
         task_metadata = dict(metadata or {})
         user_id = str(task_metadata.get("user_id", "global")).strip() or "global"
         task_metadata["user_id"] = user_id
+        task_metadata["llm_runtime_active"] = bool(
+            self.config.agent_runtimes.evaluator.enabled or self.config.agent_runtimes.optimizer.enabled
+        )
         user_profile = self.memory.get_user_profile(user_id)
         if user_profile:
             task_metadata["user_preferences"] = user_profile

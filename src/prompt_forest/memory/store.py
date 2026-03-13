@@ -122,6 +122,40 @@ class MemoryStore:
                 counts[branch_name] += 1
         return dict(counts)
 
+    def branch_bandit_stats(self, task_type: str, user_id: str | None = None) -> dict[str, dict[str, float]]:
+        records = self.retrieve_similar(task_type, limit=self.config.similarity_window, user_id=user_id)
+        if not records and user_id:
+            records = self.retrieve_similar(task_type, limit=self.config.similarity_window, user_id=None)
+        if not records:
+            return {}
+
+        reward_sum: dict[str, float] = defaultdict(float)
+        weight_sum: dict[str, float] = defaultdict(float)
+
+        n_records = len(records)
+        for idx, record in enumerate(records):
+            age = n_records - 1 - idx
+            recency_weight = self.config.recency_decay**age
+            if record.branch_rewards:
+                for branch_name, reward in record.branch_rewards.items():
+                    reward_sum[branch_name] += reward * recency_weight
+                    weight_sum[branch_name] += recency_weight
+            else:
+                for branch_name in record.activated_branches:
+                    reward_sum[branch_name] += record.reward_score * recency_weight
+                    weight_sum[branch_name] += recency_weight
+
+        out: dict[str, dict[str, float]] = {}
+        for branch_name, total in reward_sum.items():
+            count = weight_sum[branch_name]
+            if count <= 0.0:
+                continue
+            out[branch_name] = {
+                "mean_reward": total / count,
+                "count": count,
+            }
+        return out
+
     def useful_patterns(self, task_type: str) -> list[str]:
         records = self.retrieve_similar(task_type, limit=50)
         patterns: Counter[str] = Counter()
@@ -216,6 +250,51 @@ class MemoryStore:
         if not vals:
             return None
         return sum(vals) / len(vals)
+
+    def branch_reward_moments(
+        self,
+        branch_name: str,
+        task_type: str,
+        user_id: str | None = None,
+        limit: int = 24,
+    ) -> dict[str, float]:
+        records = self.retrieve_similar(task_type, limit=limit, user_id=user_id)
+        if not records and user_id:
+            records = self.retrieve_similar(task_type, limit=limit, user_id=None)
+        if not records:
+            return {"count": 0.0, "mean": 0.5, "variance": 0.0}
+
+        weighted_sum = 0.0
+        weight_sum = 0.0
+        weighted_sq_sum = 0.0
+
+        n_records = len(records)
+        for idx, record in enumerate(records):
+            reward: float | None = None
+            if branch_name in record.branch_rewards:
+                reward = float(record.branch_rewards[branch_name])
+            elif branch_name in record.activated_branches:
+                reward = float(record.reward_score)
+            if reward is None:
+                continue
+
+            age = n_records - 1 - idx
+            recency_weight = self.config.recency_decay**age
+            weighted_sum += reward * recency_weight
+            weighted_sq_sum += (reward**2) * recency_weight
+            weight_sum += recency_weight
+
+        if weight_sum <= 0.0:
+            return {"count": 0.0, "mean": 0.5, "variance": 0.0}
+
+        mean_reward = weighted_sum / weight_sum
+        second_moment = weighted_sq_sum / weight_sum
+        variance = max(0.0, second_moment - (mean_reward**2))
+        return {
+            "count": weight_sum,
+            "mean": mean_reward,
+            "variance": variance,
+        }
 
     def get_user_profile(self, user_id: str | None) -> dict[str, Any]:
         if not user_id:

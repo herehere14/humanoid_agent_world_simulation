@@ -392,10 +392,16 @@ class RLLearningValidator:
         cfg.router.affinity_coef = 0.6
         cfg.router.memory_coef = 0.25
         cfg.router.memory_term_cap = 0.15
+        cfg.router.bandit_value_coef = 0.0
+        cfg.router.bandit_bonus_coef = 0.0
+        cfg.router.bandit_bonus_cap = 0.12
+        cfg.router.bandit_shrinkage_k = 12.0
 
         cfg.optimizer.learning_rate = 0.1
         cfg.optimizer.weight_decay = 0.03
         cfg.optimizer.advantage_baseline_beta = 0.12
+        cfg.optimizer.branch_advantage_mix = 0.1
+        cfg.optimizer.branch_baseline_beta = 0.05
         cfg.optimizer.candidate_trial_episodes = 10
         cfg.optimizer.candidate_failure_trigger = 999
         cfg.optimizer.max_active_candidates = 0
@@ -418,14 +424,22 @@ class RLLearningValidator:
                 cfg.router.exploration_decay = 0.997
                 cfg.router.memory_coef = 0.08
                 cfg.memory.bias_scale = 0.35
+                cfg.router.bandit_value_coef = 0.0
+                cfg.router.bandit_bonus_coef = 0.0
                 cfg.optimizer.learning_rate = 0.07
+                cfg.optimizer.branch_advantage_mix = 0.1
+                cfg.optimizer.branch_baseline_beta = 0.05
             else:
                 cfg.router.exploration = 0.08
                 cfg.router.exploration_min = 0.03
                 cfg.router.exploration_decay = 0.995
                 cfg.router.memory_coef = 0.12
                 cfg.memory.bias_scale = 0.4
+                cfg.router.bandit_value_coef = 0.0
+                cfg.router.bandit_bonus_coef = 0.0
                 cfg.optimizer.learning_rate = 0.1
+                cfg.optimizer.branch_advantage_mix = 0.1
+                cfg.optimizer.branch_baseline_beta = 0.05
             if config_patch:
                 self._apply_config_patch(cfg, config_patch)
             return
