@@ -3,7 +3,13 @@ from __future__ import annotations
 from pathlib import Path
 
 from prompt_forest.backend.mock import MockLLMBackend
-from prompt_forest.cli import _base_model_comparison, _clone_backend_for_compare, _render_direct_prompt
+from prompt_forest.cli import (
+    _base_model_comparison,
+    _build_split_debug_panel,
+    _clone_backend_for_compare,
+    _render_direct_prompt,
+    build_parser,
+)
 from prompt_forest.config import load_config
 from prompt_forest.core.engine import PromptForestEngine
 from prompt_forest.types import TaskInput
@@ -46,3 +52,43 @@ def test_base_model_comparison_returns_adaptive_and_base_metrics(tmp_path):
     assert "hybrid_verifier_reward" in comparison["adaptive_system"]["objective_metrics"]
     assert "hybrid_verifier_reward" in comparison["base_model"]["objective_metrics"]
     assert "winner" in comparison
+
+
+def test_build_split_debug_panel_includes_comparison_and_trace(tmp_path):
+    cfg = load_config(Path(__file__).resolve().parents[1] / "configs" / "default.json")
+    cfg.artifacts_dir = str(tmp_path / "artifacts")
+    engine = PromptForestEngine(config=cfg, backend=MockLLMBackend(seed=13))
+
+    result = engine.run_task(
+        text="Audit a rollout plan for contradictions and confidence.",
+        task_type="code",
+        metadata={"expected_keywords": ["contradiction", "confidence"], "required_substrings": ["confidence"]},
+    )
+    comparison = _base_model_comparison(engine, result)
+
+    panel = _build_split_debug_panel(
+        result,
+        comparison,
+        visibility="full",
+        top_branches=4,
+        task_type="code",
+        compare_enabled=True,
+        status="Running latest turn.",
+    )
+
+    assert "Session" in panel
+    assert "Base Model" in panel
+    assert "Base vs Adaptive" in panel
+    assert "[compare] adaptive_reward=" in panel
+    assert "[routing] path=" in panel
+    assert "[optimizer] task_baseline=" in panel
+
+
+def test_build_parser_accepts_split_view_flag():
+    parser = build_parser()
+
+    args = parser.parse_args(["chat", "--split-view", "--compare-base"])
+
+    assert args.command == "chat"
+    assert args.split_view is True
+    assert args.compare_base is True

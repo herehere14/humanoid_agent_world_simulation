@@ -3,7 +3,10 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
+import textwrap
 from pathlib import Path
+from typing import Any
 
 from .backend.base import LLMBackend
 from .backend.mock import MockLLMBackend
@@ -67,6 +70,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--compare-base",
         action="store_true",
         help="Show a direct base-model answer alongside the adaptive system on every turn",
+    )
+    chat_cmd.add_argument(
+        "--split-view",
+        action="store_true",
+        help="Render chat as a left/right terminal split: conversation on the left, internals on the right",
     )
 
     bench_cmd = sub.add_parser("benchmark", help="Run benchmark dataset")
@@ -321,6 +329,358 @@ def _base_model_comparison(
     }
 
 
+def _wrap_panel_text(text: str, width: int) -> list[str]:
+    if width <= 1:
+        return [text[: max(width, 0)]]
+    wrapped: list[str] = []
+    for raw_line in text.splitlines() or [""]:
+        if not raw_line:
+            wrapped.append("")
+            continue
+        wrapped.extend(
+            textwrap.wrap(
+                raw_line,
+                width=width,
+                replace_whitespace=False,
+                drop_whitespace=False,
+            )
+            or [""]
+        )
+    return wrapped
+
+
+def _build_split_debug_panel(
+    result: dict[str, Any] | None,
+    comparison: dict[str, Any] | None,
+    *,
+    visibility: str,
+    top_branches: int,
+    task_type: str,
+    compare_enabled: bool,
+    status: str | None = None,
+) -> str:
+    sections = [
+        "Session",
+        f"task_type={task_type}",
+        f"visibility={visibility}",
+        f"compare_base={'on' if compare_enabled else 'off'}",
+        "commands=/exit, /type <task_type>, /auto, /compare on|off, /visibility <level>",
+    ]
+    if status:
+        sections.extend(["", "Status", status])
+    if compare_enabled:
+        sections.extend(["", "Base Model"])
+        if comparison:
+            base_output = str(dict(comparison.get("base_model", {}) or {}).get("selected_output", "")).strip()
+            sections.append(base_output or "(empty)")
+            sections.extend(["", "Base vs Adaptive", format_comparison_trace(comparison)])
+        else:
+            sections.extend(["Awaiting first compared turn.", "", "Base vs Adaptive", "Awaiting first compared turn."])
+    if result:
+        sections.extend(["", "Adaptive Internals", format_turn_trace(result, visibility=visibility, top_branches=top_branches)])
+    else:
+        sections.extend(
+            [
+                "",
+                "Adaptive Internals",
+                "Awaiting first turn. The right pane will show routing, branches, evaluation, and optimizer updates.",
+            ]
+        )
+    return "\n".join(sections)
+
+
+def _draw_split_panel(window: Any, title: str, body: str) -> None:
+    import curses
+
+    window.erase()
+    height, width = window.getmaxyx()
+    if height < 3 or width < 4:
+        window.noutrefresh()
+        return
+    window.box()
+    title_text = f" {title} "
+    try:
+        window.addnstr(0, 2, title_text, max(0, width - 4), curses.A_BOLD)
+    except curses.error:
+        pass
+    visible_lines = _wrap_panel_text(body, max(1, width - 2))
+    start = max(0, len(visible_lines) - max(0, height - 2))
+    row = 1
+    for line in visible_lines[start : start + max(0, height - 2)]:
+        try:
+            window.addnstr(row, 1, line, max(0, width - 2))
+        except curses.error:
+            pass
+        row += 1
+    window.noutrefresh()
+
+
+def _draw_split_chat_screen(
+    stdscr: Any,
+    transcript: list[str],
+    debug_panel: str,
+    input_buffer: str,
+    *,
+    task_type: str,
+    visibility: str,
+    compare_enabled: bool,
+) -> None:
+    import curses
+
+    stdscr.erase()
+    height, width = stdscr.getmaxyx()
+    if height < 8 or width < 60:
+        message = "Split view needs a larger terminal (min 60x8). Resize or rerun without --split-view."
+        for row, line in enumerate(_wrap_panel_text(message, max(1, width - 1))[: max(0, height - 1)]):
+            try:
+                stdscr.addnstr(row, 0, line, max(0, width - 1))
+            except curses.error:
+                pass
+        prompt = "you> "
+        visible_input = input_buffer[-max(0, width - len(prompt) - 1) :]
+        try:
+            stdscr.addnstr(max(0, height - 1), 0, f"{prompt}{visible_input}", max(0, width - 1))
+            stdscr.move(max(0, height - 1), min(width - 1, len(prompt) + len(visible_input)))
+        except curses.error:
+            pass
+        stdscr.refresh()
+        return
+
+    pane_height = height - 1
+    left_width = width // 2
+    right_width = width - left_width
+    left_window = stdscr.derwin(pane_height, left_width, 0, 0)
+    right_window = stdscr.derwin(pane_height, right_width, 0, left_width)
+
+    left_body = "\n".join(transcript) if transcript else "Conversation will appear here."
+    right_title = f"Under The Hood | visibility={visibility} | compare={'on' if compare_enabled else 'off'}"
+    _draw_split_panel(left_window, f"Conversation | type={task_type}", left_body)
+    _draw_split_panel(right_window, right_title, debug_panel)
+
+    prompt = "you> "
+    input_width = max(0, width - len(prompt) - 1)
+    visible_input = input_buffer[-input_width:] if input_width > 0 else ""
+    try:
+        stdscr.addnstr(height - 1, 0, f"{prompt}{visible_input}", max(0, width - 1))
+        stdscr.clrtoeol()
+        stdscr.move(height - 1, min(width - 1, len(prompt) + len(visible_input)))
+    except curses.error:
+        pass
+    curses.doupdate()
+
+
+def _run_split_chat_loop(
+    engine: PromptForestEngine,
+    default_task_type: str,
+    user_id: str,
+    visibility: str,
+    top_branches: int,
+    compare_base: bool,
+) -> None:
+    if not sys.stdin.isatty() or not sys.stdout.isatty():
+        print("split view requires an interactive TTY; falling back to standard chat", file=sys.stderr)
+        _run_chat_loop(
+            engine,
+            default_task_type=default_task_type,
+            user_id=user_id,
+            show_route=False,
+            visibility=visibility,
+            top_branches=top_branches,
+            compare_base=compare_base,
+        )
+        return
+
+    try:
+        import curses
+    except ImportError:
+        print("split view is unavailable because curses is not installed; falling back to standard chat", file=sys.stderr)
+        _run_chat_loop(
+            engine,
+            default_task_type=default_task_type,
+            user_id=user_id,
+            show_route=False,
+            visibility=visibility,
+            top_branches=top_branches,
+            compare_base=compare_base,
+        )
+        return
+
+    def _curses_chat(stdscr: Any) -> None:
+        nonlocal visibility
+
+        try:
+            curses.curs_set(1)
+        except curses.error:
+            pass
+        curses.noecho()
+        stdscr.keypad(True)
+
+        task_type = default_task_type
+        compare_enabled = compare_base
+        compare_backend = _clone_backend_for_compare(engine.backend) if compare_enabled else None
+        latest_result: dict[str, Any] | None = None
+        latest_comparison: dict[str, Any] | None = None
+        transcript = [
+            "system> Split view chat started.",
+            "system> Left pane is the conversation. Right pane shows routing, evaluation, optimization, and branch internals.",
+        ]
+        debug_panel = _build_split_debug_panel(
+            None,
+            None,
+            visibility=visibility,
+            top_branches=top_branches,
+            task_type=task_type,
+            compare_enabled=compare_enabled,
+            status="Waiting for input.",
+        )
+        input_buffer = ""
+
+        while True:
+            _draw_split_chat_screen(
+                stdscr,
+                transcript,
+                debug_panel,
+                input_buffer,
+                task_type=task_type,
+                visibility=visibility,
+                compare_enabled=compare_enabled,
+            )
+            try:
+                key = stdscr.get_wch()
+            except KeyboardInterrupt:
+                break
+
+            if key == curses.KEY_RESIZE:
+                continue
+            if key in ("\n", "\r"):
+                text = input_buffer.strip()
+                input_buffer = ""
+                if not text:
+                    continue
+                if text in {"/exit", "exit", "quit"}:
+                    break
+                if text.startswith("/type "):
+                    task_type = text.split(" ", 1)[1].strip() or "auto"
+                    transcript.append(f"system> task_type set to: {task_type}")
+                    debug_panel = _build_split_debug_panel(
+                        latest_result,
+                        latest_comparison if compare_enabled else None,
+                        visibility=visibility,
+                        top_branches=top_branches,
+                        task_type=task_type,
+                        compare_enabled=compare_enabled,
+                        status="Updated task type.",
+                    )
+                    continue
+                if text == "/auto":
+                    task_type = "auto"
+                    transcript.append("system> task_type set to: auto")
+                    debug_panel = _build_split_debug_panel(
+                        latest_result,
+                        latest_comparison if compare_enabled else None,
+                        visibility=visibility,
+                        top_branches=top_branches,
+                        task_type=task_type,
+                        compare_enabled=compare_enabled,
+                        status="Restored auto routing.",
+                    )
+                    continue
+                if text.startswith("/compare "):
+                    arg = text.split(" ", 1)[1].strip().lower()
+                    compare_enabled = arg in {"on", "true", "1", "yes"}
+                    compare_backend = _clone_backend_for_compare(engine.backend) if compare_enabled else None
+                    if not compare_enabled:
+                        latest_comparison = None
+                    transcript.append(f"system> base comparison {'enabled' if compare_enabled else 'disabled'}")
+                    debug_panel = _build_split_debug_panel(
+                        latest_result,
+                        latest_comparison if compare_enabled else None,
+                        visibility=visibility,
+                        top_branches=top_branches,
+                        task_type=task_type,
+                        compare_enabled=compare_enabled,
+                        status="Updated comparison mode.",
+                    )
+                    continue
+                if text.startswith("/visibility "):
+                    arg = text.split(" ", 1)[1].strip().lower()
+                    if arg in {"minimal", "eval", "opt", "full"}:
+                        visibility = arg
+                        transcript.append(f"system> visibility set to: {visibility}")
+                        debug_panel = _build_split_debug_panel(
+                            latest_result,
+                            latest_comparison if compare_enabled else None,
+                            visibility=visibility,
+                            top_branches=top_branches,
+                            task_type=task_type,
+                            compare_enabled=compare_enabled,
+                            status="Updated trace depth.",
+                        )
+                    else:
+                        transcript.append("system> visibility must be one of: minimal, eval, opt, full")
+                    continue
+
+                transcript.append(f"you> {text}")
+                transcript.append("adaptive> [working...]")
+                debug_panel = _build_split_debug_panel(
+                    None,
+                    None,
+                    visibility=visibility,
+                    top_branches=top_branches,
+                    task_type=task_type,
+                    compare_enabled=compare_enabled,
+                    status="Running adaptive system and collecting branch/evaluator/optimizer traces...",
+                )
+                _draw_split_chat_screen(
+                    stdscr,
+                    transcript,
+                    debug_panel,
+                    input_buffer,
+                    task_type=task_type,
+                    visibility=visibility,
+                    compare_enabled=compare_enabled,
+                )
+
+                try:
+                    metadata = _chat_metadata_from_text(text, user_id=user_id)
+                    result = engine.run_task(text=text, task_type=task_type, metadata=metadata)
+                    comparison = _base_model_comparison(engine, result, backend=compare_backend) if compare_enabled else None
+                    latest_result = result
+                    latest_comparison = comparison
+                    transcript[-1] = f"adaptive> {result['evaluation_signal']['selected_output']}"
+                    debug_panel = _build_split_debug_panel(
+                        result,
+                        comparison,
+                        visibility=visibility,
+                        top_branches=top_branches,
+                        task_type=task_type,
+                        compare_enabled=compare_enabled,
+                    )
+                except Exception as exc:
+                    transcript[-1] = f"adaptive> [error: {exc}]"
+                    debug_panel = _build_split_debug_panel(
+                        latest_result,
+                        latest_comparison if compare_enabled else None,
+                        visibility=visibility,
+                        top_branches=top_branches,
+                        task_type=task_type,
+                        compare_enabled=compare_enabled,
+                        status=f"Error: {exc}",
+                    )
+                continue
+
+            if key in (curses.KEY_BACKSPACE, "\b", "\x7f"):
+                input_buffer = input_buffer[:-1]
+                continue
+            if key == "\x15":
+                input_buffer = ""
+                continue
+            if isinstance(key, str) and key.isprintable():
+                input_buffer += key
+
+    curses.wrapper(_curses_chat)
+
+
 def _run_chat_loop(
     engine: PromptForestEngine,
     default_task_type: str,
@@ -415,15 +775,25 @@ def main() -> None:
         return
 
     if args.command == "chat":
-        _run_chat_loop(
-            engine,
-            default_task_type=args.task_type,
-            user_id=args.user_id,
-            show_route=args.show_route,
-            visibility=args.visibility,
-            top_branches=args.top_branches,
-            compare_base=args.compare_base,
-        )
+        if args.split_view:
+            _run_split_chat_loop(
+                engine,
+                default_task_type=args.task_type,
+                user_id=args.user_id,
+                visibility=args.visibility,
+                top_branches=args.top_branches,
+                compare_base=args.compare_base,
+            )
+        else:
+            _run_chat_loop(
+                engine,
+                default_task_type=args.task_type,
+                user_id=args.user_id,
+                show_route=args.show_route,
+                visibility=args.visibility,
+                top_branches=args.top_branches,
+                compare_base=args.compare_base,
+            )
         return
 
     if args.command == "benchmark":

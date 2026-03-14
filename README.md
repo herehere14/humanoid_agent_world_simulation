@@ -174,6 +174,17 @@ prompt-forest chat --task-type auto --visibility full --compare-base
 
 Use `/compare on` or `/compare off` to toggle the base-model comparison live.
 
+To run chat in a two-pane real-time split view, with conversation on the left and internals on the right:
+
+```bash
+prompt-forest chat --task-type auto --visibility full --compare-base --split-view
+```
+
+In split view:
+- left pane: your conversation with the adaptive agent
+- right pane: base-model output, base-vs-adaptive scoring delta, routing path, sibling branch decisions, evaluation signal, reward components, and optimizer updates
+- bottom input line: live command entry (`/type`, `/auto`, `/compare`, `/visibility`, `/exit`)
+
 With `--compare-base`, each turn shows:
 - raw base-model answer
 - adaptive system answer
