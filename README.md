@@ -137,12 +137,13 @@ openclaw_closedsourcemodel_RL/
 ## Install
 
 ```bash
-cd /Users/justin/Documents/New\ project/openclaw_closedsourcemodel_RL
+cd /path/to/openclaw_closedsourcemodel_RL
 python -m venv .venv
 source .venv/bin/activate
-pip install -e .
 pip install -e .[dev]
 ```
+
+After install, use the `prompt-forest` entrypoint directly. If you have not installed the package, the fallback is `PYTHONPATH=src python -m prompt_forest.cli ...`.
 
 ## Run
 
@@ -158,21 +159,47 @@ prompt-forest run-task \
 ### 1b) Interactive chat with the RL agent
 
 ```bash
-PYTHONPATH=src python -m prompt_forest.cli chat --task-type auto --visibility full
+prompt-forest chat --task-type auto --visibility full
 ```
 
 Use `/type <task_type>` to pin type and `/auto` to restore auto-routing.
 Use `--visibility minimal|eval|opt|full` to control how much of Agent 1/Agent 2 internals are shown.
+Use `/visibility <minimal|eval|opt|full>` to change trace depth mid-chat.
 
-### 1c) Inspect recent evaluator/optimizer traces
+To see the raw base model next to the adaptive system in real time:
+
+```bash
+prompt-forest chat --task-type auto --visibility full --compare-base
+```
+
+Use `/compare on` or `/compare off` to toggle the base-model comparison live.
+
+With `--compare-base`, each turn shows:
+- raw base-model answer
+- adaptive system answer
+- routing path, sibling preference state, probes, reward components, and optimizer updates
+- objective-score delta between base model and adaptive system
+
+### 1c) Single task with live base-vs-adaptive comparison
+
+```bash
+prompt-forest run-task \
+  --task "Audit a rollout note for contradictions and confidence." \
+  --task-type code \
+  --metadata '{"expected_keywords": ["contradiction", "confidence"], "required_substrings": ["confidence"]}' \
+  --visibility full \
+  --compare-base
+```
+
+### 1d) Inspect recent evaluator/optimizer traces
 
 ```bash
 prompt-forest inspect-events --limit 8 --visibility full
 ```
 
-This prints per-task routing path, branch-level evaluation signals, and optimizer updates (weight delta, advantage, decay, rewrites, candidate lifecycle actions).
+This prints per-task routing path, sibling preference signals, branch-level evaluation signals, reward components, and optimizer updates (weight delta, block reason, decay, rewrites, candidate lifecycle actions).
 
-### 1d) User feedback loop (personal adaptation)
+### 1e) User feedback loop (personal adaptation)
 
 After a task is answered, send explicit feedback by task id:
 
@@ -208,7 +235,7 @@ Feedback reward blend:
 
 If corrected answer is provided on rejection, reward is strongly anchored to user feedback.
 
-### 1e) Enable real API-backed Evaluator Agent and Optimizer Agent
+### 1f) Enable real API-backed Evaluator Agent and Optimizer Agent
 
 By default, Agent 1 and Agent 2 run with deterministic local logic.  
 To run them as model-backed agents, enable `agent_runtimes` in config and set API keys.
@@ -238,7 +265,7 @@ Environment variable example:
 
 ```bash
 export OPENAI_API_KEY="your_key_here"
-PYTHONPATH=src python -m prompt_forest.cli --config configs/runtime_openai_example.json chat --task-type auto --visibility full
+prompt-forest --config configs/runtime_openai_example.json chat --task-type auto --visibility full --compare-base
 ```
 
 Supported runtime providers:
@@ -300,13 +327,13 @@ prompt-forest rl-validate \
 ### 6b) Hard-slice validation (verifier-grounded)
 
 ```bash
-PYTHONPATH=src python -m prompt_forest.cli hard-validate --episodes 220 --seeds 11,17,19,23,29,31,37,41
+prompt-forest hard-validate --episodes 220 --seeds 11,17,19,23,29,31,37,41
 ```
 
 Optional simulated correction signal:
 
 ```bash
-PYTHONPATH=src python -m prompt_forest.cli hard-validate --episodes 220 --oracle-feedback
+prompt-forest hard-validate --episodes 220 --oracle-feedback
 ```
 
 Hard-slice tasks include strict `verifier_spec` metadata and use reward mode `hybrid_verifier`, which adds external verifier checks (`must_include`, `must_exclude`, regex constraints, confidence range, length floor) on top of keyword/rule/task rewards.

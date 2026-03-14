@@ -5,7 +5,11 @@ import json
 import re
 from pathlib import Path
 
+from .backend.base import LLMBackend
+from .backend.mock import MockLLMBackend
+from .backend.openai_chat import OpenAIChatBackend
 from .config import load_config
+from .contracts import evaluate_output_contract, infer_output_contract
 from .core.engine import PromptForestEngine
 from .experiments.auto_improve import AutoImprover
 from .experiments.benchmark import BenchmarkRunner
@@ -15,7 +19,10 @@ from .experiments.hard_slice_validation import HardSliceValidator
 from .experiments.live_ablation_validation import LiveAblationValidator
 from .experiments.live_model_validation import LiveModelValidator
 from .experiments.rl_validation import RLLearningValidator
-from .observability.trace import format_turn_trace
+from .observability.trace import format_comparison_trace, format_turn_trace
+from .rewards.modes import ExactMatchReward, KeywordReward, RuleBasedReward, TaskSpecificReward
+from .rewards.verifiers import ExternalVerifierReward
+from .types import TaskInput
 from .utils.io import read_json, read_jsonl
 
 
@@ -38,6 +45,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Human-readable trace level for evaluator/optimizer internals",
     )
     task_cmd.add_argument("--top-branches", type=int, default=5, help="How many routing scores to print in trace mode")
+    task_cmd.add_argument(
+        "--compare-base",
+        action="store_true",
+        help="Also run the same task through the raw base model and print a real-time comparison",
+    )
 
     chat_cmd = sub.add_parser("chat", help="Interactive chat with the adaptive RL prompt-forest agent")
     chat_cmd.add_argument("--task-type", type=str, default="auto")
@@ -51,6 +63,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Trace verbosity for evaluator and optimizer details per turn",
     )
     chat_cmd.add_argument("--top-branches", type=int, default=5)
+    chat_cmd.add_argument(
+        "--compare-base",
+        action="store_true",
+        help="Show a direct base-model answer alongside the adaptive system on every turn",
+    )
 
     bench_cmd = sub.add_parser("benchmark", help="Run benchmark dataset")
     bench_cmd.add_argument("--dataset", type=str, default="examples/demo_tasks.json")
@@ -187,6 +204,123 @@ def _chat_metadata_from_text(text: str, user_id: str) -> dict:
     }
 
 
+def _clone_backend_for_compare(backend: LLMBackend) -> LLMBackend:
+    if isinstance(backend, OpenAIChatBackend):
+        return OpenAIChatBackend(
+            model=backend.model,
+            api_key_env=backend.api_key_env,
+            base_url=backend.base_url,
+            temperature=backend.temperature,
+            max_output_tokens=backend.max_output_tokens,
+            timeout_seconds=backend.timeout_seconds,
+            max_retries=backend.max_retries,
+            retry_backoff_seconds=backend.retry_backoff_seconds,
+            api_mode=backend.api_mode,
+            reasoning_effort=backend.reasoning_effort,
+            seed=backend.seed,
+            system_prompt=backend.system_prompt,
+        )
+    if isinstance(backend, MockLLMBackend):
+        return MockLLMBackend(seed=getattr(backend, "seed", 42))
+    return backend
+
+
+def _task_from_payload(payload: dict) -> TaskInput:
+    return TaskInput(
+        task_id=str(payload.get("task_id", "compare")),
+        text=str(payload.get("text", "")),
+        task_type=str(payload.get("task_type", "general")),
+        metadata=dict(payload.get("metadata", {}) or {}),
+    )
+
+
+def _render_direct_prompt(task: TaskInput) -> str:
+    return (
+        "You are answering a user task directly without any routing or helper branches.\n"
+        f"Task type: {task.task_type}\n"
+        f"Task: {task.text}\n"
+        "Follow any explicit formatting requirements in the task exactly. "
+        "Be correct, concise when appropriate, and include confidence if the task asks for it."
+    )
+
+
+def _objective_metrics_for_output(engine: PromptForestEngine, task: TaskInput, output: str) -> dict[str, object]:
+    overall = engine.judge.score_output(output, task)
+    exact, exact_reason = ExactMatchReward(weight=1.0).score(output, task)
+    keyword, keyword_reason = KeywordReward(weight=1.0).score(output, task)
+    rule, rule_reason = RuleBasedReward(weight=1.0).score(output, task)
+    task_specific, task_reason = TaskSpecificReward(weight=1.0).score(output, task)
+    external, external_reason = ExternalVerifierReward(weight=1.0).score(output, task)
+    contract = infer_output_contract(task.text, task.metadata)
+    contract_pass = True
+    contract_reason = "no_contract"
+    if contract:
+        contract_pass, contract_reason = evaluate_output_contract(output, contract, task.text)
+
+    return {
+        "hybrid_verifier_reward": round(overall.reward, 4),
+        "hybrid_verifier_reason": overall.reason,
+        "exact_score": round(exact, 4),
+        "exact_reason": exact_reason,
+        "keyword_score": round(keyword, 4),
+        "keyword_reason": keyword_reason,
+        "rule_score": round(rule, 4),
+        "rule_reason": rule_reason,
+        "task_specific_score": round(task_specific, 4),
+        "task_specific_reason": task_reason,
+        "external_verifier_score": round(external, 4),
+        "external_verifier_reason": external_reason,
+        "contract": contract or "",
+        "contract_pass": contract_pass,
+        "contract_reason": contract_reason,
+        "output_word_count": len(output.split()),
+    }
+
+
+def _base_model_comparison(
+    engine: PromptForestEngine,
+    result: dict[str, object],
+    *,
+    backend: LLMBackend | None = None,
+) -> dict[str, object]:
+    task = _task_from_payload(dict(result.get("task", {}) or {}))
+    compare_backend = backend or _clone_backend_for_compare(engine.backend)
+    base_output, base_meta = compare_backend.generate(_render_direct_prompt(task), task, branch_name="base_model_direct")
+    base_metrics = _objective_metrics_for_output(engine, task, base_output)
+
+    adaptive_output = str(dict(result.get("evaluation_signal", {}) or {}).get("selected_output", ""))
+    adaptive_metrics = _objective_metrics_for_output(engine, task, adaptive_output)
+    delta = round(
+        float(adaptive_metrics["hybrid_verifier_reward"]) - float(base_metrics["hybrid_verifier_reward"]),
+        4,
+    )
+    if delta > 0:
+        winner = "adaptive_system"
+    elif delta < 0:
+        winner = "base_model"
+    else:
+        winner = "tie"
+
+    return {
+        "adaptive_system": {
+            "selected_branch": str(dict(result.get("evaluation_signal", {}) or {}).get("selected_branch", "none")),
+            "selected_output": adaptive_output,
+            "objective_metrics": adaptive_metrics,
+            "reward_components": dict(result.get("reward_components", {}) or {}),
+        },
+        "base_model": {
+            "selected_branch": "base_model_direct",
+            "selected_output": base_output,
+            "objective_metrics": base_metrics,
+            "model_meta": base_meta,
+        },
+        "delta": {
+            "hybrid_verifier_reward": delta,
+        },
+        "winner": winner,
+    }
+
+
 def _run_chat_loop(
     engine: PromptForestEngine,
     default_task_type: str,
@@ -194,9 +328,12 @@ def _run_chat_loop(
     show_route: bool,
     visibility: str,
     top_branches: int,
+    compare_base: bool,
 ) -> None:
     task_type = default_task_type
-    print("Interactive RL chat started. Commands: /exit, /type <task_type>, /auto")
+    compare_enabled = compare_base
+    compare_backend = _clone_backend_for_compare(engine.backend) if compare_enabled else None
+    print("Interactive RL chat started. Commands: /exit, /type <task_type>, /auto, /compare on|off, /visibility <level>")
     while True:
         try:
             text = input("you> ").strip()
@@ -219,11 +356,28 @@ def _run_chat_loop(
             task_type = "auto"
             print("task_type set to: auto")
             continue
+        if text.startswith("/compare "):
+            arg = text.split(" ", 1)[1].strip().lower()
+            compare_enabled = arg in {"on", "true", "1", "yes"}
+            compare_backend = _clone_backend_for_compare(engine.backend) if compare_enabled else None
+            print(f"base comparison {'enabled' if compare_enabled else 'disabled'}")
+            continue
+        if text.startswith("/visibility "):
+            arg = text.split(" ", 1)[1].strip().lower()
+            if arg in {"minimal", "eval", "opt", "full"}:
+                visibility = arg
+                print(f"visibility set to: {visibility}")
+            else:
+                print("visibility must be one of: minimal, eval, opt, full")
+            continue
 
         metadata = _chat_metadata_from_text(text, user_id=user_id)
         result = engine.run_task(text=text, task_type=task_type, metadata=metadata)
+        comparison = _base_model_comparison(engine, result, backend=compare_backend) if compare_enabled else None
         signal = result["evaluation_signal"]
-        print(f"agent> {signal['selected_output']}")
+        if comparison:
+            print(f"base> {comparison['base_model']['selected_output']}")
+        print(f"adaptive> {signal['selected_output']}")
         if visibility != "minimal":
             print(format_turn_trace(result, visibility=visibility, top_branches=top_branches))
         elif show_route:
@@ -233,6 +387,8 @@ def _run_chat_loop(
                 f"[reward] {signal['reward_score']:.3f} "
                 f"selected={signal['selected_branch']} reason={signal['failure_reason'] or 'ok'}"
             )
+        if comparison:
+            print(format_comparison_trace(comparison))
 
 
 def main() -> None:
@@ -247,8 +403,13 @@ def main() -> None:
         metadata = json.loads(args.metadata)
         metadata["user_id"] = args.user_id
         result = engine.run_task(text=args.task, task_type=args.task_type, metadata=metadata)
+        if args.compare_base:
+            result["base_model_comparison"] = _base_model_comparison(engine, result)
         if args.visibility != "minimal":
             print(format_turn_trace(result, visibility=args.visibility, top_branches=args.top_branches))
+            print()
+        if args.compare_base:
+            print(format_comparison_trace(result["base_model_comparison"]))
             print()
         print(json.dumps(result, indent=2))
         return
@@ -261,6 +422,7 @@ def main() -> None:
             show_route=args.show_route,
             visibility=args.visibility,
             top_branches=args.top_branches,
+            compare_base=args.compare_base,
         )
         return
 

@@ -14,6 +14,7 @@ class MockLLMBackend(LLMBackend):
     """Deterministic backend with branch-task affinity to simulate adaptation effects."""
 
     def __init__(self, seed: int = 42) -> None:
+        self.seed = seed
         self._rng = random.Random(seed)
         self._quality = {
             "math": {

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from prompt_forest.config import load_config
 from prompt_forest.core.engine import PromptForestEngine
-from prompt_forest.observability.trace import format_turn_trace
+from prompt_forest.observability.trace import format_comparison_trace, format_turn_trace
 
 
 def test_turn_trace_includes_evaluator_and_optimizer_sections(tmp_path):
@@ -23,7 +23,9 @@ def test_turn_trace_includes_evaluator_and_optimizer_sections(tmp_path):
     trace = format_turn_trace(payload, visibility="full", top_branches=4)
 
     assert "[routing] path=" in trace
+    assert "[routing] sibling_decisions:" in trace
     assert "[evaluator] selected=" in trace
+    assert "[evaluator] reward_components=" in trace
     assert "[optimizer] task_baseline=" in trace
     assert "[optimizer] branch_updates:" in trace
 
@@ -58,3 +60,37 @@ def test_turn_trace_eval_mode_omits_optimizer_section():
 
     assert "[evaluator] selected=analytical" in trace
     assert "[optimizer]" not in trace
+
+
+def test_format_comparison_trace_shows_delta_and_breakdown():
+    trace = format_comparison_trace(
+        {
+            "adaptive_system": {
+                "selected_branch": "planner_risk_allocator",
+                "objective_metrics": {
+                    "hybrid_verifier_reward": 0.81,
+                    "keyword_score": 1.0,
+                    "rule_score": 1.0,
+                    "external_verifier_score": 0.67,
+                    "hybrid_verifier_reason": "medium_quality|rules_passed",
+                },
+            },
+            "base_model": {
+                "selected_branch": "base_model_direct",
+                "objective_metrics": {
+                    "hybrid_verifier_reward": 0.65,
+                    "keyword_score": 0.5,
+                    "rule_score": 0.5,
+                    "external_verifier_score": 0.33,
+                    "hybrid_verifier_reason": "low_quality|rule_miss:confidence",
+                },
+            },
+            "delta": {"hybrid_verifier_reward": 0.16},
+            "winner": "adaptive_system",
+        }
+    )
+
+    assert "[compare] adaptive_reward=0.810" in trace
+    assert "winner=adaptive_system" in trace
+    assert "adaptive_breakdown=keyword:1.000" in trace
+    assert "base_breakdown=keyword:0.500" in trace
