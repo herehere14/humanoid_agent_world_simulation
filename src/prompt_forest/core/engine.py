@@ -208,6 +208,8 @@ class PromptForestEngine:
             "selected_path": selected_path,
             "routing_context_key": routing_context_key,
             "runtime": {
+                "primary_backend": self.backend.__class__.__name__,
+                "primary_model": getattr(self.backend, "model", "mock"),
                 "evaluator_llm_enabled": self.config.agent_runtimes.evaluator.enabled,
                 "optimizer_llm_enabled": self.config.agent_runtimes.optimizer.enabled,
                 "evaluator_provider": self.config.agent_runtimes.evaluator.provider,

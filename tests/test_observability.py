@@ -23,6 +23,7 @@ def test_turn_trace_includes_evaluator_and_optimizer_sections(tmp_path):
     trace = format_turn_trace(payload, visibility="full", top_branches=4)
 
     assert "[routing] path=" in trace
+    assert "[runtime] primary_backend=" in trace
     assert "[routing] sibling_decisions:" in trace
     assert "[evaluator] selected=" in trace
     assert "[evaluator] reward_components=" in trace

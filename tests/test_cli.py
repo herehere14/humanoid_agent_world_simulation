@@ -3,8 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from prompt_forest.backend.mock import MockLLMBackend
+from prompt_forest.backend.openai_chat import OpenAIChatBackend
 from prompt_forest.cli import (
     _base_model_comparison,
+    _build_primary_backend_from_args,
     _build_split_debug_panel,
     _clone_backend_for_compare,
     _render_direct_prompt,
@@ -92,3 +94,28 @@ def test_build_parser_accepts_split_view_flag():
     assert args.command == "chat"
     assert args.split_view is True
     assert args.compare_base is True
+
+
+def test_build_primary_backend_from_args_uses_openai_backend():
+    parser = build_parser()
+    args = parser.parse_args(
+        [
+            "chat",
+            "--model",
+            "gpt-4.1-mini",
+            "--api-key-env",
+            "OPENAI_API_KEY",
+            "--api-mode",
+            "responses",
+            "--reasoning-effort",
+            "medium",
+        ]
+    )
+
+    backend = _build_primary_backend_from_args(args)
+
+    assert isinstance(backend, OpenAIChatBackend)
+    assert backend.model == "gpt-4.1-mini"
+    assert backend.api_key_env == "OPENAI_API_KEY"
+    assert backend.api_mode == "responses"
+    assert backend.reasoning_effort == "medium"

@@ -59,6 +59,27 @@ The easiest way to think about it:
 - `compare-base`: show both side by side
 - `split-view`: left pane is the conversation, right pane shows routing, evaluation, optimization, and branch internals live
 
+## Use a real OpenAI model
+
+If you want the left pane chat itself to run on a real OpenAI model instead of the local mock backend:
+
+```bash
+export OPENAI_API_KEY="your_key_here"
+prompt-forest --config configs/runtime_openai_example.json chat \
+  --model gpt-4.1-mini \
+  --task-type auto \
+  --visibility full \
+  --compare-base \
+  --split-view
+```
+
+What this does:
+- left pane adaptive conversation: real OpenAI model via `--model`
+- right pane base-model comparison: real OpenAI model via `--compare-base`
+- right pane evaluator and optimizer: real OpenAI agent runtimes from `configs/runtime_openai_example.json`
+
+If you omit `--model`, the main conversation still uses the mock backend even if evaluator and optimizer are API-backed.
+
 ## Research framing
 
 This project is positioned as:

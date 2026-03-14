@@ -46,6 +46,8 @@ def format_turn_trace(payload: dict[str, Any], visibility: str = "full", top_bra
     if runtime:
         lines.append(
             "[runtime] "
+            f"primary_backend={runtime.get('primary_backend', 'n/a')} "
+            f"primary_model={runtime.get('primary_model', 'n/a')} "
             f"evaluator_llm={runtime.get('evaluator_llm_enabled', False)} "
             f"optimizer_llm={runtime.get('optimizer_llm_enabled', False)}"
         )

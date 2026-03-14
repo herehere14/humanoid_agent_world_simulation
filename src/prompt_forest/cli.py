@@ -53,6 +53,13 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Also run the same task through the raw base model and print a real-time comparison",
     )
+    task_cmd.add_argument("--model", type=str, default="", help="Use a real OpenAI-compatible backend for main generation")
+    task_cmd.add_argument("--api-key-env", type=str, default="OPENAI_API_KEY")
+    task_cmd.add_argument("--base-url", type=str, default="https://api.openai.com/v1")
+    task_cmd.add_argument("--temperature", type=float, default=0.2)
+    task_cmd.add_argument("--max-output-tokens", type=int, default=700)
+    task_cmd.add_argument("--api-mode", type=str, default="chat_completions", choices=["chat_completions", "responses"])
+    task_cmd.add_argument("--reasoning-effort", type=str, default="")
 
     chat_cmd = sub.add_parser("chat", help="Interactive chat with the adaptive RL prompt-forest agent")
     chat_cmd.add_argument("--task-type", type=str, default="auto")
@@ -76,6 +83,13 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Render chat as a left/right terminal split: conversation on the left, internals on the right",
     )
+    chat_cmd.add_argument("--model", type=str, default="", help="Use a real OpenAI-compatible backend for main generation")
+    chat_cmd.add_argument("--api-key-env", type=str, default="OPENAI_API_KEY")
+    chat_cmd.add_argument("--base-url", type=str, default="https://api.openai.com/v1")
+    chat_cmd.add_argument("--temperature", type=float, default=0.2)
+    chat_cmd.add_argument("--max-output-tokens", type=int, default=700)
+    chat_cmd.add_argument("--api-mode", type=str, default="chat_completions", choices=["chat_completions", "responses"])
+    chat_cmd.add_argument("--reasoning-effort", type=str, default="")
 
     bench_cmd = sub.add_parser("benchmark", help="Run benchmark dataset")
     bench_cmd.add_argument("--dataset", type=str, default="examples/demo_tasks.json")
@@ -210,6 +224,21 @@ def _chat_metadata_from_text(text: str, user_id: str) -> dict:
         "required_substrings": ["confidence"],
         "user_id": user_id,
     }
+
+
+def _build_primary_backend_from_args(args: argparse.Namespace) -> LLMBackend | None:
+    model = str(getattr(args, "model", "") or "").strip()
+    if not model:
+        return None
+    return OpenAIChatBackend(
+        model=model,
+        api_key_env=str(getattr(args, "api_key_env", "OPENAI_API_KEY") or "OPENAI_API_KEY"),
+        base_url=str(getattr(args, "base_url", "https://api.openai.com/v1") or "https://api.openai.com/v1"),
+        temperature=float(getattr(args, "temperature", 0.2) or 0.2),
+        max_output_tokens=int(getattr(args, "max_output_tokens", 700) or 700),
+        api_mode=str(getattr(args, "api_mode", "chat_completions") or "chat_completions"),
+        reasoning_effort=(str(getattr(args, "reasoning_effort", "") or "").strip() or None),
+    )
 
 
 def _clone_backend_for_compare(backend: LLMBackend) -> LLMBackend:
@@ -757,7 +786,8 @@ def main() -> None:
 
     config_path = Path(args.config)
     config = load_config(config_path if config_path.exists() else None)
-    engine = PromptForestEngine(config=config)
+    backend = _build_primary_backend_from_args(args)
+    engine = PromptForestEngine(config=config, backend=backend)
 
     if args.command == "run-task":
         metadata = json.loads(args.metadata)
