@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 import re
 from dataclasses import dataclass
 from typing import Any
@@ -27,6 +28,8 @@ class FinalComposer:
         task: TaskInput,
         route: RoutingDecision,
         outputs: dict[str, BranchOutput],
+        *,
+        on_delta: Callable[[str], None] | None = None,
     ) -> ComposerResult | None:
         if not self.config.enabled or len(route.activated_branches) < self.config.min_branches_for_compose:
             return None
@@ -43,7 +46,7 @@ class FinalComposer:
 
         feature_bundle = self._extract_feature_bundle(task, route, outputs)
         prompt = self._render_prompt(task, route, feature_bundle)
-        generated, meta = self.backend.generate(prompt, task, leaf)
+        generated, meta = self.backend.generate_stream(prompt, task, leaf, on_delta=on_delta)
         fused = self._fuse_output(generated=generated, leaf_output=leaf_output.output, bundle=feature_bundle, task=task)
 
         composed = BranchOutput(

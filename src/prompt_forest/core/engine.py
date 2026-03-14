@@ -1,7 +1,9 @@
 from __future__ import annotations
+from collections.abc import Callable
 from dataclasses import asdict
 from pathlib import Path
 from statistics import mean
+from time import perf_counter
 from typing import Any
 from uuid import uuid4
 
@@ -61,8 +63,21 @@ class PromptForestEngine:
         self._route_history: list[RoutingDecision] = []
         self._event_log = self.artifacts_dir / "events.jsonl"
 
-    def run_task(self, text: str, task_type: str = "auto", metadata: dict[str, Any] | None = None) -> dict[str, Any]:
-        return self.run_task_controlled(text=text, task_type=task_type, metadata=metadata, adapt=True, update_memory=True)
+    def run_task(
+        self,
+        text: str,
+        task_type: str = "auto",
+        metadata: dict[str, Any] | None = None,
+        event_callback: Callable[[dict[str, Any]], None] | None = None,
+    ) -> dict[str, Any]:
+        return self.run_task_controlled(
+            text=text,
+            task_type=task_type,
+            metadata=metadata,
+            adapt=True,
+            update_memory=True,
+            event_callback=event_callback,
+        )
 
     def run_task_controlled(
         self,
@@ -71,6 +86,7 @@ class PromptForestEngine:
         metadata: dict[str, Any] | None = None,
         adapt: bool = True,
         update_memory: bool = True,
+        event_callback: Callable[[dict[str, Any]], None] | None = None,
     ) -> dict[str, Any]:
         task_metadata = dict(metadata or {})
         user_id = str(task_metadata.get("user_id", "global")).strip() or "global"
@@ -82,25 +98,72 @@ class PromptForestEngine:
         if user_profile:
             task_metadata["user_preferences"] = user_profile
         task = TaskInput(task_id=str(uuid4()), text=text, task_type=task_type, metadata=task_metadata)
+        self._emit_event(
+            event_callback,
+            {
+                "type": "task_start",
+                "task_id": task.task_id,
+                "task_type": task.task_type,
+                "text": task.text,
+            },
+        )
+        started_at = perf_counter()
+        primary_calls_before = self._call_count(self.backend)
+        evaluator_calls_before = self._call_count(self.evaluator_agent.runtime)
+        optimizer_calls_before = self._call_count(self.optimizer_agent._advisor.runtime)  # noqa: SLF001
+        timings: dict[str, float] = {}
 
+        route_started = perf_counter()
         route = self.router.route(task, self.forest, self.memory)
         route = self._augment_route_with_support_paths(task, route, adapt=adapt, update_memory=update_memory)
+        timings["route_ms"] = round((perf_counter() - route_started) * 1000.0, 3)
         task.task_type = route.task_type
         self._route_history.append(route)
+        self._emit_event(
+            event_callback,
+            {
+                "type": "routing",
+                "task_type": route.task_type,
+                "activated_branches": list(route.activated_branches),
+                "activated_paths": [list(path) for path in route.activated_paths],
+                "sibling_decisions": dict(route.sibling_decisions),
+            },
+        )
 
-        outputs = self._run_path(route, task)
+        execute_started = perf_counter()
+        outputs = self._run_path(route, task, event_callback=event_callback)
+        timings["execute_ms"] = round((perf_counter() - execute_started) * 1000.0, 3)
+        probe_started = perf_counter()
         route, outputs, routing_probes = self._maybe_probe_sibling_branches(
             task,
             route,
             outputs,
             adapt=adapt,
             update_memory=update_memory,
+            event_callback=event_callback,
         )
+        timings["probe_ms"] = round((perf_counter() - probe_started) * 1000.0, 3)
         composer_notes: dict[str, Any] = {}
         contract_hint = infer_output_contract(task.text, task.metadata)
         composed = None
+        compose_started = perf_counter()
         if contract_hint is None:
-            composed = self.composer.compose(task=task, route=route, outputs=outputs)
+            self._emit_event(event_callback, {"type": "composer_start"})
+            composed = self.composer.compose(
+                task=task,
+                route=route,
+                outputs=outputs,
+                on_delta=(lambda delta: self._emit_event(event_callback, {"type": "composer_delta", "delta": delta})),
+            )
+            if composed is not None:
+                self._emit_event(
+                    event_callback,
+                    {
+                        "type": "composer_complete",
+                        "branch_name": composed.output.branch_name,
+                        "output": composed.output.output,
+                    },
+                )
         if composed is not None and route.activated_branches:
             if route.activated_paths and route.activated_paths[0]:
                 leaf = route.activated_paths[0][-1]
@@ -108,7 +171,9 @@ class PromptForestEngine:
                 leaf = route.activated_branches[-1]
             outputs[leaf] = composed.output
             composer_notes = composed.notes
+        timings["compose_ms"] = round((perf_counter() - compose_started) * 1000.0, 3)
 
+        judge_started = perf_counter()
         branch_scores = self.judge.score_all(outputs, task)
         leaf_candidates = self._candidate_leaves(route, outputs)
         numeric_scores = {k: v.reward for k, v in branch_scores.items() if k in leaf_candidates}
@@ -124,6 +189,9 @@ class PromptForestEngine:
             )
         else:
             aggregation = self._aggregate(route, outputs, numeric_scores, candidate_branches=leaf_candidates)
+        timings["judge_ms"] = round((perf_counter() - judge_started) * 1000.0, 3)
+        evaluate_started = perf_counter()
+        self._emit_event(event_callback, {"type": "evaluator_start"})
         signal = self.evaluator_agent.evaluate(
             task,
             route,
@@ -131,16 +199,29 @@ class PromptForestEngine:
             aggregation,
             branch_outputs={k: v.output for k, v in outputs.items()},
         )
+        self._emit_event(
+            event_callback,
+            {
+                "type": "evaluator_complete",
+                "selected_branch": signal.selected_branch,
+                "reward_score": signal.reward_score,
+                "confidence": signal.confidence,
+                "failure_reason": signal.failure_reason,
+            },
+        )
         if composer_notes:
             signal.aggregator_notes["composer"] = composer_notes
         self._propagate_rewards_along_path(route, signal, gamma=0.9, local_mix=0.55)
         reward_components = self._compute_reward_components(task, signal.selected_output, signal.reward_score)
+        timings["evaluate_ms"] = round((perf_counter() - evaluate_started) * 1000.0, 3)
         selected_path = self._selected_path(route, signal.selected_branch)
         routing_context_key = ""
         if len(selected_path) >= 2:
             routing_context_key = self.memory.routing_context_key_for_task(task, parent_id=selected_path[-2])
 
+        optimize_started = perf_counter()
         if adapt:
+            self._emit_event(event_callback, {"type": "optimizer_start"})
             optimize_event: OptimizationEvent = self.optimizer_agent.optimize(
                 task=task,
                 route=route,
@@ -150,6 +231,15 @@ class PromptForestEngine:
                 acceptance_runner=self._mini_holdout_acceptance,
             )
             self._attach_created_candidates(route, optimize_event, selected_branch=signal.selected_branch)
+            self._emit_event(
+                event_callback,
+                {
+                    "type": "optimizer_complete",
+                    "updated_weights": dict(optimize_event.updated_weights),
+                    "advisor_used": optimize_event.advisor_used,
+                    "advisor_error": optimize_event.advisor_error,
+                },
+            )
         else:
             optimize_event = OptimizationEvent(
                 updated_weights={},
@@ -161,7 +251,9 @@ class PromptForestEngine:
                 advisor_used=False,
                 advisor_error="",
             )
+        timings["optimize_ms"] = round((perf_counter() - optimize_started) * 1000.0, 3)
 
+        memory_started = perf_counter()
         record = MemoryRecord(
             task_id=task.task_id,
             task_type=route.task_type,
@@ -186,6 +278,11 @@ class PromptForestEngine:
             routing_preferences = self._record_route_preferences(task, route, signal)
         else:
             routing_preferences = []
+        timings["memory_ms"] = round((perf_counter() - memory_started) * 1000.0, 3)
+        timings["total_ms"] = round((perf_counter() - started_at) * 1000.0, 3)
+        timings["primary_backend_calls"] = self._call_count(self.backend) - primary_calls_before
+        timings["evaluator_runtime_calls"] = self._call_count(self.evaluator_agent.runtime) - evaluator_calls_before
+        timings["optimizer_runtime_calls"] = self._call_count(self.optimizer_agent._advisor.runtime) - optimizer_calls_before  # noqa: SLF001
 
         payload = {
             "task": asdict(task),
@@ -215,12 +312,46 @@ class PromptForestEngine:
                 "evaluator_provider": self.config.agent_runtimes.evaluator.provider,
                 "optimizer_provider": self.config.agent_runtimes.optimizer.provider,
             },
+            "timings": timings,
             "composer": composer_notes,
             "branch_weights": {name: round(branch.state.weight, 4) for name, branch in self.branches.items()},
         }
         append_jsonl(self._event_log, payload)
+        self._emit_event(
+            event_callback,
+            {
+                "type": "task_complete",
+                "selected_branch": signal.selected_branch,
+                "selected_output": signal.selected_output,
+                "reward_score": signal.reward_score,
+            },
+        )
 
         return payload
+
+    @staticmethod
+    def _call_count(obj: Any) -> int:
+        if hasattr(obj, "usage_summary"):
+            try:
+                summary = obj.usage_summary()
+                return int(summary.get("call_count", 0) or 0)
+            except Exception:
+                return 0
+        if hasattr(obj, "call_log"):
+            try:
+                return len(obj.call_log())
+            except Exception:
+                return 0
+        return 0
+
+    @staticmethod
+    def _emit_event(
+        callback: Callable[[dict[str, Any]], None] | None,
+        payload: dict[str, Any],
+    ) -> None:
+        if callback is None:
+            return
+        callback(payload)
 
     def _augment_route_with_support_paths(
         self,
@@ -279,6 +410,7 @@ class PromptForestEngine:
         *,
         adapt: bool,
         update_memory: bool,
+        event_callback: Callable[[dict[str, Any]], None] | None = None,
     ) -> tuple[RoutingDecision, dict[str, Any], list[dict[str, Any]]]:
         if not adapt or not update_memory:
             return route, outputs, []
@@ -316,7 +448,7 @@ class PromptForestEngine:
             path = self.forest.path_to_root(child_id)
             if not path:
                 continue
-            self._run_specific_path(task, path, updated_outputs)
+            self._run_specific_path(task, path, updated_outputs, event_callback=event_callback)
             added_paths.append(path)
 
         if not added_paths:
@@ -340,7 +472,14 @@ class PromptForestEngine:
         }
         return updated_route, updated_outputs, [probe_summary]
 
-    def _run_specific_path(self, task: TaskInput, path: list[str], outputs: dict[str, Any]) -> None:
+    def _run_specific_path(
+        self,
+        task: TaskInput,
+        path: list[str],
+        outputs: dict[str, Any],
+        *,
+        event_callback: Callable[[dict[str, Any]], None] | None = None,
+    ) -> None:
         context = task.metadata.get("context_seed", "")
         strict_contract = infer_output_contract(task.text, task.metadata)
         strict_mode = strict_contract is not None
@@ -355,10 +494,32 @@ class PromptForestEngine:
                 continue
 
             branch_context = self._augment_context_for_branch(task, branch, context)
-            branch_output = self.executor.run_branch(branch, task, task.task_type, context=branch_context)
+            self._emit_event(
+                event_callback,
+                {"type": "branch_start", "branch_name": branch_name, "path": list(path), "source": "probe"},
+            )
+            branch_output = self.executor.run_branch(
+                branch,
+                task,
+                task.task_type,
+                context=branch_context,
+                on_delta=(lambda delta, name=branch_name: self._emit_event(
+                    event_callback,
+                    {"type": "branch_delta", "branch_name": name, "delta": delta, "source": "probe"},
+                )),
+            )
             if not self.forest.children(branch_name):
-                branch_output = self._maybe_refine_leaf_output(task, branch, branch_output)
+                branch_output = self._maybe_refine_leaf_output(task, branch, branch_output, event_callback=event_callback)
             outputs[branch_name] = branch_output
+            self._emit_event(
+                event_callback,
+                {
+                    "type": "branch_complete",
+                    "branch_name": branch_name,
+                    "output": branch_output.output,
+                    "source": "probe",
+                },
+            )
             context = self._roll_context(context, branch_output.output, strict_mode=strict_mode)
 
     @staticmethod
@@ -499,7 +660,13 @@ class PromptForestEngine:
         append_jsonl(self._event_log, payload)
         return {"ok": True, **payload}
 
-    def _run_path(self, route: RoutingDecision, task: TaskInput) -> dict[str, Any]:
+    def _run_path(
+        self,
+        route: RoutingDecision,
+        task: TaskInput,
+        *,
+        event_callback: Callable[[dict[str, Any]], None] | None = None,
+    ) -> dict[str, Any]:
         outputs: dict[str, Any] = {}
         strict_contract = infer_output_contract(task.text, task.metadata)
         strict_mode = strict_contract is not None
@@ -520,10 +687,37 @@ class PromptForestEngine:
                     continue
 
                 branch_context = self._augment_context_for_branch(task, branch, context)
-                branch_output = self.executor.run_branch(branch, task, route.task_type, context=branch_context)
+                self._emit_event(
+                    event_callback,
+                    {"type": "branch_start", "branch_name": branch_name, "path": list(path), "source": "primary"},
+                )
+                branch_output = self.executor.run_branch(
+                    branch,
+                    task,
+                    route.task_type,
+                    context=branch_context,
+                    on_delta=(lambda delta, name=branch_name: self._emit_event(
+                        event_callback,
+                        {"type": "branch_delta", "branch_name": name, "delta": delta, "source": "primary"},
+                    )),
+                )
                 if not self.forest.children(branch_name):
-                    branch_output = self._maybe_refine_leaf_output(task, branch, branch_output)
+                    branch_output = self._maybe_refine_leaf_output(
+                        task,
+                        branch,
+                        branch_output,
+                        event_callback=event_callback,
+                    )
                 outputs[branch_name] = branch_output
+                self._emit_event(
+                    event_callback,
+                    {
+                        "type": "branch_complete",
+                        "branch_name": branch_name,
+                        "output": branch_output.output,
+                        "source": "primary",
+                    },
+                )
                 context = self._roll_context(context, branch_output.output, strict_mode=strict_mode)
         return outputs
 
@@ -549,7 +743,14 @@ class PromptForestEngine:
 
         return "\n\n".join(section for section in sections if section).strip()
 
-    def _maybe_refine_leaf_output(self, task: TaskInput, branch: PromptBranch, branch_output):
+    def _maybe_refine_leaf_output(
+        self,
+        task: TaskInput,
+        branch: PromptBranch,
+        branch_output,
+        *,
+        event_callback: Callable[[dict[str, Any]], None] | None = None,
+    ):
         if not self.config.execution_adaptation.enabled:
             return branch_output
 
@@ -576,7 +777,14 @@ class PromptForestEngine:
         if self.config.execution_adaptation.enable_support_pass and (
             missing_before or original_score < self.config.execution_adaptation.support_pass_reward_floor
         ):
-            support_output = self._support_branch_analysis(task, branch.name, branch_output.output, playbook, missing_before)
+            support_output = self._support_branch_analysis(
+                task,
+                branch.name,
+                branch_output.output,
+                playbook,
+                missing_before,
+                event_callback=event_callback,
+            )
 
         candidates: list[dict[str, Any]] = []
         plain_candidate = self._generate_refinement_candidate(
@@ -587,6 +795,7 @@ class PromptForestEngine:
             required_items=required_items,
             missing_before=missing_before,
             support_output="",
+            event_callback=event_callback,
         )
         if plain_candidate:
             candidates.append(plain_candidate)
@@ -599,6 +808,7 @@ class PromptForestEngine:
                 required_items=required_items,
                 missing_before=missing_before,
                 support_output=support_output,
+                event_callback=event_callback,
             )
             if support_candidate:
                 candidates.append(support_candidate)
@@ -725,6 +935,7 @@ class PromptForestEngine:
         required_items: list[str],
         missing_before: list[str],
         support_output: str,
+        event_callback: Callable[[dict[str, Any]], None] | None = None,
     ) -> dict[str, Any] | None:
         prompt = self._render_refinement_prompt(
             task,
@@ -739,10 +950,35 @@ class PromptForestEngine:
         if len(prompt) > max_chars:
             prompt = prompt[:max_chars].rstrip() + "\n\nReturn only the revised answer."
 
-        refined_text, meta = self.backend.generate(prompt, task, f"{branch_name}__adaptive_refine")
+        self._emit_event(
+            event_callback,
+            {
+                "type": "refine_start",
+                "branch_name": branch_name,
+                "strategy": "support_pass" if support_output else "playbook_only",
+            },
+        )
+        refined_text, meta = self.backend.generate_stream(
+            prompt,
+            task,
+            f"{branch_name}__adaptive_refine",
+            on_delta=(lambda delta, name=branch_name: self._emit_event(
+                event_callback,
+                {"type": "refine_delta", "branch_name": name, "delta": delta},
+            )),
+        )
         refined_text = refined_text.strip()
         if not refined_text:
             return None
+        self._emit_event(
+            event_callback,
+            {
+                "type": "refine_complete",
+                "branch_name": branch_name,
+                "strategy": "support_pass" if support_output else "playbook_only",
+                "output": refined_text,
+            },
+        )
 
         return {
             "text": refined_text,
@@ -759,6 +995,8 @@ class PromptForestEngine:
         draft: str,
         playbook,
         missing_items: list[str],
+        *,
+        event_callback: Callable[[dict[str, Any]], None] | None = None,
     ) -> str:
         support_branch_name = self._support_branch_for_task(task, primary_branch_name, missing_items)
         if not support_branch_name:
@@ -787,11 +1025,32 @@ class PromptForestEngine:
                 ]
             )
         support_context = "\n\n".join(section for section in context_sections if section).strip()
+        self._emit_event(
+            event_callback,
+            {
+                "type": "support_start",
+                "branch_name": support_branch_name,
+                "for_branch": primary_branch_name,
+            },
+        )
         support_output = self.executor.run_branch(
             support_branch,
             task,
             task.task_type,
             context=support_context[:700],
+            on_delta=(lambda delta, name=support_branch_name: self._emit_event(
+                event_callback,
+                {"type": "support_delta", "branch_name": name, "delta": delta},
+            )),
+        )
+        self._emit_event(
+            event_callback,
+            {
+                "type": "support_complete",
+                "branch_name": support_branch_name,
+                "for_branch": primary_branch_name,
+                "output": support_output.output,
+            },
         )
         return support_output.output.strip()
 

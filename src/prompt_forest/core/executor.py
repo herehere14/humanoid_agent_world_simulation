@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from ..backend.base import LLMBackend
 from ..branches.base import PromptBranch
 from ..types import BranchOutput, TaskInput
@@ -9,9 +11,17 @@ class PromptExecutor:
     def __init__(self, backend: LLMBackend) -> None:
         self.backend = backend
 
-    def run_branch(self, branch: PromptBranch, task: TaskInput, task_type: str, context: str = "") -> BranchOutput:
+    def run_branch(
+        self,
+        branch: PromptBranch,
+        task: TaskInput,
+        task_type: str,
+        context: str = "",
+        *,
+        on_delta: Callable[[str], None] | None = None,
+    ) -> BranchOutput:
         prompt = branch.render_prompt(task.text, task_type, context=context)
-        output, meta = self.backend.generate(prompt, task, branch.name)
+        output, meta = self.backend.generate_stream(prompt, task, branch.name, on_delta=on_delta)
         return BranchOutput(
             branch_name=branch.name,
             prompt=prompt,

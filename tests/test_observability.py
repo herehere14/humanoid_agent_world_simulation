@@ -24,6 +24,7 @@ def test_turn_trace_includes_evaluator_and_optimizer_sections(tmp_path):
 
     assert "[routing] path=" in trace
     assert "[runtime] primary_backend=" in trace
+    assert "[timing] total_ms=" in trace
     assert "[routing] sibling_decisions:" in trace
     assert "[evaluator] selected=" in trace
     assert "[evaluator] reward_components=" in trace
@@ -95,3 +96,27 @@ def test_format_comparison_trace_shows_delta_and_breakdown():
     assert "winner=adaptive_system" in trace
     assert "adaptive_breakdown=keyword:1.000" in trace
     assert "base_breakdown=keyword:0.500" in trace
+
+
+def test_engine_emits_live_progress_events(tmp_path):
+    cfg = load_config(Path(__file__).resolve().parents[1] / "configs" / "default.json")
+    cfg.artifacts_dir = str(tmp_path / "artifacts")
+    engine = PromptForestEngine(config=cfg)
+    events: list[dict[str, object]] = []
+
+    engine.run_task(
+        text="Plan a migration timeline with confidence statement.",
+        task_type="planning",
+        metadata={
+            "expected_keywords": ["plan", "timeline", "confidence"],
+            "required_substrings": ["confidence"],
+        },
+        event_callback=events.append,
+    )
+
+    event_types = [str(event.get("type", "")) for event in events]
+    assert "task_start" in event_types
+    assert "routing" in event_types
+    assert "branch_start" in event_types
+    assert "evaluator_complete" in event_types
+    assert "task_complete" in event_types

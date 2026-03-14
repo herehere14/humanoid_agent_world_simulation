@@ -36,6 +36,12 @@ prompt-forest run-task \
   --visibility full
 ```
 
+If you want lower latency for live chat, use the fast profile:
+
+```bash
+prompt-forest chat --task-type auto --visibility full --latency-mode fast
+```
+
 Important:
 - `requirements.txt` is in the repo root and installs the project itself
 - `requirements-dev.txt` is in the repo root and installs the project plus `pytest`
@@ -272,6 +278,26 @@ In split view:
 - right pane: base-model output, base-vs-adaptive scoring delta, routing path, sibling branch decisions, evaluation signal, reward components, and optimizer updates
 - bottom input line: live command entry (`/type`, `/auto`, `/compare`, `/visibility`, `/exit`)
 
+With a real OpenAI chat backend on `chat_completions`, split view now streams work live:
+- branch execution appears as it is generated
+- composer output appears as it is generated
+- base-model comparison output appears as it is generated
+- evaluator and optimizer phases appear as live status events
+
+This shows live execution and system traces, not hidden private chain-of-thought.
+
+For lower latency, add `--latency-mode fast`. That profile keeps evaluation and optimization visible, but disables the expensive extra generation steps:
+- single path instead of beam-style multi-path routing
+- no composer pass
+- no execution-refinement pass
+- no API-backed evaluator/optimizer calls
+
+Example:
+
+```bash
+prompt-forest chat --task-type auto --visibility full --compare-base --split-view --latency-mode fast
+```
+
 With `--compare-base`, each turn shows:
 - raw base-model answer
 - adaptive system answer
@@ -296,6 +322,20 @@ prompt-forest inspect-events --limit 8 --visibility full
 ```
 
 This prints per-task routing path, sibling preference signals, branch-level evaluation signals, reward components, and optimizer updates (weight delta, block reason, decay, rewrites, candidate lifecycle actions).
+
+### 1g) Speed benchmark with anti-bias controls
+
+```bash
+prompt-forest latency-validate \
+  --dataset examples/demo_tasks.json \
+  --rounds 3
+```
+
+This benchmark compares `full` vs `fast` with:
+- fresh engines for cold-turn measurements
+- alternating policy order to reduce order bias
+- identical datasets and backend family for both profiles
+- detailed latency, reward, and backend-call reports in `artifacts/latency_validation/`
 
 ### 1e) User feedback loop (personal adaptation)
 

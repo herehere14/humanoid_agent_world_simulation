@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import time
+from collections.abc import Callable
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -136,6 +137,134 @@ class OpenAIChatBackend(LLMBackend):
             meta["response_id"] = data["id"]
         return text, meta
 
+    def generate_stream(
+        self,
+        prompt: str,
+        task: TaskInput,
+        branch_name: str,
+        *,
+        on_delta: Callable[[str], None] | None = None,
+    ) -> tuple[str, dict[str, Any]]:
+        if on_delta is None or self.api_mode != "chat_completions":
+            return super().generate_stream(prompt, task, branch_name, on_delta=on_delta)
+
+        _ = task
+        key = os.getenv(self.api_key_env, "").strip()
+        if not key:
+            raise RuntimeError(f"Missing API key env var: {self.api_key_env}")
+
+        url = f"{self.base_url}/chat/completions"
+        body = self._chat_completions_body(prompt)
+        body["stream"] = True
+        body["stream_options"] = {"include_usage": True}
+        payload = json.dumps(body, ensure_ascii=True).encode("utf-8")
+        req = Request(
+            url,
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {key}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+
+        chunks: list[str] = []
+        usage: dict[str, int] = {}
+        response_id = ""
+        last_error = ""
+        started = time.perf_counter()
+
+        for attempt in range(self.max_retries + 1):
+            chunks.clear()
+            usage = {}
+            response_id = ""
+            started = time.perf_counter()
+            try:
+                with urlopen(req, timeout=self.timeout_seconds) as resp:
+                    for raw_line in resp:
+                        line = raw_line.decode("utf-8", errors="replace").strip()
+                        if not line or not line.startswith("data:"):
+                            continue
+                        data_str = line[5:].strip()
+                        if not data_str:
+                            continue
+                        if data_str == "[DONE]":
+                            break
+                        event = json.loads(data_str)
+                        if not response_id:
+                            response_id = str(event.get("id", "") or "")
+                        if "usage" in event:
+                            usage = self._normalize_usage(event.get("usage", {}))
+                        for choice in event.get("choices", []) or []:
+                            delta = choice.get("delta", {}) or {}
+                            piece = self._delta_text(delta)
+                            if piece:
+                                chunks.append(piece)
+                                on_delta(piece)
+                break
+            except HTTPError as exc:
+                body_text = exc.read().decode("utf-8", errors="replace")
+                last_error = f"HTTPError {exc.code}: {body_text}"
+                retryable = exc.code in {408, 409, 429, 500, 502, 503, 504}
+                if retryable and attempt < self.max_retries:
+                    time.sleep(self.retry_backoff_seconds * (attempt + 1))
+                    continue
+                self._record_call(
+                    endpoint=url,
+                    branch_name=branch_name,
+                    latency_ms=(time.perf_counter() - started) * 1000.0,
+                    usage={},
+                    ok=False,
+                    error=last_error,
+                )
+                raise RuntimeError(last_error) from exc
+            except (URLError, TimeoutError) as exc:
+                last_error = f"Network error: {exc}"
+                if attempt < self.max_retries:
+                    time.sleep(self.retry_backoff_seconds * (attempt + 1))
+                    continue
+                self._record_call(
+                    endpoint=url,
+                    branch_name=branch_name,
+                    latency_ms=(time.perf_counter() - started) * 1000.0,
+                    usage={},
+                    ok=False,
+                    error=last_error,
+                )
+                raise RuntimeError(last_error) from exc
+
+        latency_ms = (time.perf_counter() - started) * 1000.0
+        text = "".join(chunks).strip()
+        if not text:
+            self._record_call(
+                endpoint=url,
+                branch_name=branch_name,
+                latency_ms=latency_ms,
+                usage=usage,
+                ok=False,
+                error="No text returned from OpenAI-compatible backend stream.",
+            )
+            raise RuntimeError("No text returned from OpenAI-compatible backend stream.")
+
+        self._record_call(
+            endpoint=url,
+            branch_name=branch_name,
+            latency_ms=latency_ms,
+            usage=usage,
+            ok=True,
+        )
+        meta = {
+            "provider": "openai_compatible",
+            "model": self.model,
+            "branch": branch_name,
+            "latency_ms": round(latency_ms, 3),
+            **usage,
+            "streamed": True,
+        }
+        if response_id:
+            meta["response_id"] = response_id
+        return text, meta
+
     def _request_payload(self, prompt: str) -> tuple[str, dict[str, Any]]:
         if self.api_mode == "responses":
             url = f"{self.base_url}/responses"
@@ -150,18 +279,7 @@ class OpenAIChatBackend(LLMBackend):
             return url, body
 
         url = f"{self.base_url}/chat/completions"
-        body = {
-            "model": self.model,
-            "temperature": self.temperature,
-            "max_tokens": self.max_output_tokens,
-            "messages": [
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": prompt},
-            ],
-        }
-        if self.seed is not None:
-            body["seed"] = int(self.seed)
-        return url, body
+        return url, self._chat_completions_body(prompt)
 
     def _extract_text(self, data: dict[str, Any]) -> str:
         if self.api_mode == "responses":
@@ -187,6 +305,28 @@ class OpenAIChatBackend(LLMBackend):
             parts = [part.get("text", "") for part in content if isinstance(part, dict)]
             return "\n".join(parts).strip()
         return str(content).strip()
+
+    def _chat_completions_body(self, prompt: str) -> dict[str, Any]:
+        body = {
+            "model": self.model,
+            "temperature": self.temperature,
+            "max_tokens": self.max_output_tokens,
+            "messages": [
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": prompt},
+            ],
+        }
+        if self.seed is not None:
+            body["seed"] = int(self.seed)
+        return body
+
+    @staticmethod
+    def _delta_text(delta: dict[str, Any]) -> str:
+        content = delta.get("content", "")
+        if isinstance(content, list):
+            parts = [str(part.get("text", "")) for part in content if isinstance(part, dict)]
+            return "".join(parts)
+        return str(content or "")
 
     def call_log(self) -> list[dict[str, Any]]:
         return [dict(item) for item in self._calls]

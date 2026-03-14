@@ -5,13 +5,14 @@ import json
 import re
 import sys
 import textwrap
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
 from .backend.base import LLMBackend
 from .backend.mock import MockLLMBackend
 from .backend.openai_chat import OpenAIChatBackend
-from .config import load_config
+from .config import apply_latency_profile, load_config
 from .contracts import evaluate_output_contract, infer_output_contract
 from .core.engine import PromptForestEngine
 from .experiments.auto_improve import AutoImprover
@@ -20,6 +21,7 @@ from .experiments.continuous_runner import ContinuousImprover
 from .experiments.detailed_validation import DetailedHierarchicalValidator
 from .experiments.hard_slice_validation import HardSliceValidator
 from .experiments.live_ablation_validation import LiveAblationValidator
+from .experiments.latency_validation import LatencyValidator
 from .experiments.live_model_validation import LiveModelValidator
 from .experiments.rl_validation import RLLearningValidator
 from .observability.trace import format_comparison_trace, format_turn_trace
@@ -60,6 +62,7 @@ def build_parser() -> argparse.ArgumentParser:
     task_cmd.add_argument("--max-output-tokens", type=int, default=700)
     task_cmd.add_argument("--api-mode", type=str, default="chat_completions", choices=["chat_completions", "responses"])
     task_cmd.add_argument("--reasoning-effort", type=str, default="")
+    task_cmd.add_argument("--latency-mode", type=str, default="full", choices=["full", "fast"])
 
     chat_cmd = sub.add_parser("chat", help="Interactive chat with the adaptive RL prompt-forest agent")
     chat_cmd.add_argument("--task-type", type=str, default="auto")
@@ -90,10 +93,24 @@ def build_parser() -> argparse.ArgumentParser:
     chat_cmd.add_argument("--max-output-tokens", type=int, default=700)
     chat_cmd.add_argument("--api-mode", type=str, default="chat_completions", choices=["chat_completions", "responses"])
     chat_cmd.add_argument("--reasoning-effort", type=str, default="")
+    chat_cmd.add_argument("--latency-mode", type=str, default="fast", choices=["full", "fast"])
 
     bench_cmd = sub.add_parser("benchmark", help="Run benchmark dataset")
     bench_cmd.add_argument("--dataset", type=str, default="examples/demo_tasks.json")
     bench_cmd.add_argument("--rounds", type=int, default=4)
+
+    latency_cmd = sub.add_parser("latency-validate", help="Benchmark full vs fast latency profiles with order-balanced runs")
+    latency_cmd.add_argument("--dataset", type=str, default="examples/demo_tasks.json")
+    latency_cmd.add_argument("--rounds", type=int, default=3)
+    latency_cmd.add_argument("--model", type=str, default="")
+    latency_cmd.add_argument("--api-key-env", type=str, default="OPENAI_API_KEY")
+    latency_cmd.add_argument("--base-url", type=str, default="https://api.openai.com/v1")
+    latency_cmd.add_argument("--temperature", type=float, default=0.2)
+    latency_cmd.add_argument("--max-output-tokens", type=int, default=700)
+    latency_cmd.add_argument("--api-mode", type=str, default="chat_completions", choices=["chat_completions", "responses"])
+    latency_cmd.add_argument("--reasoning-effort", type=str, default="")
+    latency_cmd.add_argument("--output-subdir", type=str, default="latency_validation")
+    latency_cmd.add_argument("--report-prefix", type=str, default="latency_validation_report")
 
     val_cmd = sub.add_parser("rl-validate", help="Run adaptive-vs-frozen RL learning validation")
     val_cmd.add_argument("--episodes", type=int, default=240)
@@ -319,10 +336,16 @@ def _base_model_comparison(
     result: dict[str, object],
     *,
     backend: LLMBackend | None = None,
+    on_base_delta: Callable[[str], None] | None = None,
 ) -> dict[str, object]:
     task = _task_from_payload(dict(result.get("task", {}) or {}))
     compare_backend = backend or _clone_backend_for_compare(engine.backend)
-    base_output, base_meta = compare_backend.generate(_render_direct_prompt(task), task, branch_name="base_model_direct")
+    base_output, base_meta = compare_backend.generate_stream(
+        _render_direct_prompt(task),
+        task,
+        branch_name="base_model_direct",
+        on_delta=on_base_delta,
+    )
     base_metrics = _objective_metrics_for_output(engine, task, base_output)
 
     adaptive_output = str(dict(result.get("evaluation_signal", {}) or {}).get("selected_output", ""))
@@ -378,6 +401,55 @@ def _wrap_panel_text(text: str, width: int) -> list[str]:
     return wrapped
 
 
+def _append_live_event(events: list[str], line: str, *, limit: int = 32) -> None:
+    cleaned = line.strip()
+    if not cleaned:
+        return
+    events.append(cleaned)
+    if len(events) > limit:
+        del events[:-limit]
+
+
+def _format_live_event(event: dict[str, Any]) -> str | None:
+    event_type = str(event.get("type", "")).strip()
+    if event_type == "task_start":
+        return f"task_start type={event.get('task_type', 'auto')}"
+    if event_type == "routing":
+        paths = event.get("activated_paths", []) or []
+        primary = " -> ".join(paths[0]) if paths else " -> ".join(event.get("activated_branches", []) or [])
+        return f"routing {primary}"
+    if event_type == "branch_start":
+        return f"{event.get('source', 'run')} start {event.get('branch_name', 'branch')}"
+    if event_type == "branch_complete":
+        return f"{event.get('source', 'run')} done {event.get('branch_name', 'branch')}"
+    if event_type == "support_start":
+        return f"support start {event.get('branch_name', 'branch')} for {event.get('for_branch', 'leaf')}"
+    if event_type == "support_complete":
+        return f"support done {event.get('branch_name', 'branch')}"
+    if event_type == "refine_start":
+        return f"refine start {event.get('branch_name', 'branch')} [{event.get('strategy', 'default')}]"
+    if event_type == "refine_complete":
+        return f"refine done {event.get('branch_name', 'branch')} [{event.get('strategy', 'default')}]"
+    if event_type == "composer_start":
+        return "composer start"
+    if event_type == "composer_complete":
+        return f"composer done {event.get('branch_name', 'leaf')}"
+    if event_type == "evaluator_start":
+        return "evaluator start"
+    if event_type == "evaluator_complete":
+        reward = event.get("reward_score", 0.0)
+        return f"evaluator done reward={float(reward):.3f}"
+    if event_type == "optimizer_start":
+        return "optimizer start"
+    if event_type == "optimizer_complete":
+        count = len(dict(event.get("updated_weights", {}) or {}))
+        return f"optimizer done updated_weights={count}"
+    if event_type == "task_complete":
+        reward = event.get("reward_score", 0.0)
+        return f"task done branch={event.get('selected_branch', 'n/a')} reward={float(reward):.3f}"
+    return None
+
+
 def _build_split_debug_panel(
     result: dict[str, Any] | None,
     comparison: dict[str, Any] | None,
@@ -387,6 +459,10 @@ def _build_split_debug_panel(
     task_type: str,
     compare_enabled: bool,
     status: str | None = None,
+    live_events: list[str] | None = None,
+    live_stream_label: str = "",
+    live_stream_text: str = "",
+    live_base_output: str = "",
 ) -> str:
     sections = [
         "Session",
@@ -397,12 +473,19 @@ def _build_split_debug_panel(
     ]
     if status:
         sections.extend(["", "Status", status])
+    if live_events:
+        sections.extend(["", "Live Activity", "\n".join(f"- {line}" for line in live_events)])
+    if live_stream_label or live_stream_text:
+        sections.extend(["", f"Live Stream: {live_stream_label or 'active'}", live_stream_text or "(stream starting...)"])
     if compare_enabled:
         sections.extend(["", "Base Model"])
         if comparison:
             base_output = str(dict(comparison.get("base_model", {}) or {}).get("selected_output", "")).strip()
             sections.append(base_output or "(empty)")
             sections.extend(["", "Base vs Adaptive", format_comparison_trace(comparison)])
+        elif live_base_output:
+            sections.append(live_base_output)
+            sections.extend(["", "Base vs Adaptive", "Waiting for final comparison metrics..."])
         else:
             sections.extend(["Awaiting first compared turn.", "", "Base vs Adaptive", "Awaiting first compared turn."])
     if result:
@@ -551,18 +634,99 @@ def _run_split_chat_loop(
         latest_comparison: dict[str, Any] | None = None
         transcript = [
             "system> Split view chat started.",
-            "system> Left pane is the conversation. Right pane shows routing, evaluation, optimization, and branch internals.",
+            "system> Left pane is the conversation. Right pane shows live routing, generation, evaluation, and optimization.",
         ]
-        debug_panel = _build_split_debug_panel(
-            None,
-            None,
-            visibility=visibility,
-            top_branches=top_branches,
-            task_type=task_type,
-            compare_enabled=compare_enabled,
-            status="Waiting for input.",
-        )
+        live_events: list[str] = []
+        live_stream_label = ""
+        live_stream_text = ""
+        live_base_output = ""
         input_buffer = ""
+        adaptive_line_index: int | None = None
+        primary_leaf = ""
+        debug_panel = ""
+
+        def _refresh_panel(status: str | None = None) -> None:
+            nonlocal debug_panel
+            debug_panel = _build_split_debug_panel(
+                latest_result,
+                latest_comparison if compare_enabled else None,
+                visibility=visibility,
+                top_branches=top_branches,
+                task_type=task_type,
+                compare_enabled=compare_enabled,
+                status=status,
+                live_events=live_events,
+                live_stream_label=live_stream_label,
+                live_stream_text=live_stream_text,
+                live_base_output=live_base_output if compare_enabled else "",
+            )
+
+        def _redraw(status: str | None = None) -> None:
+            _refresh_panel(status=status)
+            _draw_split_chat_screen(
+                stdscr,
+                transcript,
+                debug_panel,
+                input_buffer,
+                task_type=task_type,
+                visibility=visibility,
+                compare_enabled=compare_enabled,
+            )
+
+        def _handle_engine_event(event: dict[str, Any]) -> None:
+            nonlocal live_stream_label, live_stream_text, adaptive_line_index, primary_leaf
+
+            message = _format_live_event(event)
+            if message:
+                _append_live_event(live_events, message)
+
+            event_type = str(event.get("type", ""))
+            if event_type == "routing":
+                paths = event.get("activated_paths", []) or []
+                if paths and paths[0]:
+                    primary_leaf = str(paths[0][-1])
+            elif event_type == "branch_start" and event.get("source") == "primary":
+                branch_name = str(event.get("branch_name", ""))
+                if branch_name == primary_leaf:
+                    live_stream_label = f"branch {branch_name}"
+                    live_stream_text = ""
+                    if adaptive_line_index is not None:
+                        transcript[adaptive_line_index] = f"adaptive> [{branch_name}] "
+            elif event_type == "branch_delta" and event.get("source") == "primary":
+                branch_name = str(event.get("branch_name", ""))
+                if branch_name == primary_leaf:
+                    live_stream_text += str(event.get("delta", ""))
+                    if adaptive_line_index is not None:
+                        transcript[adaptive_line_index] = f"adaptive> {live_stream_text}"
+            elif event_type == "refine_start" and str(event.get("branch_name", "")) == primary_leaf:
+                live_stream_label = f"refine {primary_leaf}"
+                live_stream_text = ""
+                if adaptive_line_index is not None:
+                    transcript[adaptive_line_index] = f"adaptive> [refining {primary_leaf}] "
+            elif event_type == "refine_delta" and str(event.get("branch_name", "")) == primary_leaf:
+                live_stream_text += str(event.get("delta", ""))
+                if adaptive_line_index is not None:
+                    transcript[adaptive_line_index] = f"adaptive> {live_stream_text}"
+            elif event_type == "composer_start":
+                live_stream_label = "composer"
+                live_stream_text = ""
+                if adaptive_line_index is not None:
+                    transcript[adaptive_line_index] = "adaptive> [composer] "
+            elif event_type == "composer_delta":
+                live_stream_text += str(event.get("delta", ""))
+                if adaptive_line_index is not None:
+                    transcript[adaptive_line_index] = f"adaptive> {live_stream_text}"
+            elif event_type == "task_complete" and adaptive_line_index is not None:
+                transcript[adaptive_line_index] = f"adaptive> {event.get('selected_output', '')}"
+
+            _redraw("Streaming live execution...")
+
+        def _handle_base_delta(delta: str) -> None:
+            nonlocal live_base_output
+            live_base_output += delta
+            _redraw("Streaming direct base-model comparison...")
+
+        _refresh_panel("Waiting for input.")
 
         while True:
             _draw_split_chat_screen(
@@ -591,28 +755,12 @@ def _run_split_chat_loop(
                 if text.startswith("/type "):
                     task_type = text.split(" ", 1)[1].strip() or "auto"
                     transcript.append(f"system> task_type set to: {task_type}")
-                    debug_panel = _build_split_debug_panel(
-                        latest_result,
-                        latest_comparison if compare_enabled else None,
-                        visibility=visibility,
-                        top_branches=top_branches,
-                        task_type=task_type,
-                        compare_enabled=compare_enabled,
-                        status="Updated task type.",
-                    )
+                    _refresh_panel("Updated task type.")
                     continue
                 if text == "/auto":
                     task_type = "auto"
                     transcript.append("system> task_type set to: auto")
-                    debug_panel = _build_split_debug_panel(
-                        latest_result,
-                        latest_comparison if compare_enabled else None,
-                        visibility=visibility,
-                        top_branches=top_branches,
-                        task_type=task_type,
-                        compare_enabled=compare_enabled,
-                        status="Restored auto routing.",
-                    )
+                    _refresh_panel("Restored auto routing.")
                     continue
                 if text.startswith("/compare "):
                     arg = text.split(" ", 1)[1].strip().lower()
@@ -620,82 +768,59 @@ def _run_split_chat_loop(
                     compare_backend = _clone_backend_for_compare(engine.backend) if compare_enabled else None
                     if not compare_enabled:
                         latest_comparison = None
+                        live_base_output = ""
                     transcript.append(f"system> base comparison {'enabled' if compare_enabled else 'disabled'}")
-                    debug_panel = _build_split_debug_panel(
-                        latest_result,
-                        latest_comparison if compare_enabled else None,
-                        visibility=visibility,
-                        top_branches=top_branches,
-                        task_type=task_type,
-                        compare_enabled=compare_enabled,
-                        status="Updated comparison mode.",
-                    )
+                    _refresh_panel("Updated comparison mode.")
                     continue
                 if text.startswith("/visibility "):
                     arg = text.split(" ", 1)[1].strip().lower()
                     if arg in {"minimal", "eval", "opt", "full"}:
                         visibility = arg
                         transcript.append(f"system> visibility set to: {visibility}")
-                        debug_panel = _build_split_debug_panel(
-                            latest_result,
-                            latest_comparison if compare_enabled else None,
-                            visibility=visibility,
-                            top_branches=top_branches,
-                            task_type=task_type,
-                            compare_enabled=compare_enabled,
-                            status="Updated trace depth.",
-                        )
+                        _refresh_panel("Updated trace depth.")
                     else:
                         transcript.append("system> visibility must be one of: minimal, eval, opt, full")
                     continue
 
                 transcript.append(f"you> {text}")
-                transcript.append("adaptive> [working...]")
-                debug_panel = _build_split_debug_panel(
-                    None,
-                    None,
-                    visibility=visibility,
-                    top_branches=top_branches,
-                    task_type=task_type,
-                    compare_enabled=compare_enabled,
-                    status="Running adaptive system and collecting branch/evaluator/optimizer traces...",
-                )
-                _draw_split_chat_screen(
-                    stdscr,
-                    transcript,
-                    debug_panel,
-                    input_buffer,
-                    task_type=task_type,
-                    visibility=visibility,
-                    compare_enabled=compare_enabled,
-                )
+                transcript.append("adaptive> [routing...]")
+                adaptive_line_index = len(transcript) - 1
+                primary_leaf = ""
+                live_stream_label = ""
+                live_stream_text = ""
+                live_base_output = ""
+                live_events.clear()
+                _append_live_event(live_events, "turn started")
+                _redraw("Running adaptive system live...")
 
                 try:
                     metadata = _chat_metadata_from_text(text, user_id=user_id)
-                    result = engine.run_task(text=text, task_type=task_type, metadata=metadata)
-                    comparison = _base_model_comparison(engine, result, backend=compare_backend) if compare_enabled else None
+                    result = engine.run_task(
+                        text=text,
+                        task_type=task_type,
+                        metadata=metadata,
+                        event_callback=_handle_engine_event,
+                    )
+                    comparison = None
+                    if compare_enabled:
+                        _append_live_event(live_events, "compare start base_model_direct")
+                        _redraw("Running direct base-model comparison...")
+                        comparison = _base_model_comparison(
+                            engine,
+                            result,
+                            backend=compare_backend,
+                            on_base_delta=_handle_base_delta,
+                        )
+                        _append_live_event(live_events, f"compare done winner={comparison.get('winner', 'tie')}")
                     latest_result = result
                     latest_comparison = comparison
-                    transcript[-1] = f"adaptive> {result['evaluation_signal']['selected_output']}"
-                    debug_panel = _build_split_debug_panel(
-                        result,
-                        comparison,
-                        visibility=visibility,
-                        top_branches=top_branches,
-                        task_type=task_type,
-                        compare_enabled=compare_enabled,
-                    )
+                    transcript[adaptive_line_index] = f"adaptive> {result['evaluation_signal']['selected_output']}"
+                    _refresh_panel()
                 except Exception as exc:
-                    transcript[-1] = f"adaptive> [error: {exc}]"
-                    debug_panel = _build_split_debug_panel(
-                        latest_result,
-                        latest_comparison if compare_enabled else None,
-                        visibility=visibility,
-                        top_branches=top_branches,
-                        task_type=task_type,
-                        compare_enabled=compare_enabled,
-                        status=f"Error: {exc}",
-                    )
+                    if adaptive_line_index is not None:
+                        transcript[adaptive_line_index] = f"adaptive> [error: {exc}]"
+                    _append_live_event(live_events, f"error {exc}")
+                    _refresh_panel(f"Error: {exc}")
                 continue
 
             if key in (curses.KEY_BACKSPACE, "\b", "\x7f"):
@@ -786,6 +911,8 @@ def main() -> None:
 
     config_path = Path(args.config)
     config = load_config(config_path if config_path.exists() else None)
+    if hasattr(args, "latency_mode"):
+        config = apply_latency_profile(config, args.latency_mode)
     backend = _build_primary_backend_from_args(args)
     engine = PromptForestEngine(config=config, backend=backend)
 
@@ -830,6 +957,24 @@ def main() -> None:
         runner = BenchmarkRunner(engine)
         summary = runner.run(dataset_path=args.dataset, rounds=args.rounds)
         print(json.dumps(summary.to_dict(), indent=2))
+        return
+
+    if args.command == "latency-validate":
+        validator = LatencyValidator(Path.cwd())
+        report = validator.run(
+            dataset_path=args.dataset,
+            rounds=args.rounds,
+            model=args.model or None,
+            api_key_env=args.api_key_env,
+            base_url=args.base_url,
+            temperature=args.temperature,
+            max_output_tokens=args.max_output_tokens,
+            api_mode=args.api_mode,
+            reasoning_effort=args.reasoning_effort or None,
+            output_subdir=args.output_subdir,
+            report_prefix=args.report_prefix,
+        )
+        print(json.dumps(report, indent=2))
         return
 
     if args.command == "rl-validate":

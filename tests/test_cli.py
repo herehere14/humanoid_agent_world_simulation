@@ -76,9 +76,15 @@ def test_build_split_debug_panel_includes_comparison_and_trace(tmp_path):
         task_type="code",
         compare_enabled=True,
         status="Running latest turn.",
+        live_events=["routing verification -> verification_constraint_checker", "evaluator done reward=0.755"],
+        live_stream_label="composer",
+        live_stream_text="draft answer",
+        live_base_output="base answer",
     )
 
     assert "Session" in panel
+    assert "Live Activity" in panel
+    assert "Live Stream: composer" in panel
     assert "Base Model" in panel
     assert "Base vs Adaptive" in panel
     assert "[compare] adaptive_reward=" in panel
