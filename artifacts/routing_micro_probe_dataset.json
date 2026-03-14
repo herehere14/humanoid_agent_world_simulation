@@ -1,0 +1,158 @@
+{
+  "train": [
+    {
+      "task_id": "train_divergence_planning_risk_failover",
+      "aspect": "planning_risk",
+      "task_type": "planning",
+      "text": "Create a concise risk register for a phased database failover in a billing platform. Include mitigation, owner, rollback, and confidence.",
+      "metadata": {
+        "expected_keywords": [
+          "risk",
+          "mitigation",
+          "owner",
+          "rollback",
+          "confidence"
+        ],
+        "required_substrings": [
+          "owner",
+          "confidence"
+        ],
+        "reference_answer": "A strong answer lists concrete failover risks, owners, mitigations, rollback triggers, and calibrated confidence.",
+        "evaluation_rubric": [
+          "clear risk register",
+          "owners",
+          "mitigations",
+          "rollback",
+          "confidence included"
+        ],
+        "verifier_spec": {
+          "must_include": [
+            "mitigation",
+            "owner",
+            "rollback",
+            "confidence"
+          ],
+          "min_token_count": 70,
+          "confidence_range": [
+            0.5,
+            0.99
+          ]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "planning_risk"
+      }
+    },
+    {
+      "task_id": "train_divergence_code_consistency_retry_backlog",
+      "aspect": "code_consistency_audit",
+      "task_type": "code",
+      "text": "Audit a rollout update for consistency when it says the new job queue is stable, but it also says the retry backlog keeps growing and the dead-letter queue was never replayed. Explain contradictions, uncertainty calibration, and confidence.",
+      "metadata": {
+        "expected_keywords": [
+          "contradiction",
+          "uncertainty",
+          "retry",
+          "confidence"
+        ],
+        "required_substrings": [
+          "confidence"
+        ],
+        "reference_answer": "A strong answer identifies the inconsistency between the stability claim and unresolved operational evidence, then recalibrates confidence.",
+        "evaluation_rubric": [
+          "internal consistency",
+          "operational contradiction",
+          "confidence included"
+        ],
+        "verifier_spec": {
+          "must_include": [
+            "confidence"
+          ],
+          "min_token_count": 70,
+          "confidence_range": [
+            0.5,
+            0.99
+          ]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "code_consistency_audit"
+      }
+    }
+  ],
+  "holdout": [
+    {
+      "task_id": "holdout_divergence_planning_risk_admin",
+      "aspect": "planning_risk",
+      "task_type": "planning",
+      "text": "Prepare a deployment risk register for launching approval workflows in an admin console next week. Include mitigation, owner, fallback, and confidence.",
+      "metadata": {
+        "expected_keywords": [
+          "risk",
+          "mitigation",
+          "owner",
+          "fallback",
+          "confidence"
+        ],
+        "required_substrings": [
+          "owner",
+          "confidence"
+        ],
+        "reference_answer": "A strong answer identifies launch risks, owners, mitigations or fallback plans, and calibrated confidence.",
+        "evaluation_rubric": [
+          "clear risk register",
+          "owners",
+          "fallback or mitigation",
+          "confidence included"
+        ],
+        "verifier_spec": {
+          "must_include": [
+            "mitigation",
+            "owner",
+            "confidence"
+          ],
+          "min_token_count": 70,
+          "confidence_range": [
+            0.5,
+            0.99
+          ]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "planning_risk"
+      }
+    },
+    {
+      "task_id": "holdout_divergence_code_consistency_backfill",
+      "aspect": "code_consistency_audit",
+      "task_type": "code",
+      "text": "Audit a migration update for consistency when it says the backfill is complete, but it also notes one shard is still lagging and manual repair steps are pending. Explain contradictions, uncertainty calibration, and confidence.",
+      "metadata": {
+        "expected_keywords": [
+          "contradiction",
+          "uncertainty",
+          "backfill",
+          "confidence"
+        ],
+        "required_substrings": [
+          "confidence"
+        ],
+        "reference_answer": "A strong answer identifies why the completion claim conflicts with the unresolved shard status and recalibrates confidence.",
+        "evaluation_rubric": [
+          "internal consistency",
+          "operational contradiction",
+          "confidence included"
+        ],
+        "verifier_spec": {
+          "must_include": [
+            "confidence"
+          ],
+          "min_token_count": 70,
+          "confidence_range": [
+            0.5,
+            0.99
+          ]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "code_consistency_audit"
+      }
+    }
+  ]
+}
