@@ -167,6 +167,27 @@ class EngineConfig:
     artifacts_dir: str = "artifacts"
 
 
+def apply_latency_profile(cfg: EngineConfig, profile: str) -> EngineConfig:
+    mode = str(profile or "full").strip().lower()
+    if mode in {"", "full"}:
+        return cfg
+    if mode != "fast":
+        raise ValueError(f"Unsupported latency profile: {profile}")
+
+    cfg.router.top_k = 1
+    cfg.router.min_candidates = 1
+    cfg.router.exploration = 0.0
+    cfg.router.exploration_min = 0.0
+    cfg.router.sibling_probe_top_n = 0
+    cfg.composer.enabled = False
+    cfg.execution_adaptation.enabled = False
+    cfg.execution_adaptation.enable_support_pass = False
+    cfg.agent_runtimes.evaluator.enabled = False
+    cfg.agent_runtimes.optimizer.enabled = False
+    cfg.optimizer.candidate_spawn_per_event = 0
+    cfg.optimizer.max_active_candidates = 0
+    return cfg
+
 
 def _merge_dataclass(instance: Any, payload: dict[str, Any]) -> Any:
     for key, value in payload.items():
