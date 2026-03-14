@@ -1,0 +1,434 @@
+{
+  "train": [
+    {
+      "task_id": "train_math_linear_equation",
+      "aspect": "reasoning",
+      "task_type": "math",
+      "text": "Solve 2x + 5 = 17. Show the algebra briefly and end with a confidence line.",
+      "metadata": {
+        "expected_answer": "x = 6",
+        "expected_keywords": ["x = 6", "subtract 5", "divide by 2", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "Subtract 5 from both sides to get 2x = 12, then divide by 2 to get x = 6.",
+        "evaluation_rubric": ["correct final answer", "brief algebra", "confidence included"],
+        "user_id": "eval_user_alpha",
+        "aspect": "reasoning"
+      }
+    },
+    {
+      "task_id": "train_math_probability",
+      "aspect": "reasoning",
+      "task_type": "math",
+      "text": "A bag has 3 red balls and 7 blue balls. What is the probability of drawing a red ball? Give the simplified answer and a confidence line.",
+      "metadata": {
+        "expected_answer": "3/10",
+        "expected_keywords": ["3/10", "probability", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "The probability is 3 out of 10, so the simplified probability is 3/10.",
+        "evaluation_rubric": ["correct probability", "simple explanation", "confidence included"],
+        "user_id": "eval_user_alpha",
+        "aspect": "reasoning"
+      }
+    },
+    {
+      "task_id": "train_planning_incident_response",
+      "aspect": "planning",
+      "task_type": "planning",
+      "text": "Create a 48-hour incident response plan for a payment API outage. Include phases, owners, rollback, risks, and confidence.",
+      "metadata": {
+        "expected_keywords": ["phase", "owner", "rollback", "risk", "confidence"],
+        "required_substrings": ["rollback", "confidence"],
+        "reference_answer": "A strong answer phases the response, assigns owners, includes mitigation and rollback, and calls out risks.",
+        "evaluation_rubric": ["sequenced plan", "clear owners", "rollback included", "risks included", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["rollback", "risk", "confidence"],
+          "min_token_count": 80,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_beta",
+        "aspect": "planning"
+      }
+    },
+    {
+      "task_id": "train_planning_hiring_plan",
+      "aspect": "planning",
+      "task_type": "planning",
+      "text": "Plan a 30-day onboarding schedule for a new senior backend engineer. Include milestones, dependencies, risks, and confidence.",
+      "metadata": {
+        "expected_keywords": ["milestone", "dependency", "risk", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer should stage onboarding, note dependencies, and identify early delivery risks.",
+        "evaluation_rubric": ["time-structured plan", "dependencies", "risks", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["milestone", "risk", "confidence"],
+          "min_token_count": 80,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_beta",
+        "aspect": "planning"
+      }
+    },
+    {
+      "task_id": "train_factual_rl_vs_supervised",
+      "aspect": "factual",
+      "task_type": "factual",
+      "text": "Explain the difference between supervised learning and reinforcement learning for a product manager. Include one practical example and confidence.",
+      "metadata": {
+        "expected_keywords": ["labels", "reward", "example", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "Supervised learning learns from labeled examples; reinforcement learning learns from reward signals over actions.",
+        "evaluation_rubric": ["clear distinction", "practical example", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["reward", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_gamma",
+        "aspect": "factual"
+      }
+    },
+    {
+      "task_id": "train_factual_latency_throughput",
+      "aspect": "factual",
+      "task_type": "factual",
+      "text": "Explain the difference between latency and throughput in backend systems. Include one operational example and confidence.",
+      "metadata": {
+        "expected_keywords": ["latency", "throughput", "example", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "Latency is how long one request takes; throughput is how much work the system handles over time.",
+        "evaluation_rubric": ["correct distinction", "operational example", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["latency", "throughput", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_gamma",
+        "aspect": "factual"
+      }
+    },
+    {
+      "task_id": "train_code_review_plan",
+      "aspect": "code",
+      "task_type": "code",
+      "text": "Review this change request at a high level: a team wants to add caching to a search endpoint. Give a concise review covering correctness risks, invalidation, tests, rollback, and confidence.",
+      "metadata": {
+        "expected_keywords": ["risk", "cache invalidation", "test", "rollback", "confidence"],
+        "required_substrings": ["test", "confidence"],
+        "reference_answer": "A strong answer calls out stale data risk, invalidation strategy, tests, and rollback.",
+        "evaluation_rubric": ["correctness risks", "cache invalidation", "tests", "rollback", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["test", "rollback", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_alpha",
+        "aspect": "code"
+      }
+    },
+    {
+      "task_id": "train_code_refactor_guidance",
+      "aspect": "code",
+      "task_type": "code",
+      "text": "A Python function is 200 lines long and mixes parsing, validation, and DB writes. Provide a refactor strategy with modules, tests, migration risk, and confidence.",
+      "metadata": {
+        "expected_keywords": ["module", "test", "risk", "confidence"],
+        "required_substrings": ["test", "confidence"],
+        "reference_answer": "A strong answer separates concerns, introduces tests, stages migration, and calls out regression risk.",
+        "evaluation_rubric": ["modular refactor", "tests", "migration risk", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["test", "risk", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_alpha",
+        "aspect": "code"
+      }
+    },
+    {
+      "task_id": "train_creative_b2b_ideas",
+      "aspect": "creative",
+      "task_type": "creative",
+      "text": "Brainstorm three B2B AI product ideas for small logistics teams. Keep them practical, highlight constraints, and include confidence.",
+      "metadata": {
+        "expected_keywords": ["idea", "constraint", "practical", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer offers multiple differentiated ideas and explicitly handles practical constraints.",
+        "evaluation_rubric": ["three distinct ideas", "constraints", "practicality", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["constraint", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_beta",
+        "aspect": "creative"
+      }
+    },
+    {
+      "task_id": "train_creative_internal_tools",
+      "aspect": "creative",
+      "task_type": "creative",
+      "text": "Generate two unconventional but realistic internal tooling ideas for a 20-person SaaS company. Mention the operational constraint for each and include confidence.",
+      "metadata": {
+        "expected_keywords": ["constraint", "operational", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer gives distinct tools, explains why they matter, and notes operational constraints.",
+        "evaluation_rubric": ["distinct ideas", "realistic value", "constraints", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["constraint", "confidence"],
+          "min_token_count": 60,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_beta",
+        "aspect": "creative"
+      }
+    },
+    {
+      "task_id": "train_general_reliability_checklist",
+      "aspect": "general",
+      "task_type": "general",
+      "text": "A teammate says an answer is 'probably fine.' Write a checklist to verify whether the answer is actually reliable. Include evidence checks, failure modes, and confidence.",
+      "metadata": {
+        "expected_keywords": ["checklist", "evidence", "failure mode", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer uses an explicit checklist, evidence checks, and failure-mode analysis.",
+        "evaluation_rubric": ["clear checklist", "evidence checks", "failure modes", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["evidence", "confidence"],
+          "min_token_count": 65,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_gamma",
+        "aspect": "general"
+      }
+    },
+    {
+      "task_id": "train_general_decision_note",
+      "aspect": "general",
+      "task_type": "general",
+      "text": "Write a short decision note comparing 'ship now' vs 'delay one week for testing' for a small release. Include tradeoffs, recommendation, and confidence.",
+      "metadata": {
+        "expected_keywords": ["tradeoff", "recommendation", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer weighs speed versus risk and makes a clear recommendation.",
+        "evaluation_rubric": ["clear tradeoffs", "explicit recommendation", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["recommendation", "confidence"],
+          "min_token_count": 60,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_gamma",
+        "aspect": "general"
+      }
+    }
+  ],
+  "holdout": [
+    {
+      "task_id": "holdout_math_derivative",
+      "aspect": "reasoning",
+      "task_type": "math",
+      "text": "Differentiate x^2 + 3x. Show the result briefly and include a confidence line.",
+      "metadata": {
+        "expected_answer": "2x + 3",
+        "expected_keywords": ["2x + 3", "derivative", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "The derivative of x^2 + 3x is 2x + 3.",
+        "evaluation_rubric": ["correct derivative", "brief explanation", "confidence included"],
+        "user_id": "eval_user_alpha",
+        "aspect": "reasoning"
+      }
+    },
+    {
+      "task_id": "holdout_planning_recovery",
+      "aspect": "planning",
+      "task_type": "planning",
+      "text": "Create a next-7-days recovery plan after a failed production deploy. Include owners, rollback, communication, risks, and confidence.",
+      "metadata": {
+        "expected_keywords": ["owner", "rollback", "communication", "risk", "confidence"],
+        "required_substrings": ["rollback", "confidence"],
+        "reference_answer": "A strong answer should phase recovery work, include owners, rollback, communication, and risk tracking.",
+        "evaluation_rubric": ["sequenced plan", "owners", "rollback", "communication", "risks", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["rollback", "communication", "confidence"],
+          "min_token_count": 85,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_beta",
+        "aspect": "planning"
+      }
+    },
+    {
+      "task_id": "holdout_factual_overfitting",
+      "aspect": "factual",
+      "task_type": "factual",
+      "text": "Explain overfitting to a startup founder. Include one warning sign, one mitigation, and confidence.",
+      "metadata": {
+        "expected_keywords": ["overfitting", "warning sign", "mitigation", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "Overfitting is when a model memorizes training patterns and fails to generalize; watch validation gaps and use regularization or better evaluation.",
+        "evaluation_rubric": ["correct explanation", "warning sign", "mitigation", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["mitigation", "confidence"],
+          "min_token_count": 65,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_gamma",
+        "aspect": "factual"
+      }
+    },
+    {
+      "task_id": "holdout_code_pr_review",
+      "aspect": "code",
+      "task_type": "code",
+      "text": "Give a pull-request review checklist for adding a background job queue to an API service. Include failure handling, tests, rollout risk, and confidence.",
+      "metadata": {
+        "expected_keywords": ["failure handling", "test", "risk", "confidence"],
+        "required_substrings": ["test", "confidence"],
+        "reference_answer": "A strong answer covers retry/failure handling, tests, observability, rollout risk, and confidence.",
+        "evaluation_rubric": ["queue-specific review points", "tests", "rollout risk", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["test", "risk", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_alpha",
+        "aspect": "code"
+      }
+    },
+    {
+      "task_id": "holdout_creative_ai_ops",
+      "aspect": "creative",
+      "task_type": "creative",
+      "text": "Propose three AI-assisted operations ideas for a small field-service company. Make them distinct, realistic, constrained, and include confidence.",
+      "metadata": {
+        "expected_keywords": ["distinct", "realistic", "constraint", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer gives differentiated ideas, explains operational value, and respects practical constraints.",
+        "evaluation_rubric": ["three ideas", "distinctness", "constraints", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["constraint", "confidence"],
+          "min_token_count": 75,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_beta",
+        "aspect": "creative"
+      }
+    },
+    {
+      "task_id": "holdout_general_tradeoff_note",
+      "aspect": "general",
+      "task_type": "general",
+      "text": "Write a short recommendation on whether a team should optimize for speed or reliability in the next sprint. Include tradeoffs, a recommendation, and confidence.",
+      "metadata": {
+        "expected_keywords": ["tradeoff", "recommendation", "reliability", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer names tradeoffs, makes a recommendation, and calibrates uncertainty.",
+        "evaluation_rubric": ["tradeoffs", "recommendation", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["recommendation", "confidence"],
+          "min_token_count": 60,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_gamma",
+        "aspect": "general"
+      }
+    },
+    {
+      "task_id": "holdout_json_contract",
+      "aspect": "contract",
+      "task_type": "general",
+      "text": "Respond ONLY as minified JSON with keys answer and confidence. The answer should summarize whether a rollout is safe today.",
+      "metadata": {
+        "output_contract": "json_lock",
+        "expected_keywords": ["answer", "confidence"],
+        "required_substrings": ["answer", "confidence"],
+        "reference_answer": "{\"answer\":\"...\",\"confidence\":0.xx}",
+        "evaluation_rubric": ["valid minified JSON object", "correct keys", "no extra text"],
+        "user_id": "eval_user_alpha",
+        "aspect": "contract"
+      }
+    },
+    {
+      "task_id": "holdout_csv_contract",
+      "aspect": "contract",
+      "task_type": "general",
+      "text": "Output ONLY CSV lines in this order with no header and no extra text:\ncache,green\nqueue,yellow\nsearch,red",
+      "metadata": {
+        "output_contract": "csv_lock",
+        "expected_keywords": ["cache,green", "queue,yellow", "search,red"],
+        "required_substrings": ["cache,green"],
+        "reference_answer": "cache,green\nqueue,yellow\nsearch,red",
+        "evaluation_rubric": ["three CSV rows", "same order", "no extra text"],
+        "user_id": "eval_user_alpha",
+        "aspect": "contract"
+      }
+    },
+    {
+      "task_id": "holdout_bullet_contract",
+      "aspect": "contract",
+      "task_type": "general",
+      "text": "Give exactly 4 bullet points. Output bullets only. Each bullet must start with '- '. Topic: release-readiness checks.",
+      "metadata": {
+        "output_contract": "bullet_lock",
+        "expected_keywords": ["release", "check"],
+        "required_substrings": ["- "],
+        "reference_answer": "- item 1\n- item 2\n- item 3\n- item 4",
+        "evaluation_rubric": ["exactly four bullets", "each starts with - ", "no extra prose"],
+        "user_id": "eval_user_beta",
+        "aspect": "contract"
+      }
+    },
+    {
+      "task_id": "holdout_code_patch_contract",
+      "aspect": "contract",
+      "task_type": "code",
+      "text": "Return exactly this format with no code fences: FIX: <python function> TESTS: <at least two bullet tests>. The function should normalize whitespace in a string.",
+      "metadata": {
+        "output_contract": "code_patch_lock",
+        "expected_keywords": ["FIX:", "TESTS:"],
+        "required_substrings": ["FIX:", "TESTS:"],
+        "reference_answer": "FIX:\ndef normalize(...)\nTESTS:\n- ...\n- ...",
+        "evaluation_rubric": ["correct FIX/TESTS contract", "python function present", "at least two tests", "no fences"],
+        "user_id": "eval_user_beta",
+        "aspect": "contract"
+      }
+    },
+    {
+      "task_id": "holdout_factual_system_design",
+      "aspect": "factual",
+      "task_type": "factual",
+      "text": "Explain the difference between horizontal scaling and vertical scaling for a technical buyer. Include one tradeoff and confidence.",
+      "metadata": {
+        "expected_keywords": ["horizontal", "vertical", "tradeoff", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "Vertical scaling makes one machine bigger; horizontal scaling adds more machines, with different operational tradeoffs.",
+        "evaluation_rubric": ["correct distinction", "tradeoff", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["horizontal", "vertical", "confidence"],
+          "min_token_count": 65,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_gamma",
+        "aspect": "factual"
+      }
+    },
+    {
+      "task_id": "holdout_planning_risk_register",
+      "aspect": "planning",
+      "task_type": "planning",
+      "text": "Create a concise risk register for launching a new usage-based pricing page next week. Include mitigation, owner, and confidence.",
+      "metadata": {
+        "expected_keywords": ["risk", "mitigation", "owner", "confidence"],
+        "required_substrings": ["owner", "confidence"],
+        "reference_answer": "A strong answer lists concrete launch risks, owners, mitigations, and confidence.",
+        "evaluation_rubric": ["clear risk register", "owners", "mitigations", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["mitigation", "owner", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_beta",
+        "aspect": "planning"
+      }
+    }
+  ]
+}

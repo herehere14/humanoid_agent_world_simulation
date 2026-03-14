@@ -59,7 +59,7 @@ def _signal(branches: list[str], reward: float, reason: str = "low_quality") -> 
     )
 
 
-def test_optimizer_updates_only_active_branches(tmp_path):
+def test_optimizer_updates_only_selected_leaf_branch(tmp_path):
     branches = create_default_branches()
     memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
     optimizer = OptimizerAgent(OptimizerConfig(learning_rate=0.2))
@@ -71,12 +71,75 @@ def test_optimizer_updates_only_active_branches(tmp_path):
     event = optimizer.optimize(TaskInput("1", "task", "math"), route, signal, branches, memory)
 
     assert branches["analytical"].state.weight > before["analytical"]
-    assert branches["verification"].state.weight > before["verification"]
+    assert branches["verification"].state.weight == before["verification"]
     assert branches["planner"].state.weight == before["planner"]
     assert "analytical" in event.update_details
+    assert "verification" not in event.update_details
     assert event.update_details["analytical"]["status_before"] == "active"
     assert event.update_details["analytical"]["status_after"] == "active"
     assert event.update_details["analytical"]["new_weight"] > event.update_details["analytical"]["old_weight"]
+
+
+def test_optimizer_blocks_middling_positive_weight_update(tmp_path):
+    branches = create_default_branches()
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    optimizer = OptimizerAgent(OptimizerConfig(learning_rate=0.2))
+
+    route = RoutingDecision(task_type="math", activated_branches=["analytical"], branch_scores={})
+    signal = _signal(["analytical"], reward=0.7, reason="medium_quality")
+    old_weight = branches["analytical"].state.weight
+
+    event = optimizer.optimize(TaskInput("1", "task", "math"), route, signal, branches, memory)
+
+    assert branches["analytical"].state.weight == old_weight
+    assert event.update_details["analytical"]["weight_update_allowed"] is False
+    assert event.update_details["analytical"]["weight_update_block_reason"] == "reward_below_floor"
+
+
+def test_optimizer_records_selected_branch_execution_hint(tmp_path):
+    branches = create_default_branches()
+    memory = MemoryStore(MemoryConfig(), memory_path=tmp_path / "m.jsonl")
+    optimizer = OptimizerAgent(OptimizerConfig(learning_rate=0.2))
+
+    route = RoutingDecision(
+        task_type="general",
+        activated_branches=["analytical"],
+        branch_scores={},
+    )
+    signal = EvaluationSignal(
+        reward_score=0.86,
+        confidence=0.8,
+        selected_branch="analytical",
+        selected_output=(
+            "## Risk Register\n"
+            "| Risk | Owner | Mitigation | Rollback |\n"
+            "| --- | --- | --- | --- |\n"
+            "Confidence: 0.82"
+        ),
+        failure_reason="",
+        suggested_improvement_direction="preserve_success_pattern",
+        branch_feedback={
+            "analytical": BranchFeedback(
+                branch_name="analytical",
+                reward=0.86,
+                confidence=0.8,
+                failure_reason="",
+                suggested_improvement_direction="preserve_success_pattern",
+            ),
+        },
+    )
+    task = TaskInput(
+            "1",
+            "Create a launch risk register with mitigation, owner, rollback, and confidence.",
+            "general",
+            metadata={"required_substrings": ["owner", "rollback", "confidence"]},
+        )
+
+    optimizer.optimize(task, route, signal, branches, memory)
+
+    hint = str(branches["analytical"].state.metadata.get("adaptive_execution_hint", ""))
+    assert "owner" in hint.lower()
+    assert "confidence" in hint.lower()
 
 
 def test_candidate_creation_after_repeated_failures(tmp_path):
@@ -449,7 +512,7 @@ def test_acceptance_gate_rolls_back_low_gain_updates(tmp_path):
         )
     )
     route = RoutingDecision(task_type="math", activated_branches=["analytical"], branch_scores={})
-    signal = _signal(["analytical"], reward=0.55, reason="ok")
+    signal = _signal(["analytical"], reward=0.8, reason="ok")
     old_weight = branches["analytical"].state.weight
 
     event = optimizer.optimize(

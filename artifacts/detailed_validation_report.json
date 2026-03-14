@@ -44,249 +44,249 @@
     ]
   },
   "learning": {
-    "mean_adaptive_reward": 0.6602,
-    "mean_frozen_reward": 0.6497,
-    "mean_reward_gain": 0.0105,
+    "mean_adaptive_reward": 0.6676,
+    "mean_frozen_reward": 0.664,
+    "mean_reward_gain": 0.0036,
     "reward_gain_win_rate": 0.5,
-    "mean_adaptive_optimal_hit_rate": 0.012,
-    "mean_frozen_optimal_hit_rate": 0.0,
-    "mean_optimal_hit_gain": 0.012,
-    "mean_adaptive_high_reward_rate": 0.0046,
-    "mean_frozen_high_reward_rate": 0.0,
-    "mean_late_minus_early": 0.0148,
+    "mean_adaptive_optimal_hit_rate": 0.0935,
+    "mean_frozen_optimal_hit_rate": 0.163,
+    "mean_optimal_hit_gain": -0.0694,
+    "mean_adaptive_high_reward_rate": 0.0889,
+    "mean_frozen_high_reward_rate": 0.163,
+    "mean_late_minus_early": 0.0145,
     "mean_adaptive_path_length": 2,
     "mean_frozen_path_length": 2,
-    "mean_adaptive_reward_std": 0.0312,
-    "mean_frozen_reward_std": 0.0127
+    "mean_adaptive_reward_std": 0.0404,
+    "mean_frozen_reward_std": 0.0156
   },
   "branch_effect": {
-    "full_minus_macro_only": 0.0509,
-    "full_minus_no_verification": -0.0017,
-    "full_minus_no_retrieval": 0.0098
+    "full_minus_macro_only": 0.0589,
+    "full_minus_no_verification": 0.0056,
+    "full_minus_no_retrieval": 0.0134
   },
   "growth": {
-    "mean_new_branches_created": 9,
+    "mean_new_branches_created": 18,
     "mean_depth_gain": 1,
-    "mean_growth_reward_trend": 0.0246
+    "mean_growth_reward_trend": 0.0133
   },
   "top_selected_leaves": [
     {
-      "branch": "analytical_symbolic_solver",
-      "count": 196
+      "branch": "verification_constraint_checker",
+      "count": 263
     },
     {
-      "branch": "creative_constraint_innovator",
-      "count": 157
+      "branch": "analytical_symbolic_solver",
+      "count": 180
     },
     {
       "branch": "planner_timeline_optimizer",
+      "count": 163
+    },
+    {
+      "branch": "creative_constraint_innovator",
       "count": 156
     },
     {
-      "branch": "code_patch_lock",
-      "count": 151
-    },
-    {
       "branch": "retrieval_evidence_tracer",
-      "count": 132
-    },
-    {
-      "branch": "json_lock",
-      "count": 100
+      "count": 133
     },
     {
       "branch": "analytical_causal_decomposer",
-      "count": 80
-    },
-    {
-      "branch": "critique_failure_hunter",
-      "count": 18
+      "count": 67
     },
     {
       "branch": "creative_divergent_generator",
-      "count": 18
+      "count": 22
+    },
+    {
+      "branch": "verification_consistency_auditor",
+      "count": 22
+    },
+    {
+      "branch": "critique_failure_hunter",
+      "count": 20
+    },
+    {
+      "branch": "bullet_lock",
+      "count": 16
     },
     {
       "branch": "planner_risk_allocator",
-      "count": 17
-    },
-    {
-      "branch": "verification_constraint_checker",
       "count": 14
     },
     {
-      "branch": "csv_lock",
-      "count": 14
+      "branch": "retrieval_source_triage",
+      "count": 9
     }
   ],
   "per_seed": [
     {
       "seed": 3,
       "task_type": "math",
-      "adaptive_avg_reward": 0.6792,
-      "frozen_avg_reward": 0.6669,
-      "reward_gain": 0.0123,
+      "adaptive_avg_reward": 0.6954,
+      "frozen_avg_reward": 0.7162,
+      "reward_gain": -0.0208,
       "adaptive_hit_rate": 0.0111,
       "frozen_hit_rate": 0.0,
       "hit_gain": 0.0111,
-      "adaptive_trend": 0.0056,
+      "adaptive_trend": -0.009,
       "macro_only_avg_reward": 0.6312,
       "no_verification_avg_reward": 0.6831,
-      "no_retrieval_avg_reward": 0.6808
+      "no_retrieval_avg_reward": 0.6964
     },
     {
       "seed": 3,
       "task_type": "planning",
-      "adaptive_avg_reward": 0.6792,
-      "frozen_avg_reward": 0.6927,
-      "reward_gain": -0.0135,
+      "adaptive_avg_reward": 0.6762,
+      "frozen_avg_reward": 0.6924,
+      "reward_gain": -0.0162,
       "adaptive_hit_rate": 0.0222,
       "frozen_hit_rate": 0.0,
       "hit_gain": 0.0222,
-      "adaptive_trend": 0.0089,
+      "adaptive_trend": 0.0145,
       "macro_only_avg_reward": 0.56,
       "no_verification_avg_reward": 0.6824,
-      "no_retrieval_avg_reward": 0.6737
+      "no_retrieval_avg_reward": 0.6699
     },
     {
       "seed": 3,
       "task_type": "factual",
-      "adaptive_avg_reward": 0.6569,
-      "frozen_avg_reward": 0.5987,
-      "reward_gain": 0.0582,
+      "adaptive_avg_reward": 0.647,
+      "frozen_avg_reward": 0.5672,
+      "reward_gain": 0.0797,
       "adaptive_hit_rate": 0.0222,
       "frozen_hit_rate": 0.0,
       "hit_gain": 0.0222,
-      "adaptive_trend": 0.0767,
-      "macro_only_avg_reward": 0.5609,
+      "adaptive_trend": 0.0939,
+      "macro_only_avg_reward": 0.5612,
       "no_verification_avg_reward": 0.6776,
-      "no_retrieval_avg_reward": 0.5964
+      "no_retrieval_avg_reward": 0.5698
     },
     {
       "seed": 3,
       "task_type": "code",
-      "adaptive_avg_reward": 0.5882,
-      "frozen_avg_reward": 0.6002,
-      "reward_gain": -0.012,
+      "adaptive_avg_reward": 0.583,
+      "frozen_avg_reward": 0.5818,
+      "reward_gain": 0.0013,
       "adaptive_hit_rate": 0.0,
       "frozen_hit_rate": 0.0,
       "hit_gain": 0.0,
-      "adaptive_trend": -0.0078,
-      "macro_only_avg_reward": 0.5775,
+      "adaptive_trend": -0.0052,
+      "macro_only_avg_reward": 0.5778,
       "no_verification_avg_reward": 0.583,
-      "no_retrieval_avg_reward": 0.5905
+      "no_retrieval_avg_reward": 0.5856
     },
     {
       "seed": 3,
       "task_type": "creative",
-      "adaptive_avg_reward": 0.6918,
+      "adaptive_avg_reward": 0.6938,
       "frozen_avg_reward": 0.6666,
-      "reward_gain": 0.0252,
+      "reward_gain": 0.0271,
       "adaptive_hit_rate": 0.0,
       "frozen_hit_rate": 0.0,
       "hit_gain": 0.0,
-      "adaptive_trend": 0.0069,
-      "macro_only_avg_reward": 0.6302,
+      "adaptive_trend": 0.0106,
+      "macro_only_avg_reward": 0.6292,
       "no_verification_avg_reward": 0.6937,
-      "no_retrieval_avg_reward": 0.6966
+      "no_retrieval_avg_reward": 0.6947
     },
     {
       "seed": 3,
       "task_type": "general",
-      "adaptive_avg_reward": 0.6594,
-      "frozen_avg_reward": 0.6663,
-      "reward_gain": -0.0069,
-      "adaptive_hit_rate": 0.0222,
-      "frozen_hit_rate": 0.0,
-      "hit_gain": 0.0222,
-      "adaptive_trend": -0.0144,
-      "macro_only_avg_reward": 0.6958,
-      "no_verification_avg_reward": 0.6449,
-      "no_retrieval_avg_reward": 0.6578
+      "adaptive_avg_reward": 0.7044,
+      "frozen_avg_reward": 0.7525,
+      "reward_gain": -0.0481,
+      "adaptive_hit_rate": 0.5111,
+      "frozen_hit_rate": 0.9778,
+      "hit_gain": -0.4667,
+      "adaptive_trend": -0.0399,
+      "macro_only_avg_reward": 0.6921,
+      "no_verification_avg_reward": 0.6456,
+      "no_retrieval_avg_reward": 0.7053
     },
     {
       "seed": 5,
       "task_type": "math",
-      "adaptive_avg_reward": 0.6821,
-      "frozen_avg_reward": 0.6692,
-      "reward_gain": 0.0129,
+      "adaptive_avg_reward": 0.6967,
+      "frozen_avg_reward": 0.7197,
+      "reward_gain": -0.023,
       "adaptive_hit_rate": 0.0111,
       "frozen_hit_rate": 0.0,
       "hit_gain": 0.0111,
-      "adaptive_trend": 0.0109,
+      "adaptive_trend": 0.0003,
       "macro_only_avg_reward": 0.6325,
       "no_verification_avg_reward": 0.6853,
-      "no_retrieval_avg_reward": 0.6834
+      "no_retrieval_avg_reward": 0.6993
     },
     {
       "seed": 5,
       "task_type": "planning",
-      "adaptive_avg_reward": 0.6811,
-      "frozen_avg_reward": 0.6946,
-      "reward_gain": -0.0135,
+      "adaptive_avg_reward": 0.6788,
+      "frozen_avg_reward": 0.6943,
+      "reward_gain": -0.0155,
       "adaptive_hit_rate": 0.0222,
       "frozen_hit_rate": 0.0,
       "hit_gain": 0.0222,
-      "adaptive_trend": 0.0115,
+      "adaptive_trend": 0.0185,
       "macro_only_avg_reward": 0.5606,
       "no_verification_avg_reward": 0.685,
-      "no_retrieval_avg_reward": 0.678
+      "no_retrieval_avg_reward": 0.6722
     },
     {
       "seed": 5,
       "task_type": "factual",
-      "adaptive_avg_reward": 0.6601,
-      "frozen_avg_reward": 0.6009,
-      "reward_gain": 0.0592,
+      "adaptive_avg_reward": 0.6496,
+      "frozen_avg_reward": 0.5695,
+      "reward_gain": 0.0801,
       "adaptive_hit_rate": 0.0222,
       "frozen_hit_rate": 0.0,
       "hit_gain": 0.0222,
-      "adaptive_trend": 0.0864,
-      "macro_only_avg_reward": 0.5599,
+      "adaptive_trend": 0.1045,
+      "macro_only_avg_reward": 0.5606,
       "no_verification_avg_reward": 0.6798,
-      "no_retrieval_avg_reward": 0.598
+      "no_retrieval_avg_reward": 0.5714
     },
     {
       "seed": 5,
       "task_type": "code",
-      "adaptive_avg_reward": 0.5918,
-      "frozen_avg_reward": 0.6022,
-      "reward_gain": -0.0104,
+      "adaptive_avg_reward": 0.5889,
+      "frozen_avg_reward": 0.5866,
+      "reward_gain": 0.0022,
       "adaptive_hit_rate": 0.0,
       "frozen_hit_rate": 0.0,
       "hit_gain": 0.0,
-      "adaptive_trend": 0.0002,
-      "macro_only_avg_reward": 0.5775,
+      "adaptive_trend": 0.0081,
+      "macro_only_avg_reward": 0.5781,
       "no_verification_avg_reward": 0.5875,
-      "no_retrieval_avg_reward": 0.595
+      "no_retrieval_avg_reward": 0.5908
     },
     {
       "seed": 5,
       "task_type": "creative",
-      "adaptive_avg_reward": 0.6931,
+      "adaptive_avg_reward": 0.6938,
       "frozen_avg_reward": 0.6692,
-      "reward_gain": 0.0239,
+      "reward_gain": 0.0246,
       "adaptive_hit_rate": 0.0,
       "frozen_hit_rate": 0.0,
       "hit_gain": 0.0,
-      "adaptive_trend": 0.0069,
-      "macro_only_avg_reward": 0.6292,
+      "adaptive_trend": 0.0133,
+      "macro_only_avg_reward": 0.6283,
       "no_verification_avg_reward": 0.6954,
-      "no_retrieval_avg_reward": 0.696
+      "no_retrieval_avg_reward": 0.6941
     },
     {
       "seed": 5,
       "task_type": "general",
-      "adaptive_avg_reward": 0.6591,
-      "frozen_avg_reward": 0.6686,
-      "reward_gain": -0.0094,
-      "adaptive_hit_rate": 0.0111,
-      "frozen_hit_rate": 0.0,
-      "hit_gain": 0.0111,
-      "adaptive_trend": -0.0144,
-      "macro_only_avg_reward": 0.6962,
-      "no_verification_avg_reward": 0.6449,
-      "no_retrieval_avg_reward": 0.6588
+      "adaptive_avg_reward": 0.7041,
+      "frozen_avg_reward": 0.7525,
+      "reward_gain": -0.0484,
+      "adaptive_hit_rate": 0.5,
+      "frozen_hit_rate": 0.9778,
+      "hit_gain": -0.4778,
+      "adaptive_trend": -0.0361,
+      "macro_only_avg_reward": 0.693,
+      "no_verification_avg_reward": 0.6456,
+      "no_retrieval_avg_reward": 0.7018
     }
   ]
 }

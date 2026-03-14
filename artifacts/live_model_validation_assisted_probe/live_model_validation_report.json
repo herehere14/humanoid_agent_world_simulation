@@ -1,0 +1,3349 @@
+{
+  "generated_at": "2026-03-13T14:37:12.475344+00:00",
+  "dataset_path": "/Users/justin/Documents/New project/repo_inspect/artifacts/live_runtime_probe_tasks.json",
+  "models": {
+    "generation_model": "gpt-4.1-mini",
+    "judge_model": "gpt-4.1-mini",
+    "api_key_env": "OPENAI_API_KEY",
+    "base_url": "https://api.openai.com/v1",
+    "temperature": 0.2,
+    "max_output_tokens": 300
+  },
+  "settings": {
+    "train_rounds": 1,
+    "use_agent_runtimes": true,
+    "router_top_k": 1,
+    "router_min_candidates": 1,
+    "composer_enabled": true,
+    "reward_mode": "hybrid_verifier"
+  },
+  "dataset_summary": {
+    "train_tasks_per_round": 4,
+    "train_rounds": 1,
+    "expanded_train_tasks": 4,
+    "holdout_tasks": 4,
+    "train_task_types": {
+      "math": 2,
+      "planning": 2
+    },
+    "holdout_task_types": {
+      "planning": 1,
+      "factual": 1,
+      "code": 1,
+      "general": 1
+    },
+    "train_contract_tasks_per_round": 0,
+    "holdout_contract_tasks": 1
+  },
+  "aggregate": {
+    "train": {
+      "adaptive_full": {
+        "episodes": 4,
+        "mean_objective_reward": 0.7508,
+        "first_third_mean_reward": 0.83,
+        "last_third_mean_reward": 0.755,
+        "last_minus_first_third": -0.075,
+        "contract_pass_rate": null,
+        "mean_path_length": 2,
+        "selected_branch_hhi": 0.25,
+        "selected_branch_counts": {
+          "json_lock": 1,
+          "bullet_lock": 1,
+          "creative_divergent_generator": 1,
+          "critique_failure_hunter": 1
+        },
+        "objective_reward_by_task_type": {
+          "math": 0.7467,
+          "planning": 0.755
+        },
+        "optimizer_event_counts": {
+          "rewritten_prompts": 0,
+          "created_candidates": 0,
+          "promoted_candidates": 0,
+          "archived_candidates": 0
+        },
+        "backend_usage": {
+          "call_count": 12,
+          "ok_calls": 12,
+          "error_calls": 0,
+          "prompt_tokens": 2126,
+          "completion_tokens": 2398,
+          "total_tokens": 4524,
+          "total_latency_ms": 41561.559,
+          "mean_latency_ms": 3463.463
+        },
+        "evaluator_runtime_usage": {
+          "call_count": 4,
+          "ok_calls": 4,
+          "error_calls": 0,
+          "prompt_tokens": 3518,
+          "completion_tokens": 793,
+          "total_tokens": 4311,
+          "total_latency_ms": 14567.063,
+          "mean_latency_ms": 3641.766
+        },
+        "optimizer_runtime_usage": {
+          "call_count": 4,
+          "ok_calls": 4,
+          "error_calls": 0,
+          "prompt_tokens": 2660,
+          "completion_tokens": 855,
+          "total_tokens": 3515,
+          "total_latency_ms": 19538.322,
+          "mean_latency_ms": 4884.581
+        }
+      },
+      "frozen_forest": {
+        "episodes": 4,
+        "mean_objective_reward": 0.7633,
+        "first_third_mean_reward": 0.83,
+        "last_third_mean_reward": 0.755,
+        "last_minus_first_third": -0.075,
+        "contract_pass_rate": null,
+        "mean_path_length": 2,
+        "selected_branch_hhi": 0.25,
+        "selected_branch_counts": {
+          "json_lock": 1,
+          "bullet_lock": 1,
+          "creative_divergent_generator": 1,
+          "csv_lock": 1
+        },
+        "objective_reward_by_task_type": {
+          "math": 0.7467,
+          "planning": 0.78
+        },
+        "optimizer_event_counts": {
+          "rewritten_prompts": 0,
+          "created_candidates": 0,
+          "promoted_candidates": 0,
+          "archived_candidates": 0
+        },
+        "backend_usage": {
+          "call_count": 12,
+          "ok_calls": 12,
+          "error_calls": 0,
+          "prompt_tokens": 2122,
+          "completion_tokens": 2410,
+          "total_tokens": 4532,
+          "total_latency_ms": 44192.934,
+          "mean_latency_ms": 3682.745
+        },
+        "evaluator_runtime_usage": {
+          "call_count": 4,
+          "ok_calls": 4,
+          "error_calls": 0,
+          "prompt_tokens": 3415,
+          "completion_tokens": 802,
+          "total_tokens": 4217,
+          "total_latency_ms": 15337.375,
+          "mean_latency_ms": 3834.344
+        },
+        "optimizer_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        }
+      },
+      "direct_model": {
+        "episodes": 4,
+        "mean_objective_reward": 0.565,
+        "first_third_mean_reward": 0.4167,
+        "last_third_mean_reward": 0.7083,
+        "last_minus_first_third": 0.2916,
+        "contract_pass_rate": null,
+        "mean_path_length": 1,
+        "selected_branch_hhi": 1.0,
+        "selected_branch_counts": {
+          "direct_model": 4
+        },
+        "objective_reward_by_task_type": {
+          "math": 0.4567,
+          "planning": 0.6733
+        },
+        "optimizer_event_counts": {},
+        "backend_usage": {
+          "call_count": 4,
+          "ok_calls": 4,
+          "error_calls": 0,
+          "prompt_tokens": 388,
+          "completion_tokens": 734,
+          "total_tokens": 1122,
+          "total_latency_ms": 14246.152,
+          "mean_latency_ms": 3561.538
+        },
+        "evaluator_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        },
+        "optimizer_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        }
+      }
+    },
+    "holdout": {
+      "adaptive_full": {
+        "episodes": 4,
+        "mean_objective_reward": 0.724,
+        "first_third_mean_reward": 0.755,
+        "last_third_mean_reward": 0.681,
+        "last_minus_first_third": -0.074,
+        "contract_pass_rate": 1.0,
+        "mean_path_length": 2,
+        "selected_branch_hhi": 0.375,
+        "selected_branch_counts": {
+          "json_lock": 2,
+          "csv_lock": 1,
+          "creative_constraint_innovator": 1
+        },
+        "objective_reward_by_task_type": {
+          "code": 0.805,
+          "factual": 0.655,
+          "general": 0.681,
+          "planning": 0.755
+        },
+        "optimizer_event_counts": {
+          "rewritten_prompts": 0,
+          "created_candidates": 0,
+          "promoted_candidates": 0,
+          "archived_candidates": 0
+        },
+        "backend_usage": {
+          "call_count": 11,
+          "ok_calls": 11,
+          "error_calls": 0,
+          "prompt_tokens": 1768,
+          "completion_tokens": 2474,
+          "total_tokens": 4242,
+          "total_latency_ms": 45578.194,
+          "mean_latency_ms": 4143.472
+        },
+        "evaluator_runtime_usage": {
+          "call_count": 4,
+          "ok_calls": 4,
+          "error_calls": 0,
+          "prompt_tokens": 3058,
+          "completion_tokens": 769,
+          "total_tokens": 3827,
+          "total_latency_ms": 12810.545,
+          "mean_latency_ms": 3202.636
+        },
+        "optimizer_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        }
+      },
+      "frozen_forest": {
+        "episodes": 4,
+        "mean_objective_reward": 0.7115,
+        "first_third_mean_reward": 0.755,
+        "last_third_mean_reward": 0.681,
+        "last_minus_first_third": -0.074,
+        "contract_pass_rate": 1.0,
+        "mean_path_length": 2,
+        "selected_branch_hhi": 0.25,
+        "selected_branch_counts": {
+          "planner_timeline_optimizer": 1,
+          "creative_constraint_innovator": 1,
+          "code_patch_lock": 1,
+          "json_lock": 1
+        },
+        "objective_reward_by_task_type": {
+          "code": 0.755,
+          "factual": 0.655,
+          "general": 0.681,
+          "planning": 0.755
+        },
+        "optimizer_event_counts": {
+          "rewritten_prompts": 0,
+          "created_candidates": 0,
+          "promoted_candidates": 0,
+          "archived_candidates": 0
+        },
+        "backend_usage": {
+          "call_count": 11,
+          "ok_calls": 11,
+          "error_calls": 0,
+          "prompt_tokens": 1783,
+          "completion_tokens": 2479,
+          "total_tokens": 4262,
+          "total_latency_ms": 54207.664,
+          "mean_latency_ms": 4927.969
+        },
+        "evaluator_runtime_usage": {
+          "call_count": 4,
+          "ok_calls": 4,
+          "error_calls": 0,
+          "prompt_tokens": 3058,
+          "completion_tokens": 840,
+          "total_tokens": 3898,
+          "total_latency_ms": 15551.912,
+          "mean_latency_ms": 3887.978
+        },
+        "optimizer_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        }
+      },
+      "direct_model": {
+        "episodes": 4,
+        "mean_objective_reward": 0.5462,
+        "first_third_mean_reward": 0.5594,
+        "last_third_mean_reward": 0.681,
+        "last_minus_first_third": 0.1216,
+        "contract_pass_rate": 1.0,
+        "mean_path_length": 1,
+        "selected_branch_hhi": 1.0,
+        "selected_branch_counts": {
+          "direct_model": 4
+        },
+        "objective_reward_by_task_type": {
+          "code": 0.5444,
+          "factual": 0.4,
+          "general": 0.681,
+          "planning": 0.5594
+        },
+        "optimizer_event_counts": {},
+        "backend_usage": {
+          "call_count": 4,
+          "ok_calls": 4,
+          "error_calls": 0,
+          "prompt_tokens": 382,
+          "completion_tokens": 708,
+          "total_tokens": 1090,
+          "total_latency_ms": 11585.945,
+          "mean_latency_ms": 2896.486
+        },
+        "evaluator_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        },
+        "optimizer_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "adaptive_vs_frozen": {
+      "objective_reward_gain": 0.0125,
+      "contract_pass_delta": 0.0,
+      "pairwise": {
+        "n": 4,
+        "left_wins": 0,
+        "right_wins": 1,
+        "ties": 3,
+        "left_win_rate": 0.0,
+        "right_win_rate": 0.25,
+        "mean_score_left": 8.75,
+        "mean_score_right": 9.25,
+        "by_task_type": {
+          "planning": {
+            "left": 0,
+            "right": 1,
+            "tie": 0
+          },
+          "factual": {
+            "left": 0,
+            "right": 0,
+            "tie": 1
+          },
+          "code": {
+            "left": 0,
+            "right": 0,
+            "tie": 1
+          },
+          "general": {
+            "left": 0,
+            "right": 0,
+            "tie": 1
+          }
+        }
+      }
+    },
+    "adaptive_vs_direct": {
+      "objective_reward_gain": 0.1778,
+      "contract_pass_delta": 0.0,
+      "pairwise": {
+        "n": 4,
+        "left_wins": 4,
+        "right_wins": 0,
+        "ties": 0,
+        "left_win_rate": 1.0,
+        "right_win_rate": 0.0,
+        "mean_score_left": 8.75,
+        "mean_score_right": 6.0,
+        "by_task_type": {
+          "planning": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "factual": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "code": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "general": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          }
+        }
+      }
+    },
+    "frozen_vs_direct": {
+      "objective_reward_gain": 0.1653,
+      "contract_pass_delta": 0.0,
+      "pairwise": {
+        "n": 4,
+        "left_wins": 3,
+        "right_wins": 1,
+        "ties": 0,
+        "left_win_rate": 0.75,
+        "right_win_rate": 0.25,
+        "mean_score_left": 8.5,
+        "mean_score_right": 7.75,
+        "by_task_type": {
+          "planning": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "factual": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "code": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "general": {
+            "left": 0,
+            "right": 1,
+            "tie": 0
+          }
+        }
+      }
+    },
+    "pairwise_summary": {
+      "adaptive_full__vs__frozen_forest": {
+        "n": 4,
+        "left_wins": 0,
+        "right_wins": 1,
+        "ties": 3,
+        "left_win_rate": 0.0,
+        "right_win_rate": 0.25,
+        "mean_score_left": 8.75,
+        "mean_score_right": 9.25,
+        "by_task_type": {
+          "planning": {
+            "left": 0,
+            "right": 1,
+            "tie": 0
+          },
+          "factual": {
+            "left": 0,
+            "right": 0,
+            "tie": 1
+          },
+          "code": {
+            "left": 0,
+            "right": 0,
+            "tie": 1
+          },
+          "general": {
+            "left": 0,
+            "right": 0,
+            "tie": 1
+          }
+        }
+      },
+      "adaptive_full__vs__direct_model": {
+        "n": 4,
+        "left_wins": 4,
+        "right_wins": 0,
+        "ties": 0,
+        "left_win_rate": 1.0,
+        "right_win_rate": 0.0,
+        "mean_score_left": 8.75,
+        "mean_score_right": 6.0,
+        "by_task_type": {
+          "planning": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "factual": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "code": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "general": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          }
+        }
+      },
+      "frozen_forest__vs__direct_model": {
+        "n": 4,
+        "left_wins": 3,
+        "right_wins": 1,
+        "ties": 0,
+        "left_win_rate": 0.75,
+        "right_win_rate": 0.25,
+        "mean_score_left": 8.5,
+        "mean_score_right": 7.75,
+        "by_task_type": {
+          "planning": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "factual": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "code": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "general": {
+            "left": 0,
+            "right": 1,
+            "tie": 0
+          }
+        }
+      }
+    }
+  },
+  "pairwise_holdout": [
+    {
+      "task_id": "holdout_planning_recovery",
+      "split": "holdout",
+      "task_type": "planning",
+      "left_policy": "adaptive_full",
+      "right_policy": "frozen_forest",
+      "winner": "frozen_forest",
+      "score_left": 7.0,
+      "score_right": 9.0,
+      "rationale": "Candidate A provides a clear, sequenced 7-day recovery plan with explicit owners, rollback steps, communication strategies, risk identification, and confidence levels for each phase. It covers all required constraints explicitly and phases the work logically from immediate rollback through root cause analysis, fix development, testing, and validation. Candidate B also addresses these elements but is incomplete in the provided text, cutting off mid-plan, and lacks the same level of detail and clarity in sequencing and communication. Candidate A's plan is more complete, explicit, and useful for practical recovery management.",
+      "raw_response": {
+        "winner": "A",
+        "score_a": 9,
+        "score_b": 7,
+        "rationale": "Candidate A provides a clear, sequenced 7-day recovery plan with explicit owners, rollback steps, communication strategies, risk identification, and confidence levels for each phase. It covers all required constraints explicitly and phases the work logically from immediate rollback through root cause analysis, fix development, testing, and validation. Candidate B also addresses these elements but is incomplete in the provided text, cutting off mid-plan, and lacks the same level of detail and clarity in sequencing and communication. Candidate A's plan is more complete, explicit, and useful for practical recovery management."
+      }
+    },
+    {
+      "task_id": "holdout_planning_recovery",
+      "split": "holdout",
+      "task_type": "planning",
+      "left_policy": "adaptive_full",
+      "right_policy": "direct_model",
+      "winner": "adaptive_full",
+      "score_left": 9.0,
+      "score_right": 7.0,
+      "rationale": "Both candidates provide a sequenced 7-day recovery plan with owners, rollback, communication, risks, and confidence. Candidate A offers a clear day-by-day plan with explicit owners and confidence levels, and includes rollback on Day 1. However, it is incomplete as it cuts off mid-sentence on Day 5 and lacks detail on communication and rollback in later days. Candidate B provides a more complete and detailed plan covering all 7 days, explicitly mentioning rollback procedures multiple times, detailed communication plans, and risk mitigation strategies. It also includes confidence levels for each phase and clearly assigns owners. Candidate B better satisfies the constraints and rubric by providing a full, phased plan with explicit rollback and confidence statements, making it more useful and complete.",
+      "raw_response": {
+        "winner": "B",
+        "score_a": 7,
+        "score_b": 9,
+        "rationale": "Both candidates provide a sequenced 7-day recovery plan with owners, rollback, communication, risks, and confidence. Candidate A offers a clear day-by-day plan with explicit owners and confidence levels, and includes rollback on Day 1. However, it is incomplete as it cuts off mid-sentence on Day 5 and lacks detail on communication and rollback in later days. Candidate B provides a more complete and detailed plan covering all 7 days, explicitly mentioning rollback procedures multiple times, detailed communication plans, and risk mitigation strategies. It also includes confidence levels for each phase and clearly assigns owners. Candidate B better satisfies the constraints and rubric by providing a full, phased plan with explicit rollback and confidence statements, making it more useful and complete."
+      }
+    },
+    {
+      "task_id": "holdout_planning_recovery",
+      "split": "holdout",
+      "task_type": "planning",
+      "left_policy": "frozen_forest",
+      "right_policy": "direct_model",
+      "winner": "frozen_forest",
+      "score_left": 9.0,
+      "score_right": 6.0,
+      "rationale": "Candidate A provides a more complete and well-sequenced 7-day recovery plan that explicitly includes owners, rollback, communication, risks, and confidence for each phase. It phases the recovery work clearly from immediate rollback through root cause analysis, fix development, testing, and validation. The confidence levels are explicitly stated and calibrated for each step. Communication plans and risk considerations are detailed and appropriate. Candidate B, while covering many key points, is incomplete and truncated, missing full sequencing beyond day 5 and lacking some communication and risk details. It also does not fully phase the plan across 7 days and is less detailed about owners and communication. Therefore, Candidate A better satisfies the task requirements and rubric criteria.",
+      "raw_response": {
+        "winner": "A",
+        "score_a": 9,
+        "score_b": 6,
+        "rationale": "Candidate A provides a more complete and well-sequenced 7-day recovery plan that explicitly includes owners, rollback, communication, risks, and confidence for each phase. It phases the recovery work clearly from immediate rollback through root cause analysis, fix development, testing, and validation. The confidence levels are explicitly stated and calibrated for each step. Communication plans and risk considerations are detailed and appropriate. Candidate B, while covering many key points, is incomplete and truncated, missing full sequencing beyond day 5 and lacking some communication and risk details. It also does not fully phase the plan across 7 days and is less detailed about owners and communication. Therefore, Candidate A better satisfies the task requirements and rubric criteria."
+      }
+    },
+    {
+      "task_id": "holdout_factual_overfitting",
+      "split": "holdout",
+      "task_type": "factual",
+      "left_policy": "adaptive_full",
+      "right_policy": "frozen_forest",
+      "winner": "tie",
+      "score_left": 9.0,
+      "score_right": 9.0,
+      "rationale": "Both candidates provide a correct and clear explanation of overfitting tailored to a startup founder, including an appropriate warning sign (high training accuracy but poor performance on new data), a mitigation strategy (cross-validation and model simplification or gathering diverse data), and an explicit confidence statement. Candidate A emphasizes simplifying the model and cross-validation, while Candidate B adds gathering diverse data and regularization. Both include a relevant analogy and confidence calibration. Neither fully covers all possible mitigations but both satisfy the task requirements well and provide useful, calibrated advice. Hence, the evaluation results in a tie with high scores.",
+      "raw_response": {
+        "winner": "tie",
+        "score_a": 9,
+        "score_b": 9,
+        "rationale": "Both candidates provide a correct and clear explanation of overfitting tailored to a startup founder, including an appropriate warning sign (high training accuracy but poor performance on new data), a mitigation strategy (cross-validation and model simplification or gathering diverse data), and an explicit confidence statement. Candidate A emphasizes simplifying the model and cross-validation, while Candidate B adds gathering diverse data and regularization. Both include a relevant analogy and confidence calibration. Neither fully covers all possible mitigations but both satisfy the task requirements well and provide useful, calibrated advice. Hence, the evaluation results in a tie with high scores."
+      }
+    },
+    {
+      "task_id": "holdout_factual_overfitting",
+      "split": "holdout",
+      "task_type": "factual",
+      "left_policy": "adaptive_full",
+      "right_policy": "direct_model",
+      "winner": "adaptive_full",
+      "score_left": 9.0,
+      "score_right": 7.0,
+      "rationale": "Both candidates correctly explain overfitting, provide a warning sign, a mitigation strategy, and include a statement of confidence as required. Candidate A offers a more detailed, relatable explanation tailored to a startup founder, using an analogy and multiple mitigation techniques (cross-validation, gathering diverse data, simplifying model, regularization). It also explicitly states a high confidence level and explains why. Candidate B is concise and correct but less detailed and less tailored, with a more generic confidence statement. Candidate A better satisfies completeness, explicit constraint satisfaction, and usefulness for the target audience.",
+      "raw_response": {
+        "winner": "A",
+        "score_a": 9,
+        "score_b": 7,
+        "rationale": "Both candidates correctly explain overfitting, provide a warning sign, a mitigation strategy, and include a statement of confidence as required. Candidate A offers a more detailed, relatable explanation tailored to a startup founder, using an analogy and multiple mitigation techniques (cross-validation, gathering diverse data, simplifying model, regularization). It also explicitly states a high confidence level and explains why. Candidate B is concise and correct but less detailed and less tailored, with a more generic confidence statement. Candidate A better satisfies completeness, explicit constraint satisfaction, and usefulness for the target audience."
+      }
+    },
+    {
+      "task_id": "holdout_factual_overfitting",
+      "split": "holdout",
+      "task_type": "factual",
+      "left_policy": "frozen_forest",
+      "right_policy": "direct_model",
+      "winner": "frozen_forest",
+      "score_left": 9.0,
+      "score_right": 8.0,
+      "rationale": "Both candidates provide a correct explanation of overfitting, include a clear warning sign, a mitigation strategy, and express confidence as required. Candidate A is concise and accurate, mentioning regularization and cross-validation as mitigations and explicitly stating confidence. Candidate B offers a more detailed and relatable explanation with an analogy, explicitly lists key points, and provides a confidence level with justification, enhancing usefulness and completeness. Candidate B also includes an additional mitigation (gathering more diverse data) and better calibration of confidence, making it more helpful for a startup founder. Therefore, Candidate B scores slightly higher for completeness, explicit confidence, and usefulness.",
+      "raw_response": {
+        "winner": "B",
+        "score_a": 8,
+        "score_b": 9,
+        "rationale": "Both candidates provide a correct explanation of overfitting, include a clear warning sign, a mitigation strategy, and express confidence as required. Candidate A is concise and accurate, mentioning regularization and cross-validation as mitigations and explicitly stating confidence. Candidate B offers a more detailed and relatable explanation with an analogy, explicitly lists key points, and provides a confidence level with justification, enhancing usefulness and completeness. Candidate B also includes an additional mitigation (gathering more diverse data) and better calibration of confidence, making it more helpful for a startup founder. Therefore, Candidate B scores slightly higher for completeness, explicit confidence, and usefulness."
+      }
+    },
+    {
+      "task_id": "holdout_code_pr_review",
+      "split": "holdout",
+      "task_type": "code",
+      "left_policy": "adaptive_full",
+      "right_policy": "frozen_forest",
+      "winner": "tie",
+      "score_left": 9.0,
+      "score_right": 9.0,
+      "rationale": "Both candidates provide comprehensive and well-structured pull-request review checklists that cover the key areas required by the task: failure handling, tests, rollout risk, and confidence. Candidate A explicitly includes confidence-related points such as code review, load testing, and documentation, which aligns well with the requirement to include confidence. Candidate B also addresses confidence implicitly through detailed failure handling, idempotency, timeouts, and resource impact considerations, which contribute to confidence in the rollout. Both include queue-specific review points, thorough testing coverage, and rollout risk mitigation strategies including feature flags and monitoring. Neither candidate omits any required constraints, and both are complete and correct. The slight differences in phrasing and emphasis do not affect overall quality or usefulness, resulting in a tie.",
+      "raw_response": {
+        "winner": "tie",
+        "score_a": 9,
+        "score_b": 9,
+        "rationale": "Both candidates provide comprehensive and well-structured pull-request review checklists that cover the key areas required by the task: failure handling, tests, rollout risk, and confidence. Candidate A explicitly includes confidence-related points such as code review, load testing, and documentation, which aligns well with the requirement to include confidence. Candidate B also addresses confidence implicitly through detailed failure handling, idempotency, timeouts, and resource impact considerations, which contribute to confidence in the rollout. Both include queue-specific review points, thorough testing coverage, and rollout risk mitigation strategies including feature flags and monitoring. Neither candidate omits any required constraints, and both are complete and correct. The slight differences in phrasing and emphasis do not affect overall quality or usefulness, resulting in a tie."
+      }
+    },
+    {
+      "task_id": "holdout_code_pr_review",
+      "split": "holdout",
+      "task_type": "code",
+      "left_policy": "adaptive_full",
+      "right_policy": "direct_model",
+      "winner": "adaptive_full",
+      "score_left": 9.0,
+      "score_right": 7.0,
+      "rationale": "Candidate A provides a more complete and structured checklist that explicitly covers all required aspects: failure handling, tests, rollout risk, and confidence. It includes detailed points on retry logic, dead letter queue, error logging, graceful degradation, and monitoring. The tests section is comprehensive, covering unit, integration, and load tests. Rollout risk includes backward compatibility, monitoring, feature flags, and incremental rollout. Confidence is explicitly addressed with code review, load testing, and documentation. Candidate B also covers most points but is less complete and less explicit about confidence and rollout risk (cut off mid-point). It lacks explicit confidence-related checklist items and is less detailed on rollout risk and monitoring. Therefore, Candidate A better satisfies the constraints and rubric, providing a more useful and calibrated checklist.",
+      "raw_response": {
+        "winner": "A",
+        "score_a": 9,
+        "score_b": 7,
+        "rationale": "Candidate A provides a more complete and structured checklist that explicitly covers all required aspects: failure handling, tests, rollout risk, and confidence. It includes detailed points on retry logic, dead letter queue, error logging, graceful degradation, and monitoring. The tests section is comprehensive, covering unit, integration, and load tests. Rollout risk includes backward compatibility, monitoring, feature flags, and incremental rollout. Confidence is explicitly addressed with code review, load testing, and documentation. Candidate B also covers most points but is less complete and less explicit about confidence and rollout risk (cut off mid-point). It lacks explicit confidence-related checklist items and is less detailed on rollout risk and monitoring. Therefore, Candidate A better satisfies the constraints and rubric, providing a more useful and calibrated checklist."
+      }
+    },
+    {
+      "task_id": "holdout_code_pr_review",
+      "split": "holdout",
+      "task_type": "code",
+      "left_policy": "frozen_forest",
+      "right_policy": "direct_model",
+      "winner": "frozen_forest",
+      "score_left": 9.0,
+      "score_right": 8.0,
+      "rationale": "Both candidates provide comprehensive checklists covering queue-specific points, failure handling, tests, and rollout risk. Candidate A is clear and well-structured but is incomplete as it cuts off mid-sentence in the rollout risk section and does not explicitly mention confidence. Candidate B is more complete, explicitly includes confidence (0.72), and covers all required areas thoroughly, including additional points like timeouts and resource impact. B also explicitly addresses confidence and rollout risk mitigation strategies such as canary deployments, making it more useful and complete. Therefore, B is the winner.",
+      "raw_response": {
+        "winner": "B",
+        "score_a": 8,
+        "score_b": 9,
+        "rationale": "Both candidates provide comprehensive checklists covering queue-specific points, failure handling, tests, and rollout risk. Candidate A is clear and well-structured but is incomplete as it cuts off mid-sentence in the rollout risk section and does not explicitly mention confidence. Candidate B is more complete, explicitly includes confidence (0.72), and covers all required areas thoroughly, including additional points like timeouts and resource impact. B also explicitly addresses confidence and rollout risk mitigation strategies such as canary deployments, making it more useful and complete. Therefore, B is the winner."
+      }
+    },
+    {
+      "task_id": "holdout_json_contract",
+      "split": "holdout",
+      "task_type": "general",
+      "left_policy": "adaptive_full",
+      "right_policy": "frozen_forest",
+      "winner": "tie",
+      "score_left": 10.0,
+      "score_right": 10.0,
+      "rationale": "Both candidates provide the correct and complete response indicating insufficient information to determine if a rollout is safe today, with the required keys and valid JSON format. Both have identical answers and confidence, fully satisfying the task constraints and rubric.",
+      "raw_response": {
+        "winner": "tie",
+        "score_a": 10,
+        "score_b": 10,
+        "rationale": "Both candidates provide the correct and complete response indicating insufficient information to determine if a rollout is safe today, with the required keys and valid JSON format. Both have identical answers and confidence, fully satisfying the task constraints and rubric."
+      }
+    },
+    {
+      "task_id": "holdout_json_contract",
+      "split": "holdout",
+      "task_type": "general",
+      "left_policy": "adaptive_full",
+      "right_policy": "direct_model",
+      "winner": "adaptive_full",
+      "score_left": 8.0,
+      "score_right": 3.0,
+      "rationale": "Candidate A correctly identifies the lack of sufficient information to determine rollout safety, aligning with the principle of not making unsupported claims, and provides a valid JSON with required keys. Candidate B asserts the rollout is safe with high confidence despite no supporting information, which is potentially incorrect and less cautious. Therefore, Candidate A is more correct, complete, and calibrated.",
+      "raw_response": {
+        "winner": "A",
+        "score_a": 8,
+        "score_b": 3,
+        "rationale": "Candidate A correctly identifies the lack of sufficient information to determine rollout safety, aligning with the principle of not making unsupported claims, and provides a valid JSON with required keys. Candidate B asserts the rollout is safe with high confidence despite no supporting information, which is potentially incorrect and less cautious. Therefore, Candidate A is more correct, complete, and calibrated."
+      }
+    },
+    {
+      "task_id": "holdout_json_contract",
+      "split": "holdout",
+      "task_type": "general",
+      "left_policy": "frozen_forest",
+      "right_policy": "direct_model",
+      "winner": "direct_model",
+      "score_left": 7.0,
+      "score_right": 9.0,
+      "rationale": "Candidate A provides a clear, confident answer directly addressing the task, fulfilling the constraints and being useful. Candidate B is correct in expressing uncertainty but less useful as it does not provide a definitive answer, and its confidence is zero, which is less helpful.",
+      "raw_response": {
+        "winner": "A",
+        "score_a": 9,
+        "score_b": 7,
+        "rationale": "Candidate A provides a clear, confident answer directly addressing the task, fulfilling the constraints and being useful. Candidate B is correct in expressing uncertainty but less useful as it does not provide a definitive answer, and its confidence is zero, which is less helpful."
+      }
+    }
+  ],
+  "per_policy": {
+    "adaptive_full": {
+      "train": [
+        {
+          "task_id": "train_math_linear_equation::round_1",
+          "split": "train",
+          "task_type": "math",
+          "aspect": "reasoning",
+          "text": "Solve 2x + 5 = 17. Show the algebra briefly and end with a confidence line.",
+          "selected_output": "Final answer:  \nGiven the equation 2x + 5 = 17, subtract 5 from both sides to get 2x = 12. Then divide both sides by 2 to find x = 6.  \n\nKey points:  \n- Subtract 5 from both sides  \n- Divide by 2  \n- Solution x = 6  \n\nConfidence: I am confident this solution is correct.\ncomposer-fusion: {\n  \"equation\": \"2x + 5 = 17\",\n  \"steps\": [\n    \"Subtract 5 from both sides: 2x = 17 - 5\",\n    \"Simplify: 2x = 12\",\n    \"Divide both sides by 2: x = 12 / 2\",\n    \"Simplify: x = 6\"\n  ],\n  \"verification\": \"Substitute x = 6 into the original equation: 2(6) + 5 = 12 + 5 = 17, which is true.\",\n  \"confidence\": \"The solution x = 6 satisfies the equation. I am confident this is correct.\"\n}\nkey-points=x = 6; subtract 5; divide by 2; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "json_lock",
+          "activated_branches": [
+            "verification",
+            "json_lock"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "json_lock"
+            ]
+          ],
+          "internal_reward_score": 0.83,
+          "internal_confidence": 0.5967,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": true,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.83,
+            "hybrid_verifier_reason": "high_quality|exact_match|keyword_coverage:4/4|rules_passed|task_specific:2/5|fallback_verifier:3/3|no_user_preference_profile",
+            "exact_score": 1.0,
+            "exact_reason": "exact_match",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "fallback_verifier:3/3",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 143
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 546,
+            "completion_tokens": 342,
+            "total_tokens": 888,
+            "total_latency_ms": 6436.106,
+            "mean_latency_ms": 2145.369
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 943,
+            "completion_tokens": 190,
+            "total_tokens": 1133,
+            "total_latency_ms": 4745.087,
+            "mean_latency_ms": 4745.087
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 631,
+            "completion_tokens": 113,
+            "total_tokens": 744,
+            "total_latency_ms": 1811.961,
+            "mean_latency_ms": 1811.961
+          }
+        },
+        {
+          "task_id": "train_math_probability::round_1",
+          "split": "train",
+          "task_type": "math",
+          "aspect": "reasoning",
+          "text": "A bag has 3 red balls and 7 blue balls. What is the probability of drawing a red ball? Give the simplified answer and a confidence line.",
+          "selected_output": "- Total balls = 3 red + 7 blue = 10  \n- Probability of drawing a red ball = Number of red balls / Total balls = 3/10  \n- Simplified probability = \\(\\frac{3}{10}\\)  \n\nConfidence: This probability is directly calculated from counting the balls, making it a straightforward and reliable result.\ncomposer-fusion: - The probability of drawing a red ball is \\(\\frac{3}{10}\\).\n- Confidence: This calculation is straightforward and based on counting discrete items, so I am highly confident (above 99%) that the answer is correct.\nkey-points=3/10; probability; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "bullet_lock",
+          "activated_branches": [
+            "verification",
+            "bullet_lock"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "bullet_lock"
+            ]
+          ],
+          "internal_reward_score": 0.6633,
+          "internal_confidence": 0.6667,
+          "failure_reason": "medium_quality|exact_match|keyword_coverage:3/3|rules_passed|task_specific:1/5|fallback_verifier:2/3|no_user_preference_profile",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": true,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.6633,
+            "hybrid_verifier_reason": "medium_quality|exact_match|keyword_coverage:3/3|rules_passed|task_specific:1/5|fallback_verifier:2/3|no_user_preference_profile",
+            "exact_score": 1.0,
+            "exact_reason": "exact_match",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:3/3",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.3333,
+            "task_specific_reason": "task_specific:1/5",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "fallback_verifier:2/3",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 90
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 530,
+            "completion_tokens": 256,
+            "total_tokens": 786,
+            "total_latency_ms": 5906.109,
+            "mean_latency_ms": 1968.703
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 844,
+            "completion_tokens": 206,
+            "total_tokens": 1050,
+            "total_latency_ms": 3061.495,
+            "mean_latency_ms": 3061.495
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 687,
+            "completion_tokens": 209,
+            "total_tokens": 896,
+            "total_latency_ms": 6773.319,
+            "mean_latency_ms": 6773.319
+          }
+        },
+        {
+          "task_id": "train_planning_incident_response::round_1",
+          "split": "train",
+          "task_type": "planning",
+          "aspect": "planning",
+          "text": "Create a 48-hour incident response plan for a payment API outage. Include phases, owners, rollback, risks, and confidence.",
+          "selected_output": "**48-Hour Incident Response Plan for Payment API Outage**\n\n---\n\n### Phase 1: Detection & Initial Assessment (0-4 hours)  \n- **Owner:** Incident Response Lead & Monitoring Team  \n- **Actions:**  \n  - Confirm outage via monitoring tools and customer reports.  \n  - Assess scope and impact on transactions.  \n  - Communicate initial incident notification to stakeholders.  \n- **Rollback:** Not applicable at this stage.  \n- **Risks:** False positives or incomplete data may delay response.  \n- **Confidence:** High \u2013 monitoring systems and alerting are reliable.\n\n---\n\n### Phase 2: Containment & Mitigation (4-12 hours)  \n- **Owner:** Engineering & DevOps Teams  \n- **Actions:**  \n  - Isolate affected components to prevent further impact.  \n  - Apply temporary fixes or throttling to reduce load.  \n  - Engage payment gateway partners if needed.  \n- **Rollback:** Revert recent deployments or configuration changes suspected to cause the outage.  \n- **Risks:** Partial service degradation; risk of incomplete containment.  \n- **Confidence:** Medium-High \u2013 rollback procedures are tested but environment complexity may vary.\n\n---\n\n### Phase 3: Root Cause Analysis & Resolution (12-36 hours)  \n- **Owner:** Engineering & QA Teams  \n- **Actions:**  \n  - Deep dive into logs, code, and infrastructure to identify root cause.  \n  - Develop and test permanent fix in staging environment.\ncomposer-fusion: Here is a Divergent 48-hour incident response plan for a payment API outage, featuring multiple novel approaches per phase, with clear owners, rollback strategies, risks, and confidence levels:\n\n---\n\n### Phase 1: Detection & Initial Response (0-2 hours)  \n**Goals:** Quickly identify outage, alert stakeholders, initiate containment.  \n**Owners:** Incident Manager + Monitoring Team  \n\n**Solution Candidates:**  \n- **A1:** Automated alert triggers combined with manual confirmation calls to on-call engineers.  \n- **A2:** Deploy AI-driven anomaly detection to predict outage scope before full failure.  \n- **A3:** Immediate circuit breaker activation to isolate payment API from dependent services.  \n\n**Rollback:** N/A (initial phase)  \n**Risks:** False positives delaying response; incomplete alert coverage.  \n**Confidence:** Medium-high (A1 standard, A2/A3 novel but promising).  \n\n---\n\n### Phase 2: Communication & Stakeholder Management (2-4 hours)  \n**Goals:** Inform internal teams, customers, and external partners transparently.  \n**Owners:** Incident Manager + Communications Lead  \n\n**Solution Candidates:**  \n- **B1:** Real-time status page updates with estimated resolution times.  \n- **B2:** Proactive customer outreach via email and social media with FAQs.  \n- **B3:** Dedicated incident hotline and chat channel for high-impact customers.  \n\n**Rollback:** N/A (communication phase)  \n**Risks:** Over/under communication causing confusion\nkey-points=phase; owner; rollback; risk; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "creative_divergent_generator",
+          "activated_branches": [
+            "creative",
+            "creative_divergent_generator"
+          ],
+          "activated_paths": [
+            [
+              "creative",
+              "creative_divergent_generator"
+            ]
+          ],
+          "internal_reward_score": 0.755,
+          "internal_confidence": 0.6167,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": true,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.755,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:5/5|rules_passed|task_specific:2/5|verifier|must_include:3/3|length:359/80|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:5/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:3/3|length:359/80|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 384
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 542,
+            "completion_tokens": 900,
+            "total_tokens": 1442,
+            "total_latency_ms": 14716.478,
+            "mean_latency_ms": 4905.493
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 882,
+            "completion_tokens": 204,
+            "total_tokens": 1086,
+            "total_latency_ms": 3457.485,
+            "mean_latency_ms": 3457.485
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 702,
+            "completion_tokens": 216,
+            "total_tokens": 918,
+            "total_latency_ms": 3754.256,
+            "mean_latency_ms": 3754.256
+          }
+        },
+        {
+          "task_id": "train_planning_hiring_plan::round_1",
+          "split": "train",
+          "task_type": "planning",
+          "aspect": "planning",
+          "text": "Plan a 30-day onboarding schedule for a new senior backend engineer. Include milestones, dependencies, risks, and confidence.",
+          "selected_output": "**30-Day Onboarding Schedule for New Senior Backend Engineer**\n\n---\n\n### Week 1 (Days 1-5): Setup and Orientation  \n**Milestones:**  \n- Complete environment setup (hardware, software, access)  \n- Introduction to team, company culture, and processes  \n- Review system architecture and key backend services  \n**Dependencies:**  \n- IT provisioning completed before Day 1  \n- Access to documentation and code repositories  \n**Risks:**  \n- Delays in access provisioning may slow progress  \n- Overwhelming information without structured guidance  \n**Confidence:** High \u2013 Standard onboarding steps with clear dependencies  \n\n---\n\n### Week 2 (Days 6-10): Deep Dive into Codebase and Tools  \n**Milestones:**  \n- Understand core backend modules and APIs  \n- Setup local development and debugging tools  \n- Complete first small bug fix or feature under mentorship  \n**Dependencies:**  \n- Completed environment setup  \n- Assigned mentor or buddy for guidance  \n**Risks:**  \n- Complexity of codebase may require additional ramp-up time  \n- Insufficient mentorship availability  \n**Confidence:** Medium-High \u2013 Dependent on mentor support and documentation quality  \n\n---\n\n### Week 3 (Days 11-20): Independent Contribution and Collaboration  \n**Milestones:**  \n- Take ownership of a backend component or feature  \n- Participate in code reviews and team meetings  \n- Begin writing or improving automated tests  \n**Dependencies:**  \n- Successful completion of initial tasks and understanding of codebase  \n- Access to project management\ncomposer-fusion: ### 30-Day Onboarding Schedule for Senior Backend Engineer\n\n---\n\n## Week 1 (Days 1-5): Setup and Orientation  \n**Goals:**  \n- Complete environment setup and access provisioning  \n- Gain high-level understanding of projects and architecture  \n- Integrate into team culture and communication  \n\n**Schedule:**  \n- Day 1: HR onboarding, company policies, team introductions  \n- Day 2-3: Configure and test development environment (IDE, local services, databases)  \n- Day 4: Obtain access to code repositories, CI/CD pipelines, monitoring tools  \n- Day 5: Attend team meetings, overview of current projects and system architecture  \n\n**Milestones:**  \n- Development environment fully functional and tested  \n- Access to all necessary tools and repositories granted  \n- Initial understanding of team structure and project scope  \n\n**Dependencies:**  \n- IT support availability for account setup and equipment delivery  \n- Updated documentation for environment configuration and access procedures  \n\n**Risks:**  \n- Delays in account provisioning or equipment delivery impacting schedule  \n- Incomplete or outdated documentation causing setup confusion  \n\n**Confidence:** High (assuming standard IT processes)  \n\n---\n\n## Week 2 (Days 6-10): Deep Dive into Codebase and Architecture  \n**Goals:**  \n- Thoroughly understand backend system architecture and services  \n- Review critical code modules, APIs, and data flows  \n- Shadow senior engineers on active tasks and code reviews  \n- Identify brittle assumptions, edge cases, and potential failure points in the\nkey-points=milestone; dependency; risk; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "critique_failure_hunter",
+          "activated_branches": [
+            "critique",
+            "critique_failure_hunter"
+          ],
+          "activated_paths": [
+            [
+              "critique",
+              "critique_failure_hunter"
+            ]
+          ],
+          "internal_reward_score": 0.755,
+          "internal_confidence": 0.5033,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": true,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.755,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:2/5|verifier|must_include:3/3|length:389/80|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:3/3|length:389/80|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 421
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 508,
+            "completion_tokens": 900,
+            "total_tokens": 1408,
+            "total_latency_ms": 14502.866,
+            "mean_latency_ms": 4834.289
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 849,
+            "completion_tokens": 193,
+            "total_tokens": 1042,
+            "total_latency_ms": 3302.996,
+            "mean_latency_ms": 3302.996
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 640,
+            "completion_tokens": 317,
+            "total_tokens": 957,
+            "total_latency_ms": 7198.786,
+            "mean_latency_ms": 7198.786
+          }
+        }
+      ],
+      "holdout": [
+        {
+          "task_id": "holdout_planning_recovery",
+          "split": "holdout",
+          "task_type": "planning",
+          "aspect": "planning",
+          "text": "Create a next-7-days recovery plan after a failed production deploy. Include owners, rollback, communication, risks, and confidence.",
+          "selected_output": "Final 7-Days Recovery Plan After Failed Production Deploy\n\nDay 0 (Day of Failure)  \n- Actions: Immediate rollback to last stable version to restore production stability.  \n- Owner: Release Manager  \n- Rollback: Executed immediately to minimize downtime.  \n- Communication: Notify all stakeholders (Dev, QA, Ops, Product) about failure and rollback completion.  \n- Risks: Potential data inconsistency if rollback affects database state; ensure backups are intact.  \n- Confidence: High, as rollback is a tested and reliable procedure.\n\nDay 1-2  \n- Actions: Conduct root cause analysis (RCA) to identify failure reasons; gather logs and metrics.  \n- Owner: Dev Lead and QA Lead  \n- Communication: Share preliminary RCA findings with stakeholders.  \n- Risks: Incomplete data may delay RCA; mitigate by prioritizing log collection.  \n- Confidence: Medium-High, dependent on data availability.\n\nDay 3-4  \n- Actions: Develop and deploy fixes to a staging environment for integration testing; prepare rollback plan for fixes.  \n- Owner: Development Team  \n- Rollback: Prepare rollback procedures for the fix deployment.  \n- Communication: Update stakeholders on fix progress and testing plans.  \n- Risks: Fixes may introduce new issues; thorough testing required.  \n- Confidence: Medium, as fixes are under active development.\n\nDay 5-6  \n- Actions: Perform comprehensive integration and regression testing in staging; validate fixes.  \n- Owner: QA\ncomposer-fusion: Day,Actions,Owners,Rollback,Communication,Risks,Confidence\n4,\"Deploy fixes to a staging environment for integration testing; Prepare rollback plan and scripts; Notify stakeholders of upcoming deploy and potential risks\",\"Engineering Lead: Oversee deployment; QA Lead: Conduct integration tests; DevOps: Prepare rollback scripts; Product Manager: Communicate with stakeholders\",\"Ready rollback scripts to revert to previous stable version if issues arise\",\"Send deployment plan and risk assessment to all stakeholders; Schedule deployment window and standby support\",\"Integration issues may arise; Rollback may be needed if critical failures occur\",\"Medium confidence; depends on integration test results\"\n5,\"Deploy fixes to production during low-traffic hours; Monitor system closely; Execute rollback if critical issues detected\",\"Engineering Lead: Lead deployment; DevOps: Monitor system and execute rollback if needed; QA Lead: Monitor post-deploy tests; Product Manager: Update users as needed\",\"Execute rollback immediately upon detection of critical failures\",\"Provide real-time updates to stakeholders during deployment; Inform users of maintenance window and status\",\"Deployment may fail again; Monitoring tools may miss subtle issues\",\"Medium confidence; cautious approach with rollback readiness\"\n6,\"Conduct thorough post-deployment monitoring and validation; Collect user feedback; Begin retrospective analysis\",\"Engineering Lead: Analyze system performance; QA Lead: Validate system stability; Product Manager: Gather user feedback\",\"Rollback not expected unless new issues arise; rollback plan remains ready\",\"Daily status report to stakeholders; Communicate any emerging issues promptly\",\"Delayed detection of issues;\nkey-points=owner; rollback; communication; risk; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "csv_lock",
+          "activated_branches": [
+            "verification",
+            "csv_lock"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "csv_lock"
+            ]
+          ],
+          "internal_reward_score": 0.755,
+          "internal_confidence": 0.6167,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.755,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:5/5|rules_passed|task_specific:2/5|verifier|must_include:3/3|length:435/85|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:5/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:3/3|length:435/85|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 416
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 553,
+            "completion_tokens": 900,
+            "total_tokens": 1453,
+            "total_latency_ms": 18062.658,
+            "mean_latency_ms": 6020.886
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 838,
+            "completion_tokens": 197,
+            "total_tokens": 1035,
+            "total_latency_ms": 2927.555,
+            "mean_latency_ms": 2927.555
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "holdout_factual_overfitting",
+          "split": "holdout",
+          "task_type": "factual",
+          "aspect": "factual",
+          "text": "Explain overfitting to a startup founder. Include one warning sign, one mitigation, and confidence.",
+          "selected_output": "Final answer:\nOverfitting occurs when your startup\u2019s AI model learns the noise or random quirks in your training data instead of the true underlying patterns, much like a founder who only listens to early customer feedback and ignores broader market signals. A key warning sign is that your model performs exceptionally well on training data but poorly on new, unseen data. To mitigate overfitting, use techniques like cross-validation or gather more diverse data to ensure your model generalizes well. With these strategies, you can be confident your AI will make reliable predictions beyond just the initial examples it saw.\n\nKey points:\n- Overfitting means the model memorizes noise, not true patterns.\n- Warning sign: great training accuracy but poor real-world performance.\n- Mitigation: cross-validation and more diverse data.\n- Confidence: these steps help build trustworthy, generalizable AI.\n\nCalibrated confidence: High confidence in this explanation\u2019s clarity and practical relevance for a startup founder.\ncomposer-fusion: Overfitting is like a startup founder who only listens to early customer feedback and ignores broader market signals\u2014your AI model becomes too tailored to the initial training data and fails to perform well with new, unseen users. One clear warning sign is a large gap between training accuracy (very high) and test accuracy (much lower), indicating the model memorizes past data instead of learning general patterns. To mitigate this, you can simplify your model or add regularization, which penalizes complexity and encourages the model to focus on the most important features. By applying these methods, you can be confident your AI will generalize better to real-world scenarios, helping your startup scale effectively without being constrained by narrow past data.\nkey-points=overfitting; warning sign; mitigation; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "creative_constraint_innovator",
+          "activated_branches": [
+            "creative",
+            "creative_constraint_innovator"
+          ],
+          "activated_paths": [
+            [
+              "creative",
+              "creative_constraint_innovator"
+            ]
+          ],
+          "internal_reward_score": 0.655,
+          "internal_confidence": 0.8633,
+          "failure_reason": "medium_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:0/5|verifier|must_include:2/2|length:288/65|confidence_range:ok|no_user_preference_profile",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.655,
+            "hybrid_verifier_reason": "medium_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:0/5|verifier|must_include:2/2|length:288/65|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.0,
+            "task_specific_reason": "task_specific:0/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:2/2|length:288/65|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 279
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 489,
+            "completion_tokens": 632,
+            "total_tokens": 1121,
+            "total_latency_ms": 11033.271,
+            "mean_latency_ms": 3677.757
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 816,
+            "completion_tokens": 207,
+            "total_tokens": 1023,
+            "total_latency_ms": 3499.097,
+            "mean_latency_ms": 3499.097
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "holdout_code_pr_review",
+          "split": "holdout",
+          "task_type": "code",
+          "aspect": "code",
+          "text": "Give a pull-request review checklist for adding a background job queue to an API service. Include failure handling, tests, rollout risk, and confidence.",
+          "selected_output": "# Pull-Request Review Checklist for Adding a Background Job Queue to an API Service\n\n## 1. Functional Correctness  \n- [ ] **Job Enqueueing:** Verify jobs are correctly enqueued with expected payloads and priorities.  \n- [ ] **Job Processing:** Confirm jobs are processed as intended and produce expected side effects or outputs.  \n\n## 2. Failure Handling  \n- [ ] **Retry Logic:** Ensure failed jobs are retried according to the defined policy.  \n- [ ] **Dead Letter Queue:** Verify that jobs failing after max retries are moved to a dead letter queue or logged for manual intervention.  \n- [ ] **Error Logging:** Confirm errors during job processing are logged with sufficient detail for debugging.  \n- [ ] **Graceful Degradation:** Check that the API service handles job queue failures without crashing or losing critical functionality.  \n\n## 3. Tests  \n- [ ] **Unit Tests:** Cover job enqueueing, processing logic, and failure scenarios.  \n- [ ] **Integration Tests:** Validate end-to-end job lifecycle including retries and dead letter queue handling.  \n- [ ] **Load Tests:** Assess queue behavior under expected and peak loads to identify bottlenecks or failures.  \n\n## 4. Rollout Risk  \n- [ ] **Backward Compatibility:** Confirm the new queue integration does not break existing API functionality.  \n- [ ] **Monitoring:** Ensure monitoring and alerting are in place for job queue health and failures.  \n- [ ] **Feature\ncomposer-fusion: {\n  \"Failure Handling\": [\n    \"Dead Letter Queue: Verify that jobs failing after max retries are moved to a dead letter queue or logged for manual inspection.\",\n    \"Error Logging: Ensure errors during job processing are logged with sufficient context for debugging.\",\n    \"Alerting: Check if alerts/notifications are configured for critical failures or dead letter queue entries.\",\n    \"Graceful Degradation: Confirm that API service handles job queue failures gracefully without impacting synchronous API responses.\"\n  ],\n  \"Tests\": [\n    \"Unit Tests: Validate that enqueueing logic and job processing functions have comprehensive unit tests covering success and failure cases.\",\n    \"Integration Tests: Verify integration tests simulate end-to-end job lifecycle, including retries and failure scenarios.\"\n  ],\n  \"Rollout Risk\": [\n    \"Backward Compatibility: Ensure new job queue integration does not break existing API functionality.\",\n    \"Feature Flags: Use feature flags or toggles to enable/disable the background job queue during rollout.\",\n    \"Monitoring: Confirm monitoring is in place to track job queue performance and failures post-deployment.\",\n    \"Incremental Rollout: Plan for phased rollout to limit impact in case of issues.\"\n  ],\n  \"Confidence\": [\n    \"Code Review: Ensure thorough peer review focusing on concurrency, error handling, and resource management.\",\n    \"Load Testing: Perform load and stress testing to validate job queue stability under expected traffic.\",\n    \"Documentation: Confirm documentation is updated to reflect new background job queue behavior and failure modes.\"\n  ]\nkey-points=failure handling; test; risk; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "json_lock",
+          "activated_branches": [
+            "verification",
+            "json_lock"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "json_lock"
+            ]
+          ],
+          "internal_reward_score": 0.805,
+          "internal_confidence": 0.7994,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.805,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:3/5|verifier|must_include:3/3|length:408/70|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 1.0,
+            "task_specific_reason": "task_specific:3/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:3/3|length:408/70|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 444
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 534,
+            "completion_tokens": 900,
+            "total_tokens": 1434,
+            "total_latency_ms": 14844.716,
+            "mean_latency_ms": 4948.239
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 831,
+            "completion_tokens": 187,
+            "total_tokens": 1018,
+            "total_latency_ms": 3348.246,
+            "mean_latency_ms": 3348.246
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "holdout_json_contract",
+          "split": "holdout",
+          "task_type": "general",
+          "aspect": "contract",
+          "text": "Respond ONLY as minified JSON with keys answer and confidence. The answer should summarize whether a rollout is safe today.",
+          "selected_output": "{\"answer\":\"Insufficient information to determine if a rollout is safe today.\",\"confidence\":0.0}",
+          "selected_branch": "json_lock",
+          "activated_branches": [
+            "verification",
+            "json_lock"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "json_lock"
+            ]
+          ],
+          "internal_reward_score": 0.681,
+          "internal_confidence": 0.5,
+          "failure_reason": "contract_pass:json_lock:json_valid|low_quality|no_exact_reference|keyword_coverage:2/2|rules_passed|task_specific:1/4|fallback_verifier:1/3|no_user_preference_profile",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.681,
+            "hybrid_verifier_reason": "contract_pass:json_lock:json_valid|low_quality|no_exact_reference|keyword_coverage:2/2|rules_passed|task_specific:1/4|fallback_verifier:1/3|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:2/2",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.3333,
+            "task_specific_reason": "task_specific:1/4",
+            "external_verifier_score": 0.3333,
+            "external_verifier_reason": "fallback_verifier:1/3",
+            "contract": "json_lock",
+            "contract_pass": true,
+            "contract_reason": "json_valid",
+            "output_word_count": 10
+          },
+          "backend_usage": {
+            "call_count": 2,
+            "ok_calls": 2,
+            "error_calls": 0,
+            "prompt_tokens": 192,
+            "completion_tokens": 42,
+            "total_tokens": 234,
+            "total_latency_ms": 1637.549,
+            "mean_latency_ms": 818.774
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 573,
+            "completion_tokens": 178,
+            "total_tokens": 751,
+            "total_latency_ms": 3035.647,
+            "mean_latency_ms": 3035.647
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        }
+      ],
+      "branch_snapshot": {
+        "analytical": {
+          "weight": 1.05,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "analytical_symbolic_solver",
+            "analytical_causal_decomposer"
+          ],
+          "specialties": [
+            "math",
+            "code",
+            "general"
+          ]
+        },
+        "planner": {
+          "weight": 1.0,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "specialties": [
+            "planning",
+            "general",
+            "code"
+          ]
+        },
+        "retrieval": {
+          "weight": 1.0,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "retrieval_evidence_tracer",
+            "retrieval_source_triage"
+          ],
+          "specialties": [
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "critique": {
+          "weight": 0.9647,
+          "status": "active",
+          "avg_reward": 0.7229,
+          "trial_remaining": 0,
+          "history_len": 1,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "critique_failure_hunter",
+            "critique_adversarial_probe"
+          ],
+          "specialties": [
+            "code",
+            "planning",
+            "general"
+          ]
+        },
+        "verification": {
+          "weight": 1.1525,
+          "status": "active",
+          "avg_reward": 0.6406,
+          "trial_remaining": 0,
+          "history_len": 2,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "verification_constraint_checker",
+            "verification_consistency_auditor",
+            "json_lock",
+            "csv_lock",
+            "code_patch_lock",
+            "bullet_lock"
+          ],
+          "specialties": [
+            "math",
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "creative": {
+          "weight": 0.9105,
+          "status": "active",
+          "avg_reward": 0.6569,
+          "trial_remaining": 0,
+          "history_len": 1,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "creative_divergent_generator",
+            "creative_constraint_innovator"
+          ],
+          "specialties": [
+            "creative",
+            "planning",
+            "general"
+          ]
+        },
+        "analytical_symbolic_solver": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "analytical",
+          "children": [],
+          "specialties": [
+            "math",
+            "code"
+          ]
+        },
+        "analytical_causal_decomposer": {
+          "weight": 0.92,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "analytical",
+          "children": [],
+          "specialties": [
+            "planning",
+            "general",
+            "code"
+          ]
+        },
+        "planner_timeline_optimizer": {
+          "weight": 0.94,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "planner",
+          "children": [],
+          "specialties": [
+            "planning",
+            "general"
+          ]
+        },
+        "planner_risk_allocator": {
+          "weight": 0.93,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "planner",
+          "children": [],
+          "specialties": [
+            "planning",
+            "code",
+            "general"
+          ]
+        },
+        "retrieval_evidence_tracer": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "retrieval",
+          "children": [],
+          "specialties": [
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "retrieval_source_triage": {
+          "weight": 0.92,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "retrieval",
+          "children": [],
+          "specialties": [
+            "factual",
+            "general"
+          ]
+        },
+        "critique_failure_hunter": {
+          "weight": 0.9187,
+          "status": "active",
+          "avg_reward": 0.755,
+          "trial_remaining": 0,
+          "history_len": 1,
+          "depth": 2,
+          "parent": "critique",
+          "children": [],
+          "specialties": [
+            "code",
+            "planning",
+            "general"
+          ]
+        },
+        "critique_adversarial_probe": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "critique",
+          "children": [],
+          "specialties": [
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "verification_constraint_checker": {
+          "weight": 0.97,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "math",
+            "factual",
+            "code",
+            "general"
+          ]
+        },
+        "verification_consistency_auditor": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "general",
+            "planning",
+            "factual"
+          ]
+        },
+        "json_lock": {
+          "weight": 1.0084,
+          "status": "active",
+          "avg_reward": 0.83,
+          "trial_remaining": 0,
+          "history_len": 1,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "math",
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "csv_lock": {
+          "weight": 0.98,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "general",
+            "planning"
+          ]
+        },
+        "code_patch_lock": {
+          "weight": 0.99,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "code",
+            "general"
+          ]
+        },
+        "bullet_lock": {
+          "weight": 0.9767,
+          "status": "active",
+          "avg_reward": 0.6633,
+          "trial_remaining": 0,
+          "history_len": 1,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "general",
+            "planning",
+            "creative"
+          ]
+        },
+        "creative_divergent_generator": {
+          "weight": 0.9211,
+          "status": "active",
+          "avg_reward": 0.755,
+          "trial_remaining": 0,
+          "history_len": 1,
+          "depth": 2,
+          "parent": "creative",
+          "children": [],
+          "specialties": [
+            "creative",
+            "general"
+          ]
+        },
+        "creative_constraint_innovator": {
+          "weight": 0.91,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "creative",
+          "children": [],
+          "specialties": [
+            "creative",
+            "planning",
+            "code"
+          ]
+        }
+      },
+      "memory": {
+        "records": 4,
+        "avg_reward": 0.7508,
+        "task_distribution": {
+          "math": 2,
+          "planning": 2
+        }
+      },
+      "routing_histogram": {
+        "verification": 5,
+        "json_lock": 3,
+        "bullet_lock": 1,
+        "creative": 2,
+        "creative_divergent_generator": 1,
+        "critique": 1,
+        "critique_failure_hunter": 1,
+        "csv_lock": 1,
+        "creative_constraint_innovator": 1
+      },
+      "backend_usage_total": {
+        "call_count": 23,
+        "ok_calls": 23,
+        "error_calls": 0,
+        "prompt_tokens": 3894,
+        "completion_tokens": 4872,
+        "total_tokens": 8766,
+        "total_latency_ms": 87139.753,
+        "mean_latency_ms": 3788.685
+      },
+      "evaluator_runtime_usage_total": {
+        "call_count": 8,
+        "ok_calls": 8,
+        "error_calls": 0,
+        "prompt_tokens": 6576,
+        "completion_tokens": 1562,
+        "total_tokens": 8138,
+        "total_latency_ms": 27377.608,
+        "mean_latency_ms": 3422.201
+      },
+      "optimizer_runtime_usage_total": {
+        "call_count": 4,
+        "ok_calls": 4,
+        "error_calls": 0,
+        "prompt_tokens": 2660,
+        "completion_tokens": 855,
+        "total_tokens": 3515,
+        "total_latency_ms": 19538.322,
+        "mean_latency_ms": 4884.581
+      }
+    },
+    "frozen_forest": {
+      "train": [
+        {
+          "task_id": "train_math_linear_equation::round_1",
+          "split": "train",
+          "task_type": "math",
+          "aspect": "reasoning",
+          "text": "Solve 2x + 5 = 17. Show the algebra briefly and end with a confidence line.",
+          "selected_output": "Final answer:  \nGiven the equation 2x + 5 = 17, subtract 5 from both sides to get 2x = 12. Then divide both sides by 2 to find x = 6.  \n\nKey points:  \n- Subtract 5 from both sides  \n- Divide by 2  \n- Solution: x = 6  \n\nConfidence: I am confident this solution is correct.\ncomposer-fusion: {\n  \"equation\": \"2x + 5 = 17\",\n  \"steps\": [\n    \"Subtract 5 from both sides: 2x = 17 - 5\",\n    \"Simplify: 2x = 12\",\n    \"Divide both sides by 2: x = 12 / 2\",\n    \"Simplify: x = 6\"\n  ],\n  \"verification\": \"Substitute x = 6 into the original equation: 2(6) + 5 = 12 + 5 = 17, which is true.\",\n  \"confidence\": \"The solution x = 6 satisfies the equation exactly. I am confident this is the correct solution.\"\n}\nkey-points=x = 6; subtract 5; divide by 2; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "json_lock",
+          "activated_branches": [
+            "verification",
+            "json_lock"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "json_lock"
+            ]
+          ],
+          "internal_reward_score": 0.83,
+          "internal_confidence": 0.5967,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.83,
+            "hybrid_verifier_reason": "high_quality|exact_match|keyword_coverage:4/4|rules_passed|task_specific:2/5|fallback_verifier:3/3|no_user_preference_profile",
+            "exact_score": 1.0,
+            "exact_reason": "exact_match",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "fallback_verifier:3/3",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 146
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 549,
+            "completion_tokens": 349,
+            "total_tokens": 898,
+            "total_latency_ms": 7808.506,
+            "mean_latency_ms": 2602.835
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 948,
+            "completion_tokens": 189,
+            "total_tokens": 1137,
+            "total_latency_ms": 3865.092,
+            "mean_latency_ms": 3865.092
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "train_math_probability::round_1",
+          "split": "train",
+          "task_type": "math",
+          "aspect": "reasoning",
+          "text": "A bag has 3 red balls and 7 blue balls. What is the probability of drawing a red ball? Give the simplified answer and a confidence line.",
+          "selected_output": "- The probability of drawing a red ball is \\(\\frac{3}{10}\\).\n- This is calculated by dividing the number of red balls (3) by the total number of balls (3 + 7 = 10).\n\nConfidence: This calculation is straightforward and based on counting discrete items, so the probability \\(\\frac{3}{10}\\) is reliable and accurate.\ncomposer-fusion: - The probability of drawing a red ball is \\(\\frac{3}{10}\\).\n- Confidence: This calculation is straightforward and based on counting discrete items, so I am highly confident (above 99%) that the answer is correct.\nkey-points=3/10; probability; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "bullet_lock",
+          "activated_branches": [
+            "verification",
+            "bullet_lock"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "bullet_lock"
+            ]
+          ],
+          "internal_reward_score": 0.6633,
+          "internal_confidence": 0.6667,
+          "failure_reason": "medium_quality|exact_match|keyword_coverage:3/3|rules_passed|task_specific:1/5|fallback_verifier:2/3|no_user_preference_profile",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.6633,
+            "hybrid_verifier_reason": "medium_quality|exact_match|keyword_coverage:3/3|rules_passed|task_specific:1/5|fallback_verifier:2/3|no_user_preference_profile",
+            "exact_score": 1.0,
+            "exact_reason": "exact_match",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:3/3",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.3333,
+            "task_specific_reason": "task_specific:1/5",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "fallback_verifier:2/3",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 92
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 529,
+            "completion_tokens": 261,
+            "total_tokens": 790,
+            "total_latency_ms": 5073.526,
+            "mean_latency_ms": 1691.175
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 839,
+            "completion_tokens": 215,
+            "total_tokens": 1054,
+            "total_latency_ms": 3551.901,
+            "mean_latency_ms": 3551.901
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "train_planning_incident_response::round_1",
+          "split": "train",
+          "task_type": "planning",
+          "aspect": "planning",
+          "text": "Create a 48-hour incident response plan for a payment API outage. Include phases, owners, rollback, risks, and confidence.",
+          "selected_output": "Final Answer:\n\n**48-Hour Incident Response Plan for Payment API Outage**\n\n**Phase 1: Detection & Initial Assessment (0-4 hours)**  \n- Owner: Incident Response Lead & Monitoring Team  \n- Actions: Confirm outage, assess scope and impact, notify stakeholders  \n- Rollback: Not applicable at this stage  \n- Risks: Misdiagnosis of issue, delayed detection  \n- Confidence: High, due to automated monitoring and alerting systems  \n\n**Phase 2: Containment & Mitigation (4-12 hours)**  \n- Owner: Engineering Team & API Product Manager  \n- Actions: Implement temporary fixes or workarounds to restore partial service, isolate faulty components  \n- Rollback: Revert recent deployments or configuration changes if identified as cause  \n- Risks: Temporary fixes may cause degraded performance or data inconsistencies  \n- Confidence: Medium-High, based on prior incident experience and testing  \n\n**Phase 3: Root Cause Analysis & Full Recovery (12-36 hours)**  \n- Owner: Engineering Team & DevOps  \n- Actions: Deep dive to identify root cause, develop and test permanent fix, deploy fix to production  \n- Rollback: Rollback to last known stable version if fix fails or causes issues  \n- Risks: Fix may introduce new bugs or downtime, incomplete root cause identification  \n- Confidence: Medium, dependent on complexity of issue and testing coverage  \n\n**Phase 4: Post-Incident Review & Prevention (36-48 hours)**  \n- Owner:\ncomposer-fusion: Here are several diverse and novel 48-hour incident response plan candidates for a payment API outage, each with phases, owners, rollback strategies, risks, and confidence levels. The plans build on the parent context but introduce variations to optimize response, reduce downtime, or improve team coordination.\n\n---\n\n### Candidate 1: Parallel Investigation & Patch Development (Novelty: Overlapping phases to reduce total downtime)\n\n**Phases & Timeline:**\n\n- **0-6 hours: Detection & Initial Triage**  \n  - Monitoring Team detects outage, alerts Incident Commander.  \n  - DevOps Team initiates containment (e.g., circuit breakers, rate limiting).\n\n- **6-18 hours: Parallel Analysis & Patch Prototyping**  \n  - Development Team investigates logs, deployments, infrastructure.  \n  - QA Team begins prototyping potential fixes based on preliminary findings.\n\n- **18-30 hours: Fix Development & Staged Testing**  \n  - Development finalizes patch.  \n  - QA tests patch in staging with synthetic transactions.\n\n- **30-42 hours: Canary Deployment & Monitoring**  \n  - DevOps deploys patch to a subset of API instances.  \n  - Support Team monitors transaction success and system health.\n\n- **42-48 hours: Full Deployment or Rollback**  \n  - If canary successful, deploy to all instances.  \n  - If issues arise, rollback immediately to last stable version.\n\n**Owners:**\n\n- Incident Commander: Engineering Manager  \n- Detection &\nkey-points=phase; owner; rollback; risk; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "creative_divergent_generator",
+          "activated_branches": [
+            "creative",
+            "creative_divergent_generator"
+          ],
+          "activated_paths": [
+            [
+              "creative",
+              "creative_divergent_generator"
+            ]
+          ],
+          "internal_reward_score": 0.805,
+          "internal_confidence": 0.6667,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.805,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:5/5|rules_passed|task_specific:3/5|verifier|must_include:3/3|length:378/80|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:5/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 1.0,
+            "task_specific_reason": "task_specific:3/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:3/3|length:378/80|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 407
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 533,
+            "completion_tokens": 900,
+            "total_tokens": 1433,
+            "total_latency_ms": 18225.824,
+            "mean_latency_ms": 6075.275
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 881,
+            "completion_tokens": 192,
+            "total_tokens": 1073,
+            "total_latency_ms": 3422.794,
+            "mean_latency_ms": 3422.794
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "train_planning_hiring_plan::round_1",
+          "split": "train",
+          "task_type": "planning",
+          "aspect": "planning",
+          "text": "Plan a 30-day onboarding schedule for a new senior backend engineer. Include milestones, dependencies, risks, and confidence.",
+          "selected_output": "Final Answer:\n\n**30-Day Onboarding Schedule for New Senior Backend Engineer**\n\n| Day | Task                                   | Milestones                                  | Dependencies                         | Risks                                    | Confidence  |\n|-----|--------------------------------------|---------------------------------------------|------------------------------------|------------------------------------------|-------------|\n| 1   | Orientation and Setup                 | Complete HR formalities and access provisioning | Access provisioning by IT          | Delays in access provisioning            | High        |\n| 2-3 | Environment Setup and Tool Familiarization | Development environment ready and tools configured | Access to repositories and tools   | Configuration issues, missing permissions | High        |\n| 4-6 | Codebase Overview and Documentation Review | Understand core backend architecture        | Access to codebase and documentation | Complexity of codebase                     | Medium      |\n| 7-10| Pair Programming and Shadowing       | Complete initial feature implementation with mentor | Availability of mentor             | Mentor availability, knowledge gaps       | Medium      |\n| 11-15| Independent Feature Development      | Deliver first independent feature           | Understanding of codebase and tools | Integration issues, unclear requirements | Medium      |\n| 16-18| System Design and Architecture Deep Dive | Present system design proposal               | Access to architecture docs, team feedback | Misalignment with existing architecture  | Medium      |\n| 19-22| Performance Optimization and Testing | Implement optimizations and tests            | Test environment availability      | Test environment instability              | Medium      |\n| 23-26| Cross-team\ncomposer-fusion: Day,Task,Milestones,Dependencies,Risks,Confidence  \n1,Orientation and Setup,Complete HR formalities and access provisioning,Access provisioning systems,Delays in access provisioning,95%  \n2,Meetings with Team Leads and Peers,Introduction to team and project overview,Scheduling availability,Scheduling conflicts,95%  \n3,Access to Code Repositories and Tools,Gain access to all necessary tools and repositories,IT support and access provisioning,Delays in access provisioning,95%  \n4,Review Documentation,Read existing documentation on backend services and processes,Availability and completeness of documentation,Incomplete or outdated documentation,95%  \n5,Setup Development Environment,Configure local environment for development,Access to tools and documentation,Delays in access provisioning,95%  \n6,Introduction to Backend Architecture,Understand system architecture and critical services,Documentation and team availability,Incomplete or outdated documentation,95%  \n7,Review Critical Backend Services and APIs,Deep dive into main backend components,Access to code repositories,Complexity of codebase may slow progress,95%  \n8,Understand Coding Standards,Learn coding guidelines and best practices,Documentation on coding standards,Incomplete or outdated documentation,95%  \n9,CI/CD Pipeline Overview,Understand build, test, and deployment processes,Access to CI/CD tools,Complexity of processes,95%  \n10,Shadow Team Members,Observe ongoing tasks and code reviews,Availability of mentors,Scheduling conflicts,95%  \n11,Shadow Team\nkey-points=milestone; dependency; risk; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "csv_lock",
+          "activated_branches": [
+            "verification",
+            "csv_lock"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "csv_lock"
+            ]
+          ],
+          "internal_reward_score": 0.755,
+          "internal_confidence": 0.5033,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.755,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:2/5|verifier|must_include:3/3|length:384/80|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:3/3|length:384/80|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 365
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 511,
+            "completion_tokens": 900,
+            "total_tokens": 1411,
+            "total_latency_ms": 13085.078,
+            "mean_latency_ms": 4361.693
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 747,
+            "completion_tokens": 206,
+            "total_tokens": 953,
+            "total_latency_ms": 4497.588,
+            "mean_latency_ms": 4497.588
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        }
+      ],
+      "holdout": [
+        {
+          "task_id": "holdout_planning_recovery",
+          "split": "holdout",
+          "task_type": "planning",
+          "aspect": "planning",
+          "text": "Create a next-7-days recovery plan after a failed production deploy. Include owners, rollback, communication, risks, and confidence.",
+          "selected_output": "Next 7-Days Recovery Plan After Failed Production Deploy\n\nDay 0 (Day of Failure): Immediate Response & Rollback  \n- Actions: Trigger rollback to the previous stable production version immediately to restore service.  \n- Owner: Release Manager and DevOps Lead  \n- Communication: Notify all stakeholders (engineering, product, support, and management) about the failure and rollback status via email and chat channels.  \n- Risks: Potential data inconsistency or partial rollback issues; monitor system health closely.  \n- Confidence: High confidence in rollback restoring stability quickly.\n\nDay 1: Assessment and Root Cause Analysis  \n- Actions: Conduct a thorough investigation to identify the root cause of the failure. Collect logs, error reports, and user feedback.  \n- Owner: Engineering Team Lead and QA Lead  \n- Communication: Share initial findings with stakeholders and set expectations for next steps.  \n- Risks: Delays in identifying root cause may prolong downtime or impact planning.  \n- Confidence: Moderate confidence in identifying root cause within 24 hours.\n\nDays 2-3: Fix Development and Testing  \n- Actions: Develop fixes addressing the root cause; perform rigorous testing in staging environments.  \n- Owner: Development Team and QA Team  \n- Communication: Provide daily progress updates to stakeholders.  \n- Risks: New bugs introduced during fixes; testing may reveal additional issues.  \n- Confidence: Moderate to high confidence in fix effectiveness after testing.\n\nDays 4-5: Pre-Production Validation and User Acceptance Testing (UAT\ncomposer-fusion: Next 7-Days Recovery Plan After Failed Production Deploy\n\nDay 0 (Day of Failure): Immediate Response & Rollback  \n- Actions:  \n  - Trigger rollback to last stable release.  \n  - Notify all stakeholders (Engineering, QA, Ops, Product, Customer Support).  \n  - Assess immediate impact on customers and systems.  \n- Owners:  \n  - Release Manager: Execute rollback.  \n  - Engineering Lead: Oversee rollback and initial impact assessment.  \n  - Communications Lead: Draft and send internal and external communications.  \n- Dependencies: Rollback procedures and access to stable release artifacts.  \n- Risks: Rollback failure or partial rollback causing inconsistent state.  \n- Confidence: High, rollback procedures are well-documented and tested.\n\nDay 1: Impact Assessment & Stabilization  \n- Actions:  \n  - Confirm system stability post-rollback.  \n  - Gather detailed impact data (customer reports, system metrics).  \n  - Communicate status update to stakeholders and customers.  \n- Owners:  \n  - Operations Lead: Validate system health.  \n  - Customer Support Lead: Collect customer feedback.  \n  - Communications Lead: Update communications.  \n- Dependencies: Successful rollback completion.  \n- Risks: Undetected residual issues; incomplete impact data.  \n- Confidence: High.\n\nDay 2: Root Cause Analysis (RCA) Initiation  \n- Actions:  \n  - Assemble cross-functional RCA team (Dev, QA, Ops).  \n  - Collect logs,\nkey-points=owner; rollback; communication; risk; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "planner_timeline_optimizer",
+          "activated_branches": [
+            "planner",
+            "planner_timeline_optimizer"
+          ],
+          "activated_paths": [
+            [
+              "planner",
+              "planner_timeline_optimizer"
+            ]
+          ],
+          "internal_reward_score": 0.755,
+          "internal_confidence": 0.6167,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.755,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:5/5|rules_passed|task_specific:2/5|verifier|must_include:3/3|length:385/85|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:5/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:3/3|length:385/85|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 414
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 542,
+            "completion_tokens": 900,
+            "total_tokens": 1442,
+            "total_latency_ms": 15907.388,
+            "mean_latency_ms": 5302.463
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 837,
+            "completion_tokens": 191,
+            "total_tokens": 1028,
+            "total_latency_ms": 4626.768,
+            "mean_latency_ms": 4626.768
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "holdout_factual_overfitting",
+          "split": "holdout",
+          "task_type": "factual",
+          "aspect": "factual",
+          "text": "Explain overfitting to a startup founder. Include one warning sign, one mitigation, and confidence.",
+          "selected_output": "Final Answer:\nOverfitting occurs when your AI model memorizes the training data\u2019s noise and quirks instead of learning the true underlying patterns\u2014like a student who memorizes answers without understanding concepts. A key warning sign is that your model performs exceptionally well on training data but poorly on new, unseen data. To mitigate this, you can use techniques like cross-validation or simplify the model to ensure it generalizes better. With these strategies, you can confidently build models that perform reliably in real-world scenarios.\n\nKey Points:\n- Overfitting means the model learns noise, not true patterns.\n- Warning sign: great training accuracy but poor performance on new data.\n- Mitigation: use cross-validation or simplify the model.\n- Confidence: applying these methods leads to more reliable, generalizable models.\n\nConfidence Level: High \u2013 these explanations and strategies are well-established best practices in machine learning.\ncomposer-fusion: Overfitting is like your AI memorizing the training data instead of truly learning the underlying patterns\u2014imagine a student who memorizes answers for a test but can\u2019t handle new questions. For your startup, this means your product might perform flawlessly during testing but fail to deliver when faced with real-world customer data. One clear warning sign is a large gap between training accuracy (very high) and testing accuracy (much lower). To mitigate this, you can simplify your model\u2014reducing complexity so it focuses on the most important signals\u2014or gather more diverse, representative data to help the model generalize better. When you manage overfitting effectively, you can confidently trust your model to make reliable predictions beyond just the examples it has seen, ensuring your product works well in practice, not just in theory.\nkey-points=overfitting; warning sign; mitigation; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "creative_constraint_innovator",
+          "activated_branches": [
+            "creative",
+            "creative_constraint_innovator"
+          ],
+          "activated_paths": [
+            [
+              "creative",
+              "creative_constraint_innovator"
+            ]
+          ],
+          "internal_reward_score": 0.655,
+          "internal_confidence": 0.8633,
+          "failure_reason": "medium_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:0/5|verifier|must_include:2/2|length:290/65|confidence_range:ok|no_user_preference_profile",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.655,
+            "hybrid_verifier_reason": "medium_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:0/5|verifier|must_include:2/2|length:290/65|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.0,
+            "task_specific_reason": "task_specific:0/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:2/2|length:290/65|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 278
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 499,
+            "completion_tokens": 637,
+            "total_tokens": 1136,
+            "total_latency_ms": 18950.594,
+            "mean_latency_ms": 6316.865
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 825,
+            "completion_tokens": 211,
+            "total_tokens": 1036,
+            "total_latency_ms": 3032.095,
+            "mean_latency_ms": 3032.095
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "holdout_code_pr_review",
+          "split": "holdout",
+          "task_type": "code",
+          "aspect": "code",
+          "text": "Give a pull-request review checklist for adding a background job queue to an API service. Include failure handling, tests, rollout risk, and confidence.",
+          "selected_output": "# Pull-Request Review Checklist for Adding a Background Job Queue to an API Service\n\n## 1. Functional Correctness\n- [ ] **Job Queue Integration:** Verify the background job queue is correctly integrated with the API service.\n- [ ] **Job Processing:** Confirm jobs are enqueued, processed, and completed as expected.\n- [ ] **Failure Handling:** Ensure retry policies are implemented (e.g., exponential backoff, max retries).\n- [ ] **Error Logging:** Check that failures and retries are properly logged for monitoring and debugging.\n- [ ] **Dead Letter Queue:** Validate handling of permanently failed jobs (e.g., moved to a dead letter queue).\n\n## 2. Testing\n- [ ] **Unit Tests:** Verify coverage for job enqueueing, processing logic, and failure scenarios.\n- [ ] **Integration Tests:** Confirm end-to-end tests cover job lifecycle within the API service.\n- [ ] **Failure Simulation:** Include tests that simulate job failures and retries to validate robustness.\n- [ ] **Load Testing:** Assess job queue behavior under expected and peak loads.\n\n## 3. Rollout Risk\n- [ ] **Backward Compatibility:** Ensure changes do not break existing API functionality.\n- [ ] **Resource Impact:** Evaluate the impact on system resources (CPU, memory, database connections).\n- [ ] **Monitoring:** Confirm monitoring and alerting are in place for job queue health and failures.\n- [ ] **Feature Flags:** Consider using feature flags or gradual rollout to mitigate risk\ncomposer-fusion: - [ ] **Retry Policies:** Confirm retry policies are configured appropriately (e.g., exponential backoff, max retries).  \n- [ ] **Error Logging:** Confirm that job failures are logged with sufficient detail for debugging.  \n- [ ] **Dead Letter Queue / Failure Handling:** Verify if failed jobs are moved to a dead letter queue or handled gracefully to avoid data loss.  \n- [ ] **Idempotency:** Ensure that job processing is idempotent or has mechanisms to prevent duplicate side effects.  \n- [ ] **Timeouts:** Check that jobs have reasonable timeouts to avoid hanging workers.  \n\n## 3. Tests  \n- [ ] **Unit Tests:** Verify presence of unit tests for job enqueueing logic and job processing functions.  \n- [ ] **Integration Tests:** Confirm integration tests cover the end-to-end flow from API request to job completion.  \n- [ ] **Failure Scenarios:** Ensure tests cover failure scenarios including retries, dead letter queue handling, and timeouts.  \n\n## 4. Rollout Risk  \n- [ ] **Backward Compatibility:** Confirm that adding the job queue does not break existing API functionality.  \n- [ ] **Resource Usage:** Assess impact on system resources (CPU, memory, DB connections) and ensure capacity planning.  \n- [ ] **Monitoring:** Verify monitoring and alerting are in place for job queue health and failure rates.  \n- [ ] **Feature Flags:** Check if rollout uses feature flags or canary deployments to mitigate risk.\nkey-points=failure handling; test; risk; confidence\nconstraints=tracked\nconfidence=0.72",
+          "selected_branch": "code_patch_lock",
+          "activated_branches": [
+            "verification",
+            "code_patch_lock"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "code_patch_lock"
+            ]
+          ],
+          "internal_reward_score": 0.755,
+          "internal_confidence": 0.7494,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.755,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:2/5|verifier|must_include:3/3|length:390/70|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:3/3|length:390/70|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 458
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 550,
+            "completion_tokens": 900,
+            "total_tokens": 1450,
+            "total_latency_ms": 17386.461,
+            "mean_latency_ms": 5795.487
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 823,
+            "completion_tokens": 199,
+            "total_tokens": 1022,
+            "total_latency_ms": 3938.492,
+            "mean_latency_ms": 3938.492
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "holdout_json_contract",
+          "split": "holdout",
+          "task_type": "general",
+          "aspect": "contract",
+          "text": "Respond ONLY as minified JSON with keys answer and confidence. The answer should summarize whether a rollout is safe today.",
+          "selected_output": "{\"answer\":\"Insufficient information to determine if a rollout is safe today.\",\"confidence\":0.0}",
+          "selected_branch": "json_lock",
+          "activated_branches": [
+            "verification",
+            "json_lock"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "json_lock"
+            ]
+          ],
+          "internal_reward_score": 0.681,
+          "internal_confidence": 0.5,
+          "failure_reason": "contract_pass:json_lock:json_valid|low_quality|no_exact_reference|keyword_coverage:2/2|rules_passed|task_specific:1/4|fallback_verifier:1/3|no_user_preference_profile",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.681,
+            "hybrid_verifier_reason": "contract_pass:json_lock:json_valid|low_quality|no_exact_reference|keyword_coverage:2/2|rules_passed|task_specific:1/4|fallback_verifier:1/3|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:2/2",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.3333,
+            "task_specific_reason": "task_specific:1/4",
+            "external_verifier_score": 0.3333,
+            "external_verifier_reason": "fallback_verifier:1/3",
+            "contract": "json_lock",
+            "contract_pass": true,
+            "contract_reason": "json_valid",
+            "output_word_count": 10
+          },
+          "backend_usage": {
+            "call_count": 2,
+            "ok_calls": 2,
+            "error_calls": 0,
+            "prompt_tokens": 192,
+            "completion_tokens": 42,
+            "total_tokens": 234,
+            "total_latency_ms": 1963.221,
+            "mean_latency_ms": 981.611
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 573,
+            "completion_tokens": 239,
+            "total_tokens": 812,
+            "total_latency_ms": 3954.557,
+            "mean_latency_ms": 3954.557
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        }
+      ],
+      "branch_snapshot": {
+        "analytical": {
+          "weight": 1.05,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "analytical_symbolic_solver",
+            "analytical_causal_decomposer"
+          ],
+          "specialties": [
+            "math",
+            "code",
+            "general"
+          ]
+        },
+        "planner": {
+          "weight": 1.0,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "specialties": [
+            "planning",
+            "general",
+            "code"
+          ]
+        },
+        "retrieval": {
+          "weight": 1.0,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "retrieval_evidence_tracer",
+            "retrieval_source_triage"
+          ],
+          "specialties": [
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "critique": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "critique_failure_hunter",
+            "critique_adversarial_probe"
+          ],
+          "specialties": [
+            "code",
+            "planning",
+            "general"
+          ]
+        },
+        "verification": {
+          "weight": 1.15,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "verification_constraint_checker",
+            "verification_consistency_auditor",
+            "json_lock",
+            "csv_lock",
+            "code_patch_lock",
+            "bullet_lock"
+          ],
+          "specialties": [
+            "math",
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "creative": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "creative_divergent_generator",
+            "creative_constraint_innovator"
+          ],
+          "specialties": [
+            "creative",
+            "planning",
+            "general"
+          ]
+        },
+        "analytical_symbolic_solver": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "analytical",
+          "children": [],
+          "specialties": [
+            "math",
+            "code"
+          ]
+        },
+        "analytical_causal_decomposer": {
+          "weight": 0.92,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "analytical",
+          "children": [],
+          "specialties": [
+            "planning",
+            "general",
+            "code"
+          ]
+        },
+        "planner_timeline_optimizer": {
+          "weight": 0.94,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "planner",
+          "children": [],
+          "specialties": [
+            "planning",
+            "general"
+          ]
+        },
+        "planner_risk_allocator": {
+          "weight": 0.93,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "planner",
+          "children": [],
+          "specialties": [
+            "planning",
+            "code",
+            "general"
+          ]
+        },
+        "retrieval_evidence_tracer": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "retrieval",
+          "children": [],
+          "specialties": [
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "retrieval_source_triage": {
+          "weight": 0.92,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "retrieval",
+          "children": [],
+          "specialties": [
+            "factual",
+            "general"
+          ]
+        },
+        "critique_failure_hunter": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "critique",
+          "children": [],
+          "specialties": [
+            "code",
+            "planning",
+            "general"
+          ]
+        },
+        "critique_adversarial_probe": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "critique",
+          "children": [],
+          "specialties": [
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "verification_constraint_checker": {
+          "weight": 0.97,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "math",
+            "factual",
+            "code",
+            "general"
+          ]
+        },
+        "verification_consistency_auditor": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "general",
+            "planning",
+            "factual"
+          ]
+        },
+        "json_lock": {
+          "weight": 0.98,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "math",
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "csv_lock": {
+          "weight": 0.98,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "general",
+            "planning"
+          ]
+        },
+        "code_patch_lock": {
+          "weight": 0.99,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "code",
+            "general"
+          ]
+        },
+        "bullet_lock": {
+          "weight": 0.97,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "general",
+            "planning",
+            "creative"
+          ]
+        },
+        "creative_divergent_generator": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "creative",
+          "children": [],
+          "specialties": [
+            "creative",
+            "general"
+          ]
+        },
+        "creative_constraint_innovator": {
+          "weight": 0.91,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "creative",
+          "children": [],
+          "specialties": [
+            "creative",
+            "planning",
+            "code"
+          ]
+        }
+      },
+      "memory": {
+        "records": 0,
+        "avg_reward": 0.0
+      },
+      "routing_histogram": {
+        "verification": 5,
+        "json_lock": 2,
+        "bullet_lock": 1,
+        "creative": 2,
+        "creative_divergent_generator": 1,
+        "csv_lock": 1,
+        "planner": 1,
+        "planner_timeline_optimizer": 1,
+        "creative_constraint_innovator": 1,
+        "code_patch_lock": 1
+      },
+      "backend_usage_total": {
+        "call_count": 23,
+        "ok_calls": 23,
+        "error_calls": 0,
+        "prompt_tokens": 3905,
+        "completion_tokens": 4889,
+        "total_tokens": 8794,
+        "total_latency_ms": 98400.598,
+        "mean_latency_ms": 4278.287
+      },
+      "evaluator_runtime_usage_total": {
+        "call_count": 8,
+        "ok_calls": 8,
+        "error_calls": 0,
+        "prompt_tokens": 6473,
+        "completion_tokens": 1642,
+        "total_tokens": 8115,
+        "total_latency_ms": 30889.287,
+        "mean_latency_ms": 3861.161
+      },
+      "optimizer_runtime_usage_total": {
+        "call_count": 0,
+        "ok_calls": 0,
+        "error_calls": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "total_latency_ms": 0.0,
+        "mean_latency_ms": 0.0
+      }
+    },
+    "direct_model": {
+      "train": [
+        {
+          "task_id": "train_math_linear_equation::round_1",
+          "split": "train",
+          "task_type": "math",
+          "aspect": "reasoning",
+          "text": "Solve 2x + 5 = 17. Show the algebra briefly and end with a confidence line.",
+          "selected_output": "Starting with the equation:  \n2x + 5 = 17  \n\nSubtract 5 from both sides:  \n2x = 17 - 5  \n2x = 12  \n\nDivide both sides by 2:  \nx = 12 / 2  \nx = 6  \n\nI am confident that the solution is x = 6.",
+          "selected_branch": "direct_model",
+          "activated_branches": [
+            "direct_model"
+          ],
+          "activated_paths": [
+            [
+              "direct_model"
+            ]
+          ],
+          "internal_reward_score": null,
+          "internal_confidence": null,
+          "failure_reason": "",
+          "optimizer": {},
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.4167,
+            "hybrid_verifier_reason": "low_quality|exact_match|keyword_coverage:2/4|rule_miss:confidence|task_specific:1/5|fallback_verifier:1/3|no_user_preference_profile",
+            "exact_score": 1.0,
+            "exact_reason": "exact_match",
+            "keyword_score": 0.5,
+            "keyword_reason": "keyword_coverage:2/4",
+            "rule_score": 0.0,
+            "rule_reason": "rule_miss:confidence",
+            "task_specific_score": 0.3333,
+            "task_specific_reason": "task_specific:1/5",
+            "external_verifier_score": 0.3333,
+            "external_verifier_reason": "fallback_verifier:1/3",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 45
+          },
+          "backend_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 93,
+            "completion_tokens": 71,
+            "total_tokens": 164,
+            "total_latency_ms": 1690.292,
+            "mean_latency_ms": 1690.292
+          },
+          "model_meta": {
+            "provider": "openai_compatible",
+            "model": "gpt-4.1-mini",
+            "branch": "direct_model",
+            "latency_ms": 1690.292,
+            "prompt_tokens": 93,
+            "completion_tokens": 71,
+            "total_tokens": 164,
+            "response_id": "chatcmpl-DIxqhGR0MnxFa1ko2HA2Md8r3sVOx"
+          }
+        },
+        {
+          "task_id": "train_math_probability::round_1",
+          "split": "train",
+          "task_type": "math",
+          "aspect": "reasoning",
+          "text": "A bag has 3 red balls and 7 blue balls. What is the probability of drawing a red ball? Give the simplified answer and a confidence line.",
+          "selected_output": "The total number of balls is 3 red + 7 blue = 10 balls.\n\nThe probability of drawing a red ball = Number of red balls / Total number of balls = 3/10.\n\nSimplified answer: \\(\\frac{3}{10}\\).\n\nConfidence: I am confident this is correct.",
+          "selected_branch": "direct_model",
+          "activated_branches": [
+            "direct_model"
+          ],
+          "activated_paths": [
+            [
+              "direct_model"
+            ]
+          ],
+          "internal_reward_score": null,
+          "internal_confidence": null,
+          "failure_reason": "",
+          "optimizer": {},
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.4967,
+            "hybrid_verifier_reason": "low_quality|exact_match|keyword_coverage:3/3|rules_passed|task_specific:0/5|fallback_verifier:1/3|no_user_preference_profile",
+            "exact_score": 1.0,
+            "exact_reason": "exact_match",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:3/3",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.0,
+            "task_specific_reason": "task_specific:0/5",
+            "external_verifier_score": 0.3333,
+            "external_verifier_reason": "fallback_verifier:1/3",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 43
+          },
+          "backend_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 103,
+            "completion_tokens": 63,
+            "total_tokens": 166,
+            "total_latency_ms": 1798.203,
+            "mean_latency_ms": 1798.203
+          },
+          "model_meta": {
+            "provider": "openai_compatible",
+            "model": "gpt-4.1-mini",
+            "branch": "direct_model",
+            "latency_ms": 1798.203,
+            "prompt_tokens": 103,
+            "completion_tokens": 63,
+            "total_tokens": 166,
+            "response_id": "chatcmpl-DIxr7PIufSFrGLA9rfHu1Qmt9I8nr"
+          }
+        },
+        {
+          "task_id": "train_planning_incident_response::round_1",
+          "split": "train",
+          "task_type": "planning",
+          "aspect": "planning",
+          "text": "Create a 48-hour incident response plan for a payment API outage. Include phases, owners, rollback, risks, and confidence.",
+          "selected_output": "**48-Hour Incident Response Plan for Payment API Outage**\n\n---\n\n### Phase 1: Detection & Initial Response (0-2 hours)  \n- **Objective:** Identify outage, assess impact, and initiate communication.  \n- **Owners:**  \n  - Incident Manager (IM)  \n  - On-call Engineering Lead  \n  - Customer Support Lead  \n- **Actions:**  \n  - Confirm outage via monitoring tools and logs.  \n  - Assess scope and impact on customers and transactions.  \n  - Notify internal stakeholders and activate incident response team.  \n  - Communicate initial status to customers via status page and support channels.  \n- **Rollback:** Not applicable at this stage.  \n- **Risks:** Misidentification of issue scope, delayed communication.  \n- **Confidence:** High in detection tools; moderate in initial impact assessment.\n\n---\n\n### Phase 2: Diagnosis & Mitigation (2-8 hours)  \n- **Objective:** Identify root cause and implement temporary mitigation to restore partial/full service.  \n- **Owners:**  \n  - Engineering Lead  \n  - DevOps Team  \n  - Security Team (if applicable)  \n- **Actions:**  \n  - Analyze logs, recent deployments, and infrastructure changes.  \n  - Identify if issue is code, infrastructure, or external dependency related.  \n  - Apply hotfixes, configuration changes, or failover to backup systems.  \n  - Monitor system behavior post-mitigation.  \n  - Update stakeholders and customers with progress",
+          "selected_branch": "direct_model",
+          "activated_branches": [
+            "direct_model"
+          ],
+          "activated_paths": [
+            [
+              "direct_model"
+            ]
+          ],
+          "internal_reward_score": null,
+          "internal_confidence": null,
+          "failure_reason": "",
+          "optimizer": {},
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.6383,
+            "hybrid_verifier_reason": "medium_quality|no_exact_reference|keyword_coverage:5/5|rules_passed|task_specific:2/5|verifier|must_include:3/3|length:161/80|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:5/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "verifier|must_include:3/3|length:161/80|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 185
+          },
+          "backend_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 97,
+            "completion_tokens": 300,
+            "total_tokens": 397,
+            "total_latency_ms": 4828.848,
+            "mean_latency_ms": 4828.848
+          },
+          "model_meta": {
+            "provider": "openai_compatible",
+            "model": "gpt-4.1-mini",
+            "branch": "direct_model",
+            "latency_ms": 4828.848,
+            "prompt_tokens": 97,
+            "completion_tokens": 300,
+            "total_tokens": 397,
+            "response_id": "chatcmpl-DIxrruaK3IKx2bZXMdeiNcHTdpYKa"
+          }
+        },
+        {
+          "task_id": "train_planning_hiring_plan::round_1",
+          "split": "train",
+          "task_type": "planning",
+          "aspect": "planning",
+          "text": "Plan a 30-day onboarding schedule for a new senior backend engineer. Include milestones, dependencies, risks, and confidence.",
+          "selected_output": "**30-Day Onboarding Schedule for Senior Backend Engineer**\n\n---\n\n### Week 1: Orientation & Environment Setup  \n**Milestones:**  \n- Complete HR and team introductions  \n- Access all necessary tools, repositories, and documentation  \n- Setup local development environment and verify with a simple build/test run  \n- Overview of company architecture and backend systems  \n\n**Dependencies:**  \n- HR and IT provisioning completed  \n- Access to code repositories and internal documentation  \n\n**Risks:**  \n- Delays in access provisioning  \n- Environment setup issues due to hardware/software incompatibilities  \n\n**Confidence:** High\n\n---\n\n### Week 2: Deep Dive into Codebase & Processes  \n**Milestones:**  \n- Review core backend services and APIs  \n- Understand deployment pipelines and CI/CD processes  \n- Shadow team members on current sprint tasks  \n- Complete a small bug fix or feature under mentorship  \n\n**Dependencies:**  \n- Access to staging environment  \n- Availability of mentor/team for shadowing and code reviews  \n\n**Risks:**  \n- Complexity of legacy code slowing understanding  \n- Insufficient documentation for some services  \n\n**Confidence:** High\n\n---\n\n### Week 3: Independent Contribution & Integration  \n**Milestones:**  \n- Take ownership of a medium-sized feature or improvement  \n- Participate in code reviews and team meetings actively  \n- Write or update unit and integration tests  \n- Deploy changes to staging environment and monitor results  \n\n**Dependencies:**  \n- Clear feature specifications  \n- Support from DevOps for deployment  \n\n**Risks:**  \n- Feature",
+          "selected_branch": "direct_model",
+          "activated_branches": [
+            "direct_model"
+          ],
+          "activated_paths": [
+            [
+              "direct_model"
+            ]
+          ],
+          "internal_reward_score": null,
+          "internal_confidence": null,
+          "failure_reason": "",
+          "optimizer": {},
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.7083,
+            "hybrid_verifier_reason": "medium_quality|no_exact_reference|keyword_coverage:3/4|rules_passed|task_specific:2/5|verifier|must_include:3/3|length:187/80|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 0.75,
+            "keyword_reason": "keyword_coverage:3/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "verifier|must_include:3/3|length:187/80|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 213
+          },
+          "backend_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 95,
+            "completion_tokens": 300,
+            "total_tokens": 395,
+            "total_latency_ms": 5928.809,
+            "mean_latency_ms": 5928.809
+          },
+          "model_meta": {
+            "provider": "openai_compatible",
+            "model": "gpt-4.1-mini",
+            "branch": "direct_model",
+            "latency_ms": 5928.809,
+            "prompt_tokens": 95,
+            "completion_tokens": 300,
+            "total_tokens": 395,
+            "response_id": "chatcmpl-DIxsc7E8aqfYwRHkKrjNC5kYESyZQ"
+          }
+        }
+      ],
+      "holdout": [
+        {
+          "task_id": "holdout_planning_recovery",
+          "split": "holdout",
+          "task_type": "planning",
+          "aspect": "planning",
+          "text": "Create a next-7-days recovery plan after a failed production deploy. Include owners, rollback, communication, risks, and confidence.",
+          "selected_output": "Next-7-Days Recovery Plan After Failed Production Deploy\n\nDay 1: Immediate Response  \n- Owner: Release Manager, DevOps Lead  \n- Actions:  \n  - Rollback to last stable release immediately.  \n  - Communicate incident to all stakeholders (Engineering, Product, Support, Customers if impacted).  \n  - Document failure details and initial impact assessment.  \n- Risks: Incomplete rollback, data inconsistency.  \n- Confidence: High (rollback procedures are well-tested).\n\nDay 2: Root Cause Analysis (RCA)  \n- Owner: Engineering Lead, QA Lead  \n- Actions:  \n  - Conduct detailed RCA to identify failure causes.  \n  - Review logs, monitoring data, and deployment scripts.  \n  - Share preliminary findings with stakeholders.  \n- Risks: Misidentifying root cause, delayed analysis.  \n- Confidence: Medium-High (depends on data availability).\n\nDay 3-4: Fix Development and Testing  \n- Owner: Development Team, QA Team  \n- Actions:  \n  - Develop fixes addressing root cause.  \n  - Perform thorough testing including unit, integration, and staging environment validation.  \n  - Update deployment scripts/processes if needed.  \n- Risks: Introducing new bugs, incomplete testing coverage.  \n- Confidence: Medium (depends on complexity of fixes).\n\nDay 5: Pre-Deployment Review and Approval  \n- Owner: Release Manager, Product Manager, QA Lead  \n- Actions:  \n  - Review fixes, test results, and",
+          "selected_branch": "direct_model",
+          "activated_branches": [
+            "direct_model"
+          ],
+          "activated_paths": [
+            [
+              "direct_model"
+            ]
+          ],
+          "internal_reward_score": null,
+          "internal_confidence": null,
+          "failure_reason": "",
+          "optimizer": {},
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.5594,
+            "hybrid_verifier_reason": "medium_quality|no_exact_reference|keyword_coverage:4/5|rules_passed|task_specific:2/5|verifier|must_include:2/3|length:167/85|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 0.8,
+            "keyword_reason": "keyword_coverage:4/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 0.5556,
+            "external_verifier_reason": "verifier|must_include:2/3|length:167/85|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 184
+          },
+          "backend_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 97,
+            "completion_tokens": 300,
+            "total_tokens": 397,
+            "total_latency_ms": 4645.797,
+            "mean_latency_ms": 4645.797
+          },
+          "model_meta": {
+            "provider": "openai_compatible",
+            "model": "gpt-4.1-mini",
+            "branch": "direct_model",
+            "latency_ms": 4645.797,
+            "prompt_tokens": 97,
+            "completion_tokens": 300,
+            "total_tokens": 397,
+            "response_id": "chatcmpl-DIxtOnMHHAM0prUselOPmdQN4Z4Dk"
+          }
+        },
+        {
+          "task_id": "holdout_factual_overfitting",
+          "split": "holdout",
+          "task_type": "factual",
+          "aspect": "factual",
+          "text": "Explain overfitting to a startup founder. Include one warning sign, one mitigation, and confidence.",
+          "selected_output": "Overfitting happens when your model learns the training data too well, including its noise and outliers, making it perform poorly on new, unseen data. \n\n**Warning sign:** Your model shows very high accuracy on training data but much lower accuracy on validation or test data.\n\n**Mitigation:** Use techniques like cross-validation, regularization, or simplifying the model to improve generalization.\n\nI\u2019m confident this explanation will help you understand and address overfitting effectively.",
+          "selected_branch": "direct_model",
+          "activated_branches": [
+            "direct_model"
+          ],
+          "activated_paths": [
+            [
+              "direct_model"
+            ]
+          ],
+          "internal_reward_score": null,
+          "internal_confidence": null,
+          "failure_reason": "",
+          "optimizer": {},
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.4,
+            "hybrid_verifier_reason": "low_quality|no_exact_reference|keyword_coverage:3/4|rule_miss:confidence|task_specific:0/5|verifier|must_include:1/2|length:71/65|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 0.75,
+            "keyword_reason": "keyword_coverage:3/4",
+            "rule_score": 0.0,
+            "rule_reason": "rule_miss:confidence",
+            "task_specific_score": 0.0,
+            "task_specific_reason": "task_specific:0/5",
+            "external_verifier_score": 0.5,
+            "external_verifier_reason": "verifier|must_include:1/2|length:71/65|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 69
+          },
+          "backend_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 91,
+            "completion_tokens": 93,
+            "total_tokens": 184,
+            "total_latency_ms": 1382.919,
+            "mean_latency_ms": 1382.919
+          },
+          "model_meta": {
+            "provider": "openai_compatible",
+            "model": "gpt-4.1-mini",
+            "branch": "direct_model",
+            "latency_ms": 1382.919,
+            "prompt_tokens": 91,
+            "completion_tokens": 93,
+            "total_tokens": 184,
+            "response_id": "chatcmpl-DIxuClkvfFy6KA5MgtsaHj8JZOLyD"
+          }
+        },
+        {
+          "task_id": "holdout_code_pr_review",
+          "split": "holdout",
+          "task_type": "code",
+          "aspect": "code",
+          "text": "Give a pull-request review checklist for adding a background job queue to an API service. Include failure handling, tests, rollout risk, and confidence.",
+          "selected_output": "**Pull-Request Review Checklist for Adding a Background Job Queue to an API Service**\n\n1. **Functionality**\n   - [ ] Background jobs are correctly enqueued from the API service.\n   - [ ] Job processing logic is implemented and separated from API request handling.\n   - [ ] Job payloads are validated before enqueueing.\n   - [ ] Idempotency is ensured for job processing to handle retries safely.\n\n2. **Failure Handling**\n   - [ ] Failures in job processing are properly caught and logged.\n   - [ ] Retry policies are defined and implemented (e.g., exponential backoff, max retries).\n   - [ ] Dead-letter queue or failure queue is configured for jobs that exceed retry limits.\n   - [ ] Alerts or monitoring hooks are in place for job failures.\n   - [ ] Graceful degradation in the API when the queue is unavailable or overloaded.\n\n3. **Tests**\n   - [ ] Unit tests cover job enqueueing logic.\n   - [ ] Unit/integration tests cover job processing, including success and failure scenarios.\n   - [ ] Tests verify retry behavior and failure handling.\n   - [ ] End-to-end tests validate that API requests trigger background jobs as expected.\n   - [ ] Load or stress tests (if applicable) to ensure queue stability under expected traffic.\n\n4. **Rollout Risk**\n   - [ ] Backward compatibility with existing API behavior is maintained.\n   - [ ] Feature flags or configuration toggles are used to enable/disable",
+          "selected_branch": "direct_model",
+          "activated_branches": [
+            "direct_model"
+          ],
+          "activated_paths": [
+            [
+              "direct_model"
+            ]
+          ],
+          "internal_reward_score": null,
+          "internal_confidence": null,
+          "failure_reason": "",
+          "optimizer": {},
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.5444,
+            "hybrid_verifier_reason": "medium_quality|no_exact_reference|keyword_coverage:3/4|rule_miss:confidence|task_specific:1/5|verifier|must_include:2/3|length:185/70|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 0.75,
+            "keyword_reason": "keyword_coverage:3/4",
+            "rule_score": 0.5,
+            "rule_reason": "rule_miss:confidence",
+            "task_specific_score": 0.3333,
+            "task_specific_reason": "task_specific:1/5",
+            "external_verifier_score": 0.5556,
+            "external_verifier_reason": "verifier|must_include:2/3|length:185/70|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 226
+          },
+          "backend_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 100,
+            "completion_tokens": 300,
+            "total_tokens": 400,
+            "total_latency_ms": 4894.329,
+            "mean_latency_ms": 4894.329
+          },
+          "model_meta": {
+            "provider": "openai_compatible",
+            "model": "gpt-4.1-mini",
+            "branch": "direct_model",
+            "latency_ms": 4894.329,
+            "prompt_tokens": 100,
+            "completion_tokens": 300,
+            "total_tokens": 400,
+            "response_id": "chatcmpl-DIxuzsRm2Y6apqL39yhWZpM402Glm"
+          }
+        },
+        {
+          "task_id": "holdout_json_contract",
+          "split": "holdout",
+          "task_type": "general",
+          "aspect": "contract",
+          "text": "Respond ONLY as minified JSON with keys answer and confidence. The answer should summarize whether a rollout is safe today.",
+          "selected_output": "{\"answer\":\"The rollout is safe today.\",\"confidence\":0.95}",
+          "selected_branch": "direct_model",
+          "activated_branches": [
+            "direct_model"
+          ],
+          "activated_paths": [
+            [
+              "direct_model"
+            ]
+          ],
+          "internal_reward_score": null,
+          "internal_confidence": null,
+          "failure_reason": "",
+          "optimizer": {},
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.681,
+            "hybrid_verifier_reason": "contract_pass:json_lock:json_valid|low_quality|no_exact_reference|keyword_coverage:2/2|rules_passed|task_specific:1/4|fallback_verifier:1/3|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:2/2",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.3333,
+            "task_specific_reason": "task_specific:1/4",
+            "external_verifier_score": 0.3333,
+            "external_verifier_reason": "fallback_verifier:1/3",
+            "contract": "json_lock",
+            "contract_pass": true,
+            "contract_reason": "json_valid",
+            "output_word_count": 5
+          },
+          "backend_usage": {
+            "call_count": 1,
+            "ok_calls": 1,
+            "error_calls": 0,
+            "prompt_tokens": 94,
+            "completion_tokens": 15,
+            "total_tokens": 109,
+            "total_latency_ms": 662.9,
+            "mean_latency_ms": 662.9
+          },
+          "model_meta": {
+            "provider": "openai_compatible",
+            "model": "gpt-4.1-mini",
+            "branch": "direct_model",
+            "latency_ms": 662.9,
+            "prompt_tokens": 94,
+            "completion_tokens": 15,
+            "total_tokens": 109,
+            "response_id": "chatcmpl-DIxvOHlYnkMHe1xktDkFsocbmuMqc"
+          }
+        }
+      ],
+      "backend_usage_total": {
+        "call_count": 8,
+        "ok_calls": 8,
+        "error_calls": 0,
+        "prompt_tokens": 770,
+        "completion_tokens": 1442,
+        "total_tokens": 2212,
+        "total_latency_ms": 25832.097,
+        "mean_latency_ms": 3229.012
+      }
+    }
+  },
+  "judge_backend_usage_total": {
+    "call_count": 12,
+    "ok_calls": 12,
+    "error_calls": 0,
+    "prompt_tokens": 10198,
+    "completion_tokens": 1673,
+    "total_tokens": 11871,
+    "total_latency_ms": 32218.32,
+    "mean_latency_ms": 2684.86
+  },
+  "limitations": [
+    "This evaluation uses a real closed-source model for generation and judging, but the task set is curated rather than benchmark-standard.",
+    "Explicit human feedback loops were not exercised because no real user labels were available.",
+    "Pairwise judging uses an LLM judge, so those results should be read alongside the objective heuristic metrics."
+  ],
+  "report_paths": {
+    "json": "/Users/justin/Documents/New project/repo_inspect/artifacts/live_model_validation/live_model_validation_report.json",
+    "markdown": "/Users/justin/Documents/New project/repo_inspect/artifacts/live_model_validation/live_model_validation_report.md"
+  }
+}

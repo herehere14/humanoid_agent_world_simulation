@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 import random
 from typing import Protocol
 
@@ -11,13 +10,17 @@ from ..types import BranchStatus, RoutingDecision, TaskInput
 
 
 class MemoryRoutingView(Protocol):
-    def branch_success_bias(self, task_type: str, user_id: str | None = None) -> dict[str, float]:
-        ...
-
     def branch_visit_counts(self, task_type: str, user_id: str | None = None) -> dict[str, int]:
         ...
 
-    def branch_bandit_stats(self, task_type: str, user_id: str | None = None) -> dict[str, dict[str, float]]:
+    def sibling_routing_scores(
+        self,
+        task: TaskInput,
+        task_type: str,
+        parent_id: str,
+        child_ids: list[str],
+        user_id: str | None = None,
+    ) -> dict[str, float]:
         ...
 
 
@@ -60,16 +63,12 @@ class HierarchicalRouter:
     ) -> RoutingDecision:
         task_type = self.classify_task_type(task)
         user_id = str(task.metadata.get("user_id", "global")).strip() or "global"
-        history_bias = memory.branch_success_bias(task_type, user_id=user_id)
         visit_counts = memory.branch_visit_counts(task_type, user_id=user_id)
-        bandit_stats = memory.branch_bandit_stats(task_type, user_id=user_id)
-        bandit_total_count = sum(max(0.0, stat.get("count", 0.0)) for stat in bandit_stats.values())
         contract_hint = infer_output_contract(task.text, task.metadata)
         beam_width = max(1, max(self.config.min_candidates, self.config.top_k))
         flattened_scores: dict[str, float] = {}
         exploration_rate = self._current_exploration()
 
-        # Beam search over the hierarchy so we can activate multiple terminal leaves per task.
         frontier: list[tuple[str, list[str], float]] = [(forest.root_id, [], 0.0)]
         completed_paths: list[tuple[list[str], float]] = []
         max_depth = max((forest.depth(node_id) for node_id in forest.nodes), default=1) + 1
@@ -85,15 +84,21 @@ class HierarchicalRouter:
                     completed_paths.append((path, path_score))
                     continue
 
+                memory_scores = self._memory_scores_for_children(
+                    task=task,
+                    task_type=task_type,
+                    parent_id=node_id,
+                    child_ids=children,
+                    forest=forest,
+                    memory=memory,
+                    user_id=user_id,
+                )
                 scores = self._score_children(
                     task_type=task_type,
                     parent_id=node_id,
                     child_ids=children,
                     forest=forest,
-                    history_bias=history_bias,
-                    bandit_stats=bandit_stats,
-                    bandit_total_count=bandit_total_count,
-                    exploration_rate=exploration_rate,
+                    memory_scores=memory_scores,
                     contract_hint=contract_hint,
                 )
                 if not scores:
@@ -125,7 +130,7 @@ class HierarchicalRouter:
         if not completed_paths and frontier:
             completed_paths = [(path, score) for _, path, score in frontier]
 
-        ordered_paths = sorted(completed_paths, key=lambda x: x[1], reverse=True)
+        ordered_paths = sorted(completed_paths, key=lambda item: item[1], reverse=True)
         activated_paths: list[list[str]] = []
         seen_leaves: set[str] = set()
         for path, _ in ordered_paths:
@@ -170,25 +175,46 @@ class HierarchicalRouter:
         if node_id not in forest.nodes:
             return None
         path: list[str] = []
-        cur = node_id
-        while cur and cur != forest.root_id:
-            path.append(cur)
-            cur = forest.parent(cur)
+        cursor = node_id
+        while cursor and cursor != forest.root_id:
+            path.append(cursor)
+            cursor = forest.parent(cursor)
         if not path:
             return None
         path.reverse()
         return path
 
-    def _score_children(
+    def _memory_scores_for_children(
         self,
+        *,
+        task: TaskInput,
         task_type: str,
         parent_id: str,
         child_ids: list[str],
         forest: HierarchicalPromptForest,
-        history_bias: dict[str, float],
-        bandit_stats: dict[str, dict[str, float]],
-        bandit_total_count: float,
-        exploration_rate: float,
+        memory: MemoryRoutingView,
+        user_id: str,
+    ) -> dict[str, float]:
+        if parent_id == forest.root_id:
+            return {}
+        if not child_ids or not all(not forest.children(child_id) for child_id in child_ids):
+            return {}
+        return memory.sibling_routing_scores(
+            task=task,
+            task_type=task_type,
+            parent_id=parent_id,
+            child_ids=child_ids,
+            user_id=user_id,
+        )
+
+    def _score_children(
+        self,
+        *,
+        task_type: str,
+        parent_id: str,
+        child_ids: list[str],
+        forest: HierarchicalPromptForest,
+        memory_scores: dict[str, float],
         contract_hint: str | None,
     ) -> dict[str, float]:
         out: dict[str, float] = {}
@@ -198,6 +224,7 @@ class HierarchicalRouter:
             if branch.state.status == BranchStatus.ARCHIVED:
                 continue
 
+            effective_weight = self._effective_weight(branch)
             affinity = self._affinity_for_child(
                 task_type=task_type,
                 parent_id=parent_id,
@@ -205,30 +232,14 @@ class HierarchicalRouter:
                 forest=forest,
                 contract_hint=contract_hint,
             )
-            memory_bias = history_bias.get(child_id, 0.0)
-            memory_bias = max(-self.config.memory_term_cap, min(self.config.memory_term_cap, memory_bias))
-
-            bandit = bandit_stats.get(child_id, {})
-            mean_reward = float(bandit.get("mean_reward", 0.5))
-            count = max(0.0, float(bandit.get("count", 0.0)))
-
-            shrink = count / (count + max(1e-8, self.config.bandit_shrinkage_k))
-            value_term = self.config.bandit_value_coef * (mean_reward - 0.5) * shrink
-
-            bonus_term = 0.0
-            if self.config.bandit_bonus_coef > 0.0 and bandit_total_count > 0.0:
-                dynamic_bonus = self.config.bandit_bonus_coef * (0.7 + exploration_rate)
-                bonus_term = dynamic_bonus * math.sqrt(
-                    math.log1p(bandit_total_count) / (1.0 + count)
-                )
-                bonus_term = min(self.config.bandit_bonus_cap, bonus_term)
+            lock_adjustment = self._lock_adjustment(child_id, contract_hint)
+            memory_term = self.config.memory_coef * memory_scores.get(child_id, 0.0)
 
             score = (
-                (self.config.weight_coef * branch.state.weight)
+                (self.config.weight_coef * effective_weight)
                 + (self.config.affinity_coef * affinity)
-                + (self.config.memory_coef * memory_bias)
-                + value_term
-                + bonus_term
+                + memory_term
+                + lock_adjustment
             )
 
             if branch.state.status == BranchStatus.CANDIDATE:
@@ -245,7 +256,7 @@ class HierarchicalRouter:
         exploration_rate: float,
         max_children: int,
     ) -> list[str]:
-        ordered = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+        ordered = sorted(scores.items(), key=lambda item: item[1], reverse=True)
         take = max(1, min(len(ordered), max_children))
         selected = [name for name, _ in ordered[:take]]
 
@@ -255,7 +266,6 @@ class HierarchicalRouter:
             if pool:
                 selected[-1] = self._rng.choice(pool)
 
-        # Preserve score ordering while deduplicating any exploration replacement.
         seen: set[str] = set()
         deduped: list[str] = []
         for name in selected:
@@ -265,9 +275,23 @@ class HierarchicalRouter:
             deduped.append(name)
         return deduped
 
+    def _effective_weight(self, branch) -> float:
+        base_weight = float(branch.state.metadata.get("base_weight", branch.state.weight))
+        learned_delta = branch.state.weight - base_weight
+        if abs(learned_delta) < 1e-9:
+            return branch.state.weight
+
+        support = len(branch.state.historical_rewards)
+        if support < max(0, self.config.learned_weight_min_support):
+            return base_weight
+
+        k = max(1e-8, self.config.learned_weight_support_k)
+        shrink = support / (support + k)
+        return base_weight + (learned_delta * shrink)
+
     @staticmethod
     def _prune_frontier(frontier: list[tuple[str, list[str], float]], beam_width: int) -> list[tuple[str, list[str], float]]:
-        ordered = sorted(frontier, key=lambda x: x[2], reverse=True)
+        ordered = sorted(frontier, key=lambda item: item[2], reverse=True)
         return ordered[: max(1, beam_width)]
 
     def _current_exploration(self) -> float:
@@ -276,6 +300,7 @@ class HierarchicalRouter:
 
     def _affinity_for_child(
         self,
+        *,
         task_type: str,
         parent_id: str,
         child_id: str,
@@ -301,3 +326,13 @@ class HierarchicalRouter:
             elif contract_hint.replace("_lock", "") in child_id:
                 base += 0.35
         return base
+
+    @staticmethod
+    def _lock_adjustment(child_id: str, contract_hint: str | None) -> float:
+        if not child_id.endswith("_lock"):
+            return 0.0
+        if contract_hint == child_id:
+            return 0.0
+        if contract_hint:
+            return -0.18
+        return -0.12

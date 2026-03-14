@@ -33,7 +33,10 @@ class FinalComposer:
         if not route.activated_branches:
             return None
 
-        leaf = route.activated_branches[-1]
+        if route.activated_paths and route.activated_paths[0]:
+            leaf = route.activated_paths[0][-1]
+        else:
+            leaf = route.activated_branches[-1]
         leaf_output = outputs.get(leaf)
         if leaf_output is None:
             return None

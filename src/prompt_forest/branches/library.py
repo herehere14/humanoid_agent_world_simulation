@@ -15,6 +15,7 @@ def create_default_branches() -> dict[str, PromptBranch]:
                 "Return a concise, stepwise reasoning result with explicit assumptions and final answer."
             ),
             weight=1.1,
+            metadata={"base_weight": 1.1},
         ),
         BranchState(
             name="planner",
@@ -25,6 +26,7 @@ def create_default_branches() -> dict[str, PromptBranch]:
                 "Produce an executable plan with milestones, risks, and next actions."
             ),
             weight=1.0,
+            metadata={"base_weight": 1.0},
         ),
         BranchState(
             name="retrieval",
@@ -35,6 +37,7 @@ def create_default_branches() -> dict[str, PromptBranch]:
                 "Return evidence-style response with key facts and caveats."
             ),
             weight=1.0,
+            metadata={"base_weight": 1.0},
         ),
         BranchState(
             name="critique",
@@ -45,6 +48,7 @@ def create_default_branches() -> dict[str, PromptBranch]:
                 "Stress-test a candidate answer with failure cases and mitigations."
             ),
             weight=0.9,
+            metadata={"base_weight": 0.9},
         ),
         BranchState(
             name="verification",
@@ -55,6 +59,7 @@ def create_default_branches() -> dict[str, PromptBranch]:
                 "Provide checks, validations, and confidence rating for the answer."
             ),
             weight=1.2,
+            metadata={"base_weight": 1.2},
         ),
         BranchState(
             name="creative",
@@ -65,6 +70,7 @@ def create_default_branches() -> dict[str, PromptBranch]:
                 "Propose novel options while preserving practical constraints."
             ),
             weight=0.8,
+            metadata={"base_weight": 0.8},
         ),
     ]
     return {b.name: PromptBranch(b) for b in branches}
@@ -78,13 +84,14 @@ def make_candidate_branch(
     initial_weight: float = 0.6,
     metadata: dict | None = None,
 ) -> PromptBranch:
+    combined_metadata = {"base_weight": initial_weight, **(metadata or {})}
     state = BranchState(
         name=name,
         purpose=purpose,
         prompt_template=prompt_template,
         weight=initial_weight,
         status=BranchStatus.CANDIDATE,
-        metadata=metadata or {},
+        metadata=combined_metadata,
         trial_remaining=trial_episodes,
     )
     return PromptBranch(state)

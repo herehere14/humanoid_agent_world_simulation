@@ -1,0 +1,225 @@
+{
+  "train_task_ids": [
+    "train_planning_incident_response::round_1",
+    "train_planning_hiring_plan::round_1",
+    "train_code_review_plan::round_1",
+    "train_general_decision_note::round_1",
+    "train_planning_incident_response::round_2",
+    "train_planning_hiring_plan::round_2",
+    "train_code_review_plan::round_2",
+    "train_general_decision_note::round_2"
+  ],
+  "holdout_task_ids": [
+    "holdout_planning_recovery",
+    "holdout_code_pr_review",
+    "holdout_general_tradeoff_note",
+    "holdout_planning_risk_register"
+  ],
+  "aggregate": {
+    "full_adaptive": {
+      "train_mean": 0.7488,
+      "holdout_mean": 0.755,
+      "memory": {
+        "records": 8,
+        "avg_reward": 0.7488,
+        "task_distribution": {
+          "planning": 4,
+          "code": 2,
+          "general": 2
+        },
+        "route_contexts": 7,
+        "user_profiles": 0
+      },
+      "routing_histogram": {
+        "planner": 4,
+        "planner_timeline_optimizer": 1,
+        "planner_risk_allocator": 3,
+        "verification": 4,
+        "bullet_lock": 1,
+        "code_patch_lock": 1,
+        "analytical": 1,
+        "analytical_causal_decomposer": 1,
+        "creative": 2,
+        "creative_divergent_generator": 2,
+        "verification_constraint_checker": 2,
+        "retrieval": 1,
+        "retrieval_evidence_tracer": 1
+      }
+    },
+    "frozen": {
+      "train_mean": 0.7738,
+      "holdout_mean": 0.7675,
+      "memory": {
+        "records": 0,
+        "avg_reward": 0.0,
+        "route_contexts": 0,
+        "user_profiles": 0
+      },
+      "routing_histogram": {
+        "planner": 4,
+        "planner_timeline_optimizer": 1,
+        "planner_risk_allocator": 3,
+        "verification": 4,
+        "bullet_lock": 1,
+        "code_patch_lock": 1,
+        "analytical": 1,
+        "analytical_causal_decomposer": 1,
+        "creative": 2,
+        "creative_divergent_generator": 2,
+        "verification_constraint_checker": 2,
+        "retrieval": 1,
+        "retrieval_evidence_tracer": 1
+      }
+    },
+    "memory_only": {
+      "train_mean": 0.7675,
+      "holdout_mean": 0.78,
+      "memory": {
+        "records": 8,
+        "avg_reward": 0.7675,
+        "task_distribution": {
+          "planning": 4,
+          "code": 2,
+          "general": 2
+        },
+        "route_contexts": 7,
+        "user_profiles": 0
+      },
+      "routing_histogram": {
+        "planner": 4,
+        "planner_timeline_optimizer": 1,
+        "planner_risk_allocator": 3,
+        "verification": 4,
+        "bullet_lock": 1,
+        "code_patch_lock": 1,
+        "analytical": 1,
+        "analytical_causal_decomposer": 1,
+        "creative": 2,
+        "creative_divergent_generator": 2,
+        "verification_constraint_checker": 2,
+        "retrieval": 1,
+        "retrieval_evidence_tracer": 1
+      }
+    },
+    "weight_only": {
+      "train_mean": 0.755,
+      "holdout_mean": 0.755,
+      "memory": {
+        "records": 0,
+        "avg_reward": 0.0,
+        "route_contexts": 0,
+        "user_profiles": 0
+      },
+      "routing_histogram": {
+        "planner": 4,
+        "planner_timeline_optimizer": 1,
+        "planner_risk_allocator": 3,
+        "verification": 4,
+        "bullet_lock": 1,
+        "code_patch_lock": 1,
+        "analytical": 1,
+        "analytical_causal_decomposer": 1,
+        "creative": 2,
+        "creative_divergent_generator": 2,
+        "verification_constraint_checker": 2,
+        "retrieval": 1,
+        "retrieval_evidence_tracer": 1
+      }
+    }
+  },
+  "per_policy_holdout": {
+    "full_adaptive": [
+      {
+        "task_id": "holdout_planning_recovery",
+        "selected_branch": "planner_risk_allocator",
+        "reward": 0.805
+      },
+      {
+        "task_id": "holdout_code_pr_review",
+        "selected_branch": "verification_constraint_checker",
+        "reward": 0.755
+      },
+      {
+        "task_id": "holdout_general_tradeoff_note",
+        "selected_branch": "retrieval_evidence_tracer",
+        "reward": 0.705
+      },
+      {
+        "task_id": "holdout_planning_risk_register",
+        "selected_branch": "planner_risk_allocator",
+        "reward": 0.755
+      }
+    ],
+    "frozen": [
+      {
+        "task_id": "holdout_planning_recovery",
+        "selected_branch": "planner_risk_allocator",
+        "reward": 0.805
+      },
+      {
+        "task_id": "holdout_code_pr_review",
+        "selected_branch": "verification_constraint_checker",
+        "reward": 0.805
+      },
+      {
+        "task_id": "holdout_general_tradeoff_note",
+        "selected_branch": "retrieval_evidence_tracer",
+        "reward": 0.705
+      },
+      {
+        "task_id": "holdout_planning_risk_register",
+        "selected_branch": "planner_risk_allocator",
+        "reward": 0.755
+      }
+    ],
+    "memory_only": [
+      {
+        "task_id": "holdout_planning_recovery",
+        "selected_branch": "planner_risk_allocator",
+        "reward": 0.805
+      },
+      {
+        "task_id": "holdout_code_pr_review",
+        "selected_branch": "verification_constraint_checker",
+        "reward": 0.805
+      },
+      {
+        "task_id": "holdout_general_tradeoff_note",
+        "selected_branch": "retrieval_evidence_tracer",
+        "reward": 0.755
+      },
+      {
+        "task_id": "holdout_planning_risk_register",
+        "selected_branch": "planner_risk_allocator",
+        "reward": 0.755
+      }
+    ],
+    "weight_only": [
+      {
+        "task_id": "holdout_planning_recovery",
+        "selected_branch": "planner_risk_allocator",
+        "reward": 0.755
+      },
+      {
+        "task_id": "holdout_code_pr_review",
+        "selected_branch": "verification_constraint_checker",
+        "reward": 0.805
+      },
+      {
+        "task_id": "holdout_general_tradeoff_note",
+        "selected_branch": "retrieval_evidence_tracer",
+        "reward": 0.705
+      },
+      {
+        "task_id": "holdout_planning_risk_register",
+        "selected_branch": "planner_risk_allocator",
+        "reward": 0.755
+      }
+    ]
+  },
+  "deltas_vs_frozen": {
+    "full_adaptive": -0.0125,
+    "memory_only": 0.0125,
+    "weight_only": -0.0125
+  }
+}

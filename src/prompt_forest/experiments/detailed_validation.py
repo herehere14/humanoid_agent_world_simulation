@@ -207,6 +207,13 @@ class DetailedHierarchicalValidator:
         cfg.memory.user_bias_mix = 0.0
         cfg.optimizer.learning_rate = 0.08
         cfg.optimizer.weight_decay = 0.03
+        # Synthetic validation uses dense, trustworthy rewards, so keep optimizer
+        # updates permissive here instead of inheriting live-runtime guardrails.
+        cfg.optimizer.selected_leaf_only_updates = False
+        cfg.optimizer.weight_update_min_advantage = 0.0
+        cfg.optimizer.weight_update_reward_floor = 0.0
+        cfg.optimizer.weight_update_negative_reward_ceiling = 1.0
+        cfg.optimizer.weight_support_shrinkage_k = 0.0
         cfg.optimizer.rewrite_cooldown_episodes = 1
         cfg.optimizer.rewrite_failure_streak_trigger = 1
         cfg.optimizer.update_acceptance_min_gain = -1.0

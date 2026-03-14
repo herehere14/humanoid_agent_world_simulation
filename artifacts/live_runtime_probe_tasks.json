@@ -1,0 +1,279 @@
+{
+  "train": [
+    {
+      "task_id": "train_math_linear_equation",
+      "aspect": "reasoning",
+      "task_type": "math",
+      "text": "Solve 2x + 5 = 17. Show the algebra briefly and end with a confidence line.",
+      "metadata": {
+        "expected_answer": "x = 6",
+        "expected_keywords": [
+          "x = 6",
+          "subtract 5",
+          "divide by 2",
+          "confidence"
+        ],
+        "required_substrings": [
+          "confidence"
+        ],
+        "reference_answer": "Subtract 5 from both sides to get 2x = 12, then divide by 2 to get x = 6.",
+        "evaluation_rubric": [
+          "correct final answer",
+          "brief algebra",
+          "confidence included"
+        ],
+        "user_id": "eval_user_alpha",
+        "aspect": "reasoning"
+      }
+    },
+    {
+      "task_id": "train_math_probability",
+      "aspect": "reasoning",
+      "task_type": "math",
+      "text": "A bag has 3 red balls and 7 blue balls. What is the probability of drawing a red ball? Give the simplified answer and a confidence line.",
+      "metadata": {
+        "expected_answer": "3/10",
+        "expected_keywords": [
+          "3/10",
+          "probability",
+          "confidence"
+        ],
+        "required_substrings": [
+          "confidence"
+        ],
+        "reference_answer": "The probability is 3 out of 10, so the simplified probability is 3/10.",
+        "evaluation_rubric": [
+          "correct probability",
+          "simple explanation",
+          "confidence included"
+        ],
+        "user_id": "eval_user_alpha",
+        "aspect": "reasoning"
+      }
+    },
+    {
+      "task_id": "train_planning_incident_response",
+      "aspect": "planning",
+      "task_type": "planning",
+      "text": "Create a 48-hour incident response plan for a payment API outage. Include phases, owners, rollback, risks, and confidence.",
+      "metadata": {
+        "expected_keywords": [
+          "phase",
+          "owner",
+          "rollback",
+          "risk",
+          "confidence"
+        ],
+        "required_substrings": [
+          "rollback",
+          "confidence"
+        ],
+        "reference_answer": "A strong answer phases the response, assigns owners, includes mitigation and rollback, and calls out risks.",
+        "evaluation_rubric": [
+          "sequenced plan",
+          "clear owners",
+          "rollback included",
+          "risks included",
+          "confidence included"
+        ],
+        "verifier_spec": {
+          "must_include": [
+            "rollback",
+            "risk",
+            "confidence"
+          ],
+          "min_token_count": 80,
+          "confidence_range": [
+            0.5,
+            0.99
+          ]
+        },
+        "user_id": "eval_user_beta",
+        "aspect": "planning"
+      }
+    },
+    {
+      "task_id": "train_planning_hiring_plan",
+      "aspect": "planning",
+      "task_type": "planning",
+      "text": "Plan a 30-day onboarding schedule for a new senior backend engineer. Include milestones, dependencies, risks, and confidence.",
+      "metadata": {
+        "expected_keywords": [
+          "milestone",
+          "dependency",
+          "risk",
+          "confidence"
+        ],
+        "required_substrings": [
+          "confidence"
+        ],
+        "reference_answer": "A strong answer should stage onboarding, note dependencies, and identify early delivery risks.",
+        "evaluation_rubric": [
+          "time-structured plan",
+          "dependencies",
+          "risks",
+          "confidence included"
+        ],
+        "verifier_spec": {
+          "must_include": [
+            "milestone",
+            "risk",
+            "confidence"
+          ],
+          "min_token_count": 80,
+          "confidence_range": [
+            0.5,
+            0.99
+          ]
+        },
+        "user_id": "eval_user_beta",
+        "aspect": "planning"
+      }
+    }
+  ],
+  "holdout": [
+    {
+      "task_id": "holdout_planning_recovery",
+      "aspect": "planning",
+      "task_type": "planning",
+      "text": "Create a next-7-days recovery plan after a failed production deploy. Include owners, rollback, communication, risks, and confidence.",
+      "metadata": {
+        "expected_keywords": [
+          "owner",
+          "rollback",
+          "communication",
+          "risk",
+          "confidence"
+        ],
+        "required_substrings": [
+          "rollback",
+          "confidence"
+        ],
+        "reference_answer": "A strong answer should phase recovery work, include owners, rollback, communication, and risk tracking.",
+        "evaluation_rubric": [
+          "sequenced plan",
+          "owners",
+          "rollback",
+          "communication",
+          "risks",
+          "confidence included"
+        ],
+        "verifier_spec": {
+          "must_include": [
+            "rollback",
+            "communication",
+            "confidence"
+          ],
+          "min_token_count": 85,
+          "confidence_range": [
+            0.5,
+            0.99
+          ]
+        },
+        "user_id": "eval_user_beta",
+        "aspect": "planning"
+      }
+    },
+    {
+      "task_id": "holdout_factual_overfitting",
+      "aspect": "factual",
+      "task_type": "factual",
+      "text": "Explain overfitting to a startup founder. Include one warning sign, one mitigation, and confidence.",
+      "metadata": {
+        "expected_keywords": [
+          "overfitting",
+          "warning sign",
+          "mitigation",
+          "confidence"
+        ],
+        "required_substrings": [
+          "confidence"
+        ],
+        "reference_answer": "Overfitting is when a model memorizes training patterns and fails to generalize; watch validation gaps and use regularization or better evaluation.",
+        "evaluation_rubric": [
+          "correct explanation",
+          "warning sign",
+          "mitigation",
+          "confidence included"
+        ],
+        "verifier_spec": {
+          "must_include": [
+            "mitigation",
+            "confidence"
+          ],
+          "min_token_count": 65,
+          "confidence_range": [
+            0.5,
+            0.99
+          ]
+        },
+        "user_id": "eval_user_gamma",
+        "aspect": "factual"
+      }
+    },
+    {
+      "task_id": "holdout_code_pr_review",
+      "aspect": "code",
+      "task_type": "code",
+      "text": "Give a pull-request review checklist for adding a background job queue to an API service. Include failure handling, tests, rollout risk, and confidence.",
+      "metadata": {
+        "expected_keywords": [
+          "failure handling",
+          "test",
+          "risk",
+          "confidence"
+        ],
+        "required_substrings": [
+          "test",
+          "confidence"
+        ],
+        "reference_answer": "A strong answer covers retry/failure handling, tests, observability, rollout risk, and confidence.",
+        "evaluation_rubric": [
+          "queue-specific review points",
+          "tests",
+          "rollout risk",
+          "confidence included"
+        ],
+        "verifier_spec": {
+          "must_include": [
+            "test",
+            "risk",
+            "confidence"
+          ],
+          "min_token_count": 70,
+          "confidence_range": [
+            0.5,
+            0.99
+          ]
+        },
+        "user_id": "eval_user_alpha",
+        "aspect": "code"
+      }
+    },
+    {
+      "task_id": "holdout_json_contract",
+      "aspect": "contract",
+      "task_type": "general",
+      "text": "Respond ONLY as minified JSON with keys answer and confidence. The answer should summarize whether a rollout is safe today.",
+      "metadata": {
+        "output_contract": "json_lock",
+        "expected_keywords": [
+          "answer",
+          "confidence"
+        ],
+        "required_substrings": [
+          "answer",
+          "confidence"
+        ],
+        "reference_answer": "{\"answer\":\"...\",\"confidence\":0.xx}",
+        "evaluation_rubric": [
+          "valid minified JSON object",
+          "correct keys",
+          "no extra text"
+        ],
+        "user_id": "eval_user_alpha",
+        "aspect": "contract"
+      }
+    }
+  ]
+}

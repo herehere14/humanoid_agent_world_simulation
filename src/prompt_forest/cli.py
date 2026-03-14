@@ -12,6 +12,8 @@ from .experiments.benchmark import BenchmarkRunner
 from .experiments.continuous_runner import ContinuousImprover
 from .experiments.detailed_validation import DetailedHierarchicalValidator
 from .experiments.hard_slice_validation import HardSliceValidator
+from .experiments.live_ablation_validation import LiveAblationValidator
+from .experiments.live_model_validation import LiveModelValidator
 from .experiments.rl_validation import RLLearningValidator
 from .observability.trace import format_turn_trace
 from .utils.io import read_json, read_jsonl
@@ -78,6 +80,28 @@ def build_parser() -> argparse.ArgumentParser:
     hard_cmd.add_argument("--episodes", type=int, default=220)
     hard_cmd.add_argument("--seeds", type=str, default="11,17,19,23,29,31,37,41")
     hard_cmd.add_argument("--oracle-feedback", action="store_true", help="Simulate oracle correction feedback during full-policy training")
+
+    live_cmd = sub.add_parser("live-validate", help="Run real-model validation against adaptive, frozen, and direct baselines")
+    live_cmd.add_argument("--dataset", type=str, default="examples/live_eval_tasks.json")
+    live_cmd.add_argument("--model", type=str, default="gpt-4.1-mini")
+    live_cmd.add_argument("--judge-model", type=str, default="")
+    live_cmd.add_argument("--api-key-env", type=str, default="OPENAI_API_KEY")
+    live_cmd.add_argument("--base-url", type=str, default="https://api.openai.com/v1")
+    live_cmd.add_argument("--temperature", type=float, default=0.2)
+    live_cmd.add_argument("--max-output-tokens", type=int, default=700)
+    live_cmd.add_argument("--train-rounds", type=int, default=2)
+    live_cmd.add_argument("--disable-agent-runtimes", action="store_true")
+
+    ablate_cmd = sub.add_parser("live-ablate", help="Run live ablation for frozen, memory-only, weight-only, and full adaptive policies")
+    ablate_cmd.add_argument("--dataset", type=str, default="examples/live_eval_tasks.json")
+    ablate_cmd.add_argument("--model", type=str, default="gpt-4.1-mini")
+    ablate_cmd.add_argument("--judge-model", type=str, default="")
+    ablate_cmd.add_argument("--api-key-env", type=str, default="OPENAI_API_KEY")
+    ablate_cmd.add_argument("--base-url", type=str, default="https://api.openai.com/v1")
+    ablate_cmd.add_argument("--temperature", type=float, default=0.2)
+    ablate_cmd.add_argument("--max-output-tokens", type=int, default=700)
+    ablate_cmd.add_argument("--train-rounds", type=int, default=2)
+    ablate_cmd.add_argument("--disable-agent-runtimes", action="store_true")
 
     improve_cmd = sub.add_parser("auto-improve", help="Run multi-round config tuning with anti-bias objective")
     improve_cmd.add_argument("--rounds", type=int, default=3)
@@ -260,6 +284,38 @@ def main() -> None:
         print(json.dumps(report, indent=2))
         return
 
+    if args.command == "live-validate":
+        validator = LiveModelValidator(Path.cwd())
+        report = validator.run(
+            dataset_path=args.dataset,
+            model=args.model,
+            judge_model=args.judge_model or None,
+            api_key_env=args.api_key_env,
+            base_url=args.base_url,
+            temperature=args.temperature,
+            max_output_tokens=args.max_output_tokens,
+            train_rounds=args.train_rounds,
+            use_agent_runtimes=not args.disable_agent_runtimes,
+        )
+        print(json.dumps(report, indent=2))
+        return
+
+    if args.command == "live-ablate":
+        validator = LiveAblationValidator(Path.cwd())
+        report = validator.run(
+            dataset_path=args.dataset,
+            model=args.model,
+            judge_model=args.judge_model or None,
+            api_key_env=args.api_key_env,
+            base_url=args.base_url,
+            temperature=args.temperature,
+            max_output_tokens=args.max_output_tokens,
+            train_rounds=args.train_rounds,
+            use_agent_runtimes=not args.disable_agent_runtimes,
+        )
+        print(json.dumps(report, indent=2))
+        return
+
     if args.command == "auto-improve":
         seeds = [int(x.strip()) for x in args.seeds.split(",") if x.strip()]
         final_seeds = [int(x.strip()) for x in args.final_seeds.split(",") if x.strip()]
@@ -344,7 +400,7 @@ def main() -> None:
         payload = {
             "branches": engine.branch_snapshot(),
             "memory": engine.memory.stats(),
-            "user_profiles": len(engine.memory._user_profiles),  # noqa: SLF001
+            "user_profiles": int(engine.memory.stats().get("user_profiles", 0)),
             "routing_histogram": engine.routing_histogram(),
             "runtime": {
                 "evaluator_llm_enabled": engine.config.agent_runtimes.evaluator.enabled,

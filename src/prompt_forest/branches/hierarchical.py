@@ -100,6 +100,7 @@ def _branch(name: str, purpose: str, prompt: str, weight: float) -> PromptBranch
             purpose=purpose,
             prompt_template=prompt,
             weight=weight,
+            metadata={"base_weight": weight},
         )
     )
 

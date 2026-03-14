@@ -13,6 +13,8 @@ class RouterConfig:
     exploration: float = 0.15
     min_candidates: int = 2
     weight_coef: float = 1.0
+    learned_weight_min_support: int = 2
+    learned_weight_support_k: float = 2.0
     affinity_coef: float = 0.6
     memory_coef: float = 0.2
     memory_term_cap: float = 0.15
@@ -31,6 +33,11 @@ class OptimizerConfig:
     advantage_baseline_beta: float = 0.1
     min_weight: float = 0.1
     max_weight: float = 3.0
+    selected_leaf_only_updates: bool = True
+    weight_update_min_advantage: float = 0.12
+    weight_update_reward_floor: float = 0.74
+    weight_update_negative_reward_ceiling: float = 0.4
+    weight_support_shrinkage_k: float = 1.5
     prompt_rewrite_threshold: float = 0.45
     max_prompt_variants: int = 5
     candidate_trial_episodes: int = 10
@@ -72,6 +79,11 @@ class MemoryConfig:
     shrinkage_k: float = 20.0
     recency_decay: float = 0.98
     user_bias_mix: float = 0.7
+    routing_min_support: int = 2
+    routing_min_similarity: float = 0.34
+    routing_margin: float = 0.03
+    routing_shrinkage_k: float = 4.0
+    execution_hint_min_reward: float = 0.7
 
 
 @dataclass

@@ -54,6 +54,11 @@ class OptimizerAgent:
         task_baseline_before = self._task_baselines.get(route.task_type, 0.5)
         user_id = str(task.metadata.get("user_id", "global")).strip() or "global"
         llm_runtime_active = bool(task.metadata.get("llm_runtime_active", False))
+        eligible_branches = (
+            self._branches_for_weight_update(route, signal.selected_branch)
+            if self.config.selected_leaf_only_updates
+            else set(route.activated_branches)
+        )
 
         advisor_directives: dict[str, dict[str, Any]] = {}
         advisor_proposals: list[dict[str, str]] = []
@@ -72,6 +77,8 @@ class OptimizerAgent:
                 advisor_error = str(exc)
 
         for branch_name in route.activated_branches:
+            if branch_name not in eligible_branches:
+                continue
             branch = branches.get(branch_name)
             if branch is None or not branch.is_active:
                 continue
@@ -102,13 +109,17 @@ class OptimizerAgent:
                 user_id=user_id,
                 llm_runtime_active=llm_runtime_active,
             )
+            support_scale = self._support_scale(reward_count)
+            update_allowed, update_block_reason = self._should_apply_weight_update(reward=reward, advantage=advantage)
 
-            # Damp noisy updates from low-confidence branch feedback.
-            delta = self.config.learning_rate * advantage * confidence_scale * variance_scale
+            # Damp noisy updates from low-confidence and low-support branch feedback.
+            delta = 0.0
+            if update_allowed:
+                delta = self.config.learning_rate * advantage * confidence_scale * variance_scale * support_scale
 
             advice_conf = self._clamp01(advice.get("confidence", 0.0))
             advice_weight_threshold = max(0.55, self.config.advisor_rewrite_confidence_threshold - 0.15)
-            if advisor_rewrite_only:
+            if advisor_rewrite_only or not update_allowed:
                 advisory_extra_delta = 0.0
             else:
                 advisory_extra_delta = self._bounded_advisory_delta(advice.get("extra_weight_delta", 0.0))
@@ -118,9 +129,10 @@ class OptimizerAgent:
                     advisory_extra_delta *= ((advice_conf - advice_weight_threshold) / max(1e-8, 1.0 - advice_weight_threshold))
                     advisory_extra_delta *= confidence_scale
                     advisory_extra_delta *= variance_scale
+                    advisory_extra_delta *= support_scale
 
             total_delta = delta + advisory_extra_delta
-            decay = self.config.weight_decay * (old_weight - 1.0)
+            decay = self.config.weight_decay * (old_weight - 1.0) if update_allowed else 0.0
             raw_weight = old_weight + total_delta - decay
             new_weight = raw_weight
             branch.state.weight = max(self.config.min_weight, min(self.config.max_weight, new_weight))
@@ -142,19 +154,22 @@ class OptimizerAgent:
                 rewritten.append(branch_name)
                 prompt_rewritten = True
 
-            accepted_update = self._passes_acceptance_gate(
-                memory=memory,
-                branch_name=branch_name,
-                task_type=route.task_type,
-                user_id=user_id,
-                old_weight=old_weight,
-                new_weight=branch.state.weight,
-                old_prompt=old_prompt,
-                new_prompt=branch.state.prompt_template,
-                prompt_rewritten=prompt_rewritten,
-                acceptance_runner=acceptance_runner,
-                task=task,
-            )
+            changed_weight = abs(branch.state.weight - old_weight) > 1e-9
+            accepted_update = True
+            if changed_weight or prompt_rewritten:
+                accepted_update = self._passes_acceptance_gate(
+                    memory=memory,
+                    branch_name=branch_name,
+                    task_type=route.task_type,
+                    user_id=user_id,
+                    old_weight=old_weight,
+                    new_weight=branch.state.weight,
+                    old_prompt=old_prompt,
+                    new_prompt=branch.state.prompt_template,
+                    prompt_rewritten=prompt_rewritten,
+                    acceptance_runner=acceptance_runner,
+                    task=task,
+                )
             if not accepted_update:
                 branch.state.weight = old_weight
                 if prompt_rewritten:
@@ -162,6 +177,13 @@ class OptimizerAgent:
                     if branch_name in rewritten:
                         rewritten.remove(branch_name)
                 prompt_rewritten = False
+            elif branch_name == signal.selected_branch:
+                self._refresh_execution_hint(
+                    branch=branch,
+                    task=task,
+                    selected_output=signal.selected_output,
+                    reward=reward,
+                )
             updated[branch_name] = round(branch.state.weight, 4)
             branch_baseline_after = self._update_branch_baseline(
                 key=branch_baseline_key,
@@ -199,10 +221,13 @@ class OptimizerAgent:
                 "decay": round(decay, 4),
                 "feedback_confidence": round(fb_conf, 4),
                 "confidence_scale": round(confidence_scale, 4),
+                "support_scale": round(support_scale, 4),
                 "variance_scale": round(variance_scale, 4),
                 "reward_variance": round(reward_variance, 6),
                 "reward_count": round(reward_count, 4),
                 "llm_runtime_active": llm_runtime_active,
+                "weight_update_allowed": update_allowed,
+                "weight_update_block_reason": update_block_reason,
                 "advisor_confidence": round(advice_conf, 4),
                 "old_weight": round(old_weight, 4),
                 "raw_weight_after_update": round(raw_weight, 4),
@@ -264,9 +289,6 @@ class OptimizerAgent:
         user_id: str,
         llm_runtime_active: bool,
     ) -> tuple[float, float, float]:
-        if not llm_runtime_active:
-            return 1.0, 0.0, 0.0
-
         moments = memory.branch_reward_moments(
             branch_name=branch_name,
             task_type=task_type,
@@ -275,6 +297,8 @@ class OptimizerAgent:
         )
         variance = max(0.0, float(moments.get("variance", 0.0)))
         count = max(0.0, float(moments.get("count", 0.0)))
+        if not llm_runtime_active:
+            return 1.0, variance, count
         if count <= 0.0:
             return 1.0, variance, count
 
@@ -283,6 +307,32 @@ class OptimizerAgent:
         shrink = count / (count + 8.0)
         scale = (1.0 - shrink) + (shrink * raw_scale)
         return max(self.config.llm_min_variance_scale, min(1.0, scale)), variance, count
+
+    @staticmethod
+    def _branches_for_weight_update(route: RoutingDecision, selected_branch: str) -> set[str]:
+        if selected_branch:
+            return {selected_branch}
+        if route.activated_paths and route.activated_paths[0]:
+            return {route.activated_paths[0][-1]}
+        if route.activated_branches:
+            return {route.activated_branches[-1]}
+        return set()
+
+    def _support_scale(self, count: float) -> float:
+        k = max(1e-8, self.config.weight_support_shrinkage_k)
+        return (count + 1.0) / (count + 1.0 + k)
+
+    def _should_apply_weight_update(self, reward: float, advantage: float) -> tuple[bool, str]:
+        min_adv = max(0.0, self.config.weight_update_min_advantage)
+        if advantage >= min_adv and reward >= self.config.weight_update_reward_floor:
+            return True, "positive_signal"
+        if advantage <= -min_adv and reward <= self.config.weight_update_negative_reward_ceiling:
+            return True, "negative_signal"
+        if abs(advantage) < min_adv:
+            return False, "low_advantage"
+        if advantage > 0.0:
+            return False, "reward_below_floor"
+        return False, "reward_above_negative_ceiling"
 
     def _should_extend_candidate_trial(self, avg_reward: float, branch: PromptBranch) -> bool:
         lower = self.config.candidate_promote_threshold - self.config.candidate_neutral_band
@@ -296,6 +346,56 @@ class OptimizerAgent:
 
         branch.state.metadata["trial_extensions_used"] = used + 1
         return True
+
+    def _refresh_execution_hint(
+        self,
+        *,
+        branch: PromptBranch,
+        task: TaskInput,
+        selected_output: str,
+        reward: float,
+    ) -> None:
+        threshold = max(self.config.weight_update_reward_floor, 0.75)
+        if reward < threshold:
+            return
+
+        hint = self._build_execution_hint(task=task, selected_output=selected_output)
+        if not hint:
+            return
+        branch.state.metadata["adaptive_execution_hint"] = hint
+        branch.state.metadata["adaptive_execution_hint_reward"] = round(reward, 4)
+
+    @staticmethod
+    def _build_execution_hint(task: TaskInput, selected_output: str) -> str:
+        directives: list[str] = []
+        required = [str(x).strip() for x in task.metadata.get("required_substrings", []) if str(x).strip()]
+        if required:
+            directives.append(f"Explicitly include {', '.join(required[:4])}.")
+
+        output_l = selected_output.lower()
+        if selected_output.count("|") >= 8:
+            directives.append("Prefer a compact table when multiple fields must be compared.")
+        if "##" in selected_output or "#" in selected_output:
+            directives.append("Use short section headings for scanability.")
+        if any(token in output_l for token in ("phase", "week", "timeline", "day ")):
+            directives.append("Sequence the answer with explicit phases or time blocks.")
+        if "correctness" in output_l:
+            directives.append("Make correctness risks explicit.")
+        if "test" in output_l or "validation" in output_l:
+            directives.append("Call out tests or validation gaps.")
+        if "tradeoff" in output_l or "tradeoffs" in output_l:
+            directives.append("Spell out tradeoffs explicitly.")
+        if "recommendation" in output_l:
+            directives.append("Finish with a direct recommendation.")
+        if "owner" in output_l:
+            directives.append("Assign explicit owners or accountable roles.")
+        if "risk" in output_l:
+            directives.append("Call out risks and mitigations directly.")
+        if "rollback" in output_l or "fallback" in output_l:
+            directives.append("State rollback or fallback explicitly.")
+        if "confidence" in output_l:
+            directives.append("End with calibrated confidence.")
+        return " ".join(directives[:4]).strip()
 
     def _try_create_candidates(
         self,

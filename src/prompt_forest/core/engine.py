@@ -105,8 +105,18 @@ class PromptForestEngine:
         branch_scores = self.judge.score_all(outputs, task)
         leaf_candidates = self._candidate_leaves(route, outputs)
         numeric_scores = {k: v.reward for k, v in branch_scores.items() if k in leaf_candidates}
-
-        aggregation = self._aggregate(route, outputs, numeric_scores, candidate_branches=leaf_candidates)
+        if composed is not None and route.activated_branches:
+            if route.activated_paths and route.activated_paths[0]:
+                composed_leaf = route.activated_paths[0][-1]
+            else:
+                composed_leaf = route.activated_branches[-1]
+            aggregation = AggregationResult(
+                selected_branch=composed_leaf,
+                selected_output=outputs[composed_leaf].output,
+                notes={"strategy": "composer_primary", "path": route.activated_branches},
+            )
+        else:
+            aggregation = self._aggregate(route, outputs, numeric_scores, candidate_branches=leaf_candidates)
         signal = self.evaluator_agent.evaluate(
             task,
             route,
@@ -118,6 +128,10 @@ class PromptForestEngine:
             signal.aggregator_notes["composer"] = composer_notes
         self._propagate_rewards_along_path(route, signal, gamma=0.9, local_mix=0.55)
         reward_components = self._compute_reward_components(task, signal.selected_output, signal.reward_score)
+        selected_path = self._selected_path(route, signal.selected_branch)
+        routing_context_key = ""
+        if len(selected_path) >= 2:
+            routing_context_key = self.memory.routing_context_key_for_task(task, parent_id=selected_path[-2])
 
         if adapt:
             optimize_event: OptimizationEvent = self.optimizer_agent.optimize(
@@ -154,6 +168,8 @@ class PromptForestEngine:
             confidence=signal.confidence,
             useful_patterns=self.memory.useful_patterns(route.task_type),
             branch_rewards={name: fb.reward for name, fb in signal.branch_feedback.items()},
+            selected_path=selected_path,
+            routing_context_key=routing_context_key,
             user_id=user_id,
             task_metadata=task.metadata,
             reward_components=reward_components,
@@ -177,6 +193,8 @@ class PromptForestEngine:
             },
             "optimization": asdict(optimize_event),
             "reward_components": reward_components,
+            "selected_path": selected_path,
+            "routing_context_key": routing_context_key,
             "runtime": {
                 "evaluator_llm_enabled": self.config.agent_runtimes.evaluator.enabled,
                 "optimizer_llm_enabled": self.config.agent_runtimes.optimizer.enabled,
@@ -286,10 +304,33 @@ class PromptForestEngine:
                     context = self._roll_context(context, outputs[branch_name].output, strict_mode=strict_mode)
                     continue
 
-                branch_output = self.executor.run_branch(branch, task, route.task_type, context=context)
+                branch_context = self._augment_context_for_branch(task, branch, context)
+                branch_output = self.executor.run_branch(branch, task, route.task_type, context=branch_context)
                 outputs[branch_name] = branch_output
                 context = self._roll_context(context, branch_output.output, strict_mode=strict_mode)
         return outputs
+
+    def _augment_context_for_branch(self, task: TaskInput, branch: PromptBranch, context: str) -> str:
+        base_context = str(context or "").strip()
+        user_id = str(task.metadata.get("user_id", "global")).strip() or "global"
+        memory_hints = self.memory.execution_guidance(task, branch.name, user_id=user_id, limit=2)
+        adaptive_hint = str(branch.state.metadata.get("adaptive_execution_hint", "")).strip()
+
+        sections: list[str] = []
+        if base_context:
+            sections.append(base_context[-520:])
+
+        guidance_lines: list[str] = []
+        if adaptive_hint:
+            guidance_lines.append(f"Adaptive branch hint: {adaptive_hint}")
+        for hint in memory_hints:
+            guidance_lines.append(f"Similar success: {hint}")
+
+        if guidance_lines:
+            guidance = "Execution guidance:\n" + "\n".join(f"- {line}" for line in guidance_lines)
+            sections.append(guidance[:520])
+
+        return "\n\n".join(section for section in sections if section).strip()
 
     @staticmethod
     def _candidate_leaves(route: RoutingDecision, outputs: dict[str, Any]) -> list[str]:
@@ -415,6 +456,17 @@ class PromptForestEngine:
             )
 
     @staticmethod
+    def _selected_path(route: RoutingDecision, selected_branch: str) -> list[str]:
+        for path in route.activated_paths:
+            if path and path[-1] == selected_branch:
+                return list(path)
+        if route.activated_paths:
+            return list(route.activated_paths[0])
+        if route.activated_branches:
+            return list(route.activated_branches)
+        return []
+
+    @staticmethod
     def _roll_context(current_context: str, new_piece: str, max_chars: int = 800, strict_mode: bool = False) -> str:
         if strict_mode:
             snippet = PromptForestEngine._compact_context_piece(new_piece, max_chars=120)
@@ -488,15 +540,16 @@ class PromptForestEngine:
                     metadata=dict(record.task_metadata or {}),
                 )
                 context_seed = str(replay_task.metadata.get("context_seed", ""))
+                replay_context = self._augment_context_for_branch(replay_task, branch, context_seed)
 
                 branch.state.weight = old_weight
                 branch.state.prompt_template = old_prompt
-                old_output = self.executor.run_branch(branch, replay_task, replay_task.task_type, context=context_seed)
+                old_output = self.executor.run_branch(branch, replay_task, replay_task.task_type, context=replay_context)
                 old_score = self.judge.score_output(old_output.output, replay_task).reward
 
                 branch.state.weight = new_weight
                 branch.state.prompt_template = new_prompt
-                new_output = self.executor.run_branch(branch, replay_task, replay_task.task_type, context=context_seed)
+                new_output = self.executor.run_branch(branch, replay_task, replay_task.task_type, context=replay_context)
                 new_score = self.judge.score_output(new_output.output, replay_task).reward
 
                 old_scores.append(old_score)

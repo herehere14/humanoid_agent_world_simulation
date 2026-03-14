@@ -96,6 +96,8 @@ class MemoryRecord:
     confidence: float
     useful_patterns: list[str]
     branch_rewards: dict[str, float] = field(default_factory=dict)
+    selected_path: list[str] = field(default_factory=list)
+    routing_context_key: str = ""
     user_id: str = "global"
     task_metadata: dict[str, Any] = field(default_factory=dict)
     reward_components: dict[str, float] = field(default_factory=dict)

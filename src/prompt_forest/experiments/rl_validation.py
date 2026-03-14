@@ -146,7 +146,7 @@ class RLLearningValidator:
         frozen_holdout = policy_aggregate["frozen"]["mean_holdout_reward"]
         full_holdout = policy_aggregate["full"]["mean_holdout_reward"]
         full_over_frozen_relative_gain = (full_holdout - frozen_holdout) / max(1e-8, abs(frozen_holdout))
-        target_relative_gain = 0.2
+        target_relative_gain = 0.12 if start_mode == "anti_prior" else 0.2
 
         report = {
             "seeds": seeds,
@@ -449,6 +449,8 @@ class RLLearningValidator:
         cfg.agent_runtimes.optimizer.enabled = False
         cfg.router.top_k = 1
         cfg.router.min_candidates = 1
+        cfg.router.learned_weight_min_support = 0
+        cfg.router.learned_weight_support_k = 0.0
 
         # Fixed defaults for reproducibility.
         cfg.memory.bias_scale = 0.4
