@@ -24,6 +24,11 @@ class RouterConfig:
     bandit_shrinkage_k: float = 12.0
     exploration_min: float = 0.03
     exploration_decay: float = 0.997
+    route_override_min_support: int = 4
+    route_override_min_win_rate: float = 0.7
+    route_override_min_margin: float = 0.03
+    sibling_probe_score_gap: float = 0.08
+    sibling_probe_top_n: int = 2
 
 
 @dataclass
@@ -83,6 +88,12 @@ class MemoryConfig:
     routing_min_similarity: float = 0.34
     routing_margin: float = 0.03
     routing_shrinkage_k: float = 4.0
+    routing_pair_tie_margin: float = 0.01
+    routing_promotion_min_support: int = 4
+    routing_promotion_min_win_rate: float = 0.7
+    routing_promotion_min_margin: float = 0.03
+    routing_pair_replay_window: int = 24
+    routing_pair_replay_min_samples: int = 3
     execution_hint_min_reward: float = 0.7
 
 
@@ -108,6 +119,19 @@ class ComposerConfig:
     min_branches_for_compose: int = 2
     max_feature_items: int = 14
     force_required_substrings: bool = False
+
+
+@dataclass
+class ExecutionAdaptationConfig:
+    enabled: bool = True
+    min_success_support: int = 2
+    min_similarity: float = 0.38
+    max_success_examples: int = 2
+    max_failure_examples: int = 1
+    max_prompt_chars: int = 1200
+    min_judge_gain: float = 0.015
+    enable_support_pass: bool = False
+    support_pass_reward_floor: float = 0.78
 
 
 @dataclass
@@ -138,6 +162,7 @@ class EngineConfig:
     feedback: FeedbackConfig = field(default_factory=FeedbackConfig)
     evaluator: EvaluatorConfig = field(default_factory=EvaluatorConfig)
     composer: ComposerConfig = field(default_factory=ComposerConfig)
+    execution_adaptation: ExecutionAdaptationConfig = field(default_factory=ExecutionAdaptationConfig)
     agent_runtimes: AgentRuntimesConfig = field(default_factory=AgentRuntimesConfig)
     artifacts_dir: str = "artifacts"
 

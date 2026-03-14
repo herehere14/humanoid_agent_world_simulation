@@ -222,7 +222,10 @@ def create_default_hierarchical_forest() -> HierarchicalPromptForest:
                     "You are the Timeline Optimizer niche branch. Task type: {task_type}.\\n"
                     "Task: {task}\\n"
                     "Parent context: {context}\\n"
-                    "Produce a realistic timeline with milestones, dependencies, and monitoring points."
+                    "Optimize for schedule structure, not risk ownership. "
+                    "Produce a realistic timeline with phases, milestones, checkpoints, sequencing, dependencies, and monitoring points. "
+                    "Default to time blocks such as day/week/phase, and make handoffs explicit. "
+                    "Do not turn the answer into a risk register unless the task explicitly asks for one."
                 ),
                 0.94,
                 ["planning", "general"],
@@ -234,7 +237,13 @@ def create_default_hierarchical_forest() -> HierarchicalPromptForest:
                     "You are the Risk Allocator niche branch. Task type: {task_type}.\\n"
                     "Task: {task}\\n"
                     "Parent context: {context}\\n"
-                    "Allocate resources under uncertainty and include fallback plans."
+                    "Optimize for risk ownership and mitigation, not timeline polish. "
+                    "Produce a risk register or operating-risk plan with explicit owners, mitigations, fallback or rollback actions, and high-risk dependencies. "
+                    "Surface uncertainty, escalation triggers, and containment steps. "
+                    "Keep the register compact and operational rather than encyclopedic. "
+                    "Close with a short rollout-plan note or go/no-go timing cue if it helps execution. "
+                    "End with a calibrated numeric confidence line in the form confidence=0.xx even if the table already includes qualitative confidence labels. "
+                    "Do not spend most of the answer on phases or milestone sequencing unless that is explicitly requested."
                 ),
                 0.93,
                 ["planning", "code", "general"],
@@ -300,7 +309,11 @@ def create_default_hierarchical_forest() -> HierarchicalPromptForest:
                     "You are the Constraint Checker niche branch. Task type: {task_type}.\\n"
                     "Task: {task}\\n"
                     "Parent context: {context}\\n"
-                    "Verify required constraints and produce pass/fail evidence for each."
+                    "Act as a hard requirements auditor. "
+                    "Verify required constraints one by one and produce pass or fail evidence for each explicit requirement, field, rule, or contract. "
+                    "Prefer checklist, requirement coverage, and missing-item detection over broad narrative critique. "
+                    "If a requirement is absent, say exactly what is missing. "
+                    "For audit or consistency tasks, explicitly name the contradiction or unresolved gap and end with a calibrated confidence line in the form confidence=0.xx."
                 ),
                 0.97,
                 ["math", "factual", "code", "general"],
@@ -312,7 +325,11 @@ def create_default_hierarchical_forest() -> HierarchicalPromptForest:
                     "You are the Consistency Auditor niche branch. Task type: {task_type}.\\n"
                     "Task: {task}\\n"
                     "Parent context: {context}\\n"
-                    "Audit internal consistency and calibrate uncertainty statements."
+                    "Act as an internal coherence and calibration auditor. "
+                    "Audit cross-step consistency, contradictions, unsupported jumps, and confidence calibration. "
+                    "Prefer reasoning integrity, tradeoff coherence, and uncertainty calibration over checklist coverage. "
+                    "Do not frame the answer as a pass or fail checklist unless the task explicitly demands that format. "
+                    "When you find a contradiction, state it explicitly, explain the uncertainty impact, and end with a calibrated confidence line in the form confidence=0.xx."
                 ),
                 0.95,
                 ["general", "planning", "factual"],

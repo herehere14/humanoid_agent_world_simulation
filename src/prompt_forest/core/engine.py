@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from dataclasses import asdict
 from pathlib import Path
 from statistics import mean
@@ -85,10 +84,18 @@ class PromptForestEngine:
         task = TaskInput(task_id=str(uuid4()), text=text, task_type=task_type, metadata=task_metadata)
 
         route = self.router.route(task, self.forest, self.memory)
+        route = self._augment_route_with_support_paths(task, route, adapt=adapt, update_memory=update_memory)
         task.task_type = route.task_type
         self._route_history.append(route)
 
         outputs = self._run_path(route, task)
+        route, outputs, routing_probes = self._maybe_probe_sibling_branches(
+            task,
+            route,
+            outputs,
+            adapt=adapt,
+            update_memory=update_memory,
+        )
         composer_notes: dict[str, Any] = {}
         contract_hint = infer_output_contract(task.text, task.metadata)
         composed = None
@@ -176,10 +183,15 @@ class PromptForestEngine:
         )
         if update_memory:
             self.memory.add(record)
+            routing_preferences = self._record_route_preferences(task, route, signal)
+        else:
+            routing_preferences = []
 
         payload = {
             "task": asdict(task),
             "routing": asdict(route),
+            "routing_probes": routing_probes,
+            "routing_preferences": routing_preferences,
             "branch_scores": {k: asdict(v) for k, v in branch_scores.items()},
             "evaluation_signal": {
                 "reward_score": signal.reward_score,
@@ -207,6 +219,207 @@ class PromptForestEngine:
         append_jsonl(self._event_log, payload)
 
         return payload
+
+    def _augment_route_with_support_paths(
+        self,
+        task: TaskInput,
+        route: RoutingDecision,
+        *,
+        adapt: bool,
+        update_memory: bool,
+    ) -> RoutingDecision:
+        if not self.config.execution_adaptation.enable_support_pass:
+            return route
+        if adapt or update_memory:
+            return route
+        if not route.activated_paths or not route.activated_paths[0]:
+            return route
+
+        user_id = str(task.metadata.get("user_id", "global")).strip() or "global"
+        similar_records = self.memory.retrieve_similar(task.task_type, limit=6, user_id=user_id)
+        if len(similar_records) < self.config.execution_adaptation.min_success_support:
+            similar_records = self.memory.retrieve_similar(task.task_type, limit=6, user_id=None)
+        if len(similar_records) < self.config.execution_adaptation.min_success_support:
+            return route
+
+        primary_path = list(route.activated_paths[0])
+        primary_leaf = primary_path[-1]
+        support_leaf = self._support_branch_for_task(task, primary_leaf, [])
+        if not support_leaf or support_leaf == primary_leaf:
+            return route
+        if support_leaf not in self.forest.nodes:
+            return route
+
+        support_path = self.forest.path_to_root(support_leaf)
+        if not support_path or support_path in route.activated_paths:
+            return route
+
+        activated_paths = [list(path) for path in route.activated_paths]
+        activated_paths.append(support_path)
+        activated_branches = list(route.activated_branches)
+        for branch_name in support_path:
+            if branch_name not in activated_branches:
+                activated_branches.append(branch_name)
+
+        return RoutingDecision(
+            task_type=route.task_type,
+            activated_branches=activated_branches,
+            branch_scores=dict(route.branch_scores),
+            activated_paths=activated_paths,
+            sibling_decisions=dict(route.sibling_decisions),
+        )
+
+    def _maybe_probe_sibling_branches(
+        self,
+        task: TaskInput,
+        route: RoutingDecision,
+        outputs: dict[str, Any],
+        *,
+        adapt: bool,
+        update_memory: bool,
+    ) -> tuple[RoutingDecision, dict[str, Any], list[dict[str, Any]]]:
+        if not adapt or not update_memory:
+            return route, outputs, []
+        if not route.activated_paths or not route.activated_paths[0]:
+            return route, outputs, []
+
+        primary_path = route.activated_paths[0]
+        if len(primary_path) < 2:
+            return route, outputs, []
+
+        parent_id = primary_path[-2]
+        decision = dict(route.sibling_decisions.get(parent_id, {}))
+        probe_candidates = [
+            str(child).strip()
+            for child in decision.get("probe_candidates", [])
+            if str(child).strip()
+        ]
+        if len(probe_candidates) < 2:
+            return route, outputs, []
+
+        existing = {
+            path[-1]
+            for path in route.activated_paths
+            if len(path) >= 2 and path[-2] == parent_id and path[-1] in outputs
+        }
+        missing = [child for child in probe_candidates if child not in existing]
+        if not missing:
+            return route, outputs, []
+
+        updated_outputs = dict(outputs)
+        added_paths: list[list[str]] = []
+        for child_id in missing:
+            if child_id not in self.forest.nodes:
+                continue
+            path = self.forest.path_to_root(child_id)
+            if not path:
+                continue
+            self._run_specific_path(task, path, updated_outputs)
+            added_paths.append(path)
+
+        if not added_paths:
+            return route, outputs, []
+
+        updated_route = self._merge_route_with_paths(route, added_paths)
+        updated_decisions = dict(updated_route.sibling_decisions)
+        decision["probed_children"] = [
+            path[-1]
+            for path in updated_route.activated_paths
+            if len(path) >= 2 and path[-2] == parent_id and path[-1] in probe_candidates
+        ]
+        updated_decisions[parent_id] = decision
+        updated_route.sibling_decisions = updated_decisions
+
+        probe_summary = {
+            "parent_id": parent_id,
+            "probe_candidates": probe_candidates,
+            "added_children": [path[-1] for path in added_paths],
+            "score_gap": decision.get("score_gap", 0.0),
+        }
+        return updated_route, updated_outputs, [probe_summary]
+
+    def _run_specific_path(self, task: TaskInput, path: list[str], outputs: dict[str, Any]) -> None:
+        context = task.metadata.get("context_seed", "")
+        strict_contract = infer_output_contract(task.text, task.metadata)
+        strict_mode = strict_contract is not None
+
+        for branch_name in path:
+            branch = self.branches.get(branch_name)
+            if branch is None or not branch.is_active:
+                continue
+
+            if branch_name in outputs:
+                context = self._roll_context(context, outputs[branch_name].output, strict_mode=strict_mode)
+                continue
+
+            branch_context = self._augment_context_for_branch(task, branch, context)
+            branch_output = self.executor.run_branch(branch, task, task.task_type, context=branch_context)
+            if not self.forest.children(branch_name):
+                branch_output = self._maybe_refine_leaf_output(task, branch, branch_output)
+            outputs[branch_name] = branch_output
+            context = self._roll_context(context, branch_output.output, strict_mode=strict_mode)
+
+    @staticmethod
+    def _merge_route_with_paths(route: RoutingDecision, added_paths: list[list[str]]) -> RoutingDecision:
+        activated_paths = [list(path) for path in route.activated_paths]
+        activated_branches = list(route.activated_branches)
+        for path in added_paths:
+            if not path or path in activated_paths:
+                continue
+            activated_paths.append(path)
+            for branch_name in path:
+                if branch_name not in activated_branches:
+                    activated_branches.append(branch_name)
+
+        return RoutingDecision(
+            task_type=route.task_type,
+            activated_branches=activated_branches,
+            branch_scores=dict(route.branch_scores),
+            activated_paths=activated_paths,
+            sibling_decisions=dict(route.sibling_decisions),
+        )
+
+    def _record_route_preferences(
+        self,
+        task: TaskInput,
+        route: RoutingDecision,
+        signal,
+    ) -> list[dict[str, Any]]:
+        grouped_rewards: dict[str, dict[str, float]] = {}
+        for path in route.activated_paths:
+            if len(path) < 2:
+                continue
+            parent_id = path[-2]
+            child_id = path[-1]
+            child_feedback = signal.branch_feedback.get(child_id)
+            if child_feedback is None:
+                continue
+            grouped_rewards.setdefault(parent_id, {})[child_id] = float(child_feedback.reward)
+
+        updates: list[dict[str, Any]] = []
+        user_id = str(task.metadata.get("user_id", "global")).strip() or "global"
+        for parent_id, reward_by_child in grouped_rewards.items():
+            if len(reward_by_child) < 2:
+                continue
+            signal_summary = self.memory.record_sibling_probe(
+                task=task,
+                parent_id=parent_id,
+                reward_by_child=reward_by_child,
+                user_id=user_id,
+                source="probe",
+            )
+            updates.append(
+                {
+                    "parent_id": parent_id,
+                    "reward_by_child": {name: round(score, 4) for name, score in reward_by_child.items()},
+                    "preferred_child": signal_summary.preferred_child,
+                    "override_child": signal_summary.override_child,
+                    "support": signal_summary.support,
+                    "win_rate": round(signal_summary.win_rate, 4),
+                    "expected_margin": round(signal_summary.expected_margin, 4),
+                }
+            )
+        return updates
 
     def apply_feedback(
         self,
@@ -306,6 +519,8 @@ class PromptForestEngine:
 
                 branch_context = self._augment_context_for_branch(task, branch, context)
                 branch_output = self.executor.run_branch(branch, task, route.task_type, context=branch_context)
+                if not self.forest.children(branch_name):
+                    branch_output = self._maybe_refine_leaf_output(task, branch, branch_output)
                 outputs[branch_name] = branch_output
                 context = self._roll_context(context, branch_output.output, strict_mode=strict_mode)
         return outputs
@@ -331,6 +546,346 @@ class PromptForestEngine:
             sections.append(guidance[:520])
 
         return "\n\n".join(section for section in sections if section).strip()
+
+    def _maybe_refine_leaf_output(self, task: TaskInput, branch: PromptBranch, branch_output):
+        if not self.config.execution_adaptation.enabled:
+            return branch_output
+
+        user_id = str(task.metadata.get("user_id", "global")).strip() or "global"
+        playbook = self.memory.execution_playbook(
+            task,
+            branch.name,
+            user_id=user_id,
+            success_limit=self.config.execution_adaptation.max_success_examples + 1,
+            failure_limit=self.config.execution_adaptation.max_failure_examples,
+            min_similarity=self.config.execution_adaptation.min_similarity,
+        )
+        if playbook.support < self.config.execution_adaptation.min_success_support:
+            return branch_output
+
+        required_items = self._merge_coverage_items(playbook.coverage_items, self._task_priority_items(task))
+        missing_before = self._missing_coverage_items(branch_output.output, required_items)
+        should_refine = bool(missing_before) or bool(playbook.anti_patterns) or playbook.support > self.config.execution_adaptation.min_success_support
+        if not should_refine:
+            return branch_output
+
+        original_score = self.judge.score_output(branch_output.output, task).reward
+        support_output = ""
+        if self.config.execution_adaptation.enable_support_pass and (
+            missing_before or original_score < self.config.execution_adaptation.support_pass_reward_floor
+        ):
+            support_output = self._support_branch_analysis(task, branch.name, branch_output.output, playbook, missing_before)
+
+        candidates: list[dict[str, Any]] = []
+        plain_candidate = self._generate_refinement_candidate(
+            task=task,
+            branch_name=branch.name,
+            branch_output=branch_output,
+            playbook=playbook,
+            required_items=required_items,
+            missing_before=missing_before,
+            support_output="",
+        )
+        if plain_candidate:
+            candidates.append(plain_candidate)
+        if support_output:
+            support_candidate = self._generate_refinement_candidate(
+                task=task,
+                branch_name=branch.name,
+                branch_output=branch_output,
+                playbook=playbook,
+                required_items=required_items,
+                missing_before=missing_before,
+                support_output=support_output,
+            )
+            if support_candidate:
+                candidates.append(support_candidate)
+        if not candidates:
+            return branch_output
+
+        best_candidate = max(
+            candidates,
+            key=lambda item: (item["score"], -len(item["missing_after"]), item["strategy"] == "support_pass"),
+        )
+        refined_text = str(best_candidate["text"]).strip()
+        refined_score = float(best_candidate["score"])
+        missing_after = list(best_candidate["missing_after"])
+        improved_coverage = len(missing_after) < len(missing_before)
+        gain = refined_score - original_score
+        min_gain = max(0.0, self.config.execution_adaptation.min_judge_gain)
+
+        if len(missing_after) > len(missing_before):
+            return branch_output
+        if gain < min_gain and not (improved_coverage and refined_score >= original_score):
+            return branch_output
+
+        refined_meta = {
+            **branch_output.model_meta,
+            **best_candidate["meta"],
+            "adaptive_refined": True,
+            "adaptive_refine_gain": round(gain, 4),
+            "adaptive_refine_support": playbook.support,
+            "adaptive_refine_missing_before": missing_before,
+            "adaptive_refine_missing_after": missing_after,
+            "adaptive_refine_strategy": best_candidate["strategy"],
+        }
+        return type(branch_output)(
+            branch_name=branch_output.branch_name,
+            prompt=branch_output.prompt,
+            output=refined_text,
+            task_type=branch_output.task_type,
+            model_meta=refined_meta,
+        )
+
+    def _render_refinement_prompt(
+        self,
+        task: TaskInput,
+        branch_name: str,
+        draft: str,
+        playbook,
+        required_items: list[str],
+        missing_items: list[str],
+        *,
+        support_output: str = "",
+    ) -> str:
+        coverage = required_items or playbook.coverage_items or ["none"]
+        structure = playbook.structure_cues or ["keep the structure concise and easy to scan"]
+        anti_patterns = playbook.anti_patterns or ["do not add meta commentary"]
+        examples = playbook.success_examples[: self.config.execution_adaptation.max_success_examples]
+        guidance = playbook.guidance[: self.config.execution_adaptation.max_success_examples]
+
+        sections = [
+            "You are improving a branch draft using a learned execution playbook from successful similar tasks.",
+            f"Branch: {branch_name}",
+            f"Task type: {task.task_type}",
+            f"Task: {task.text}",
+            "Current draft:",
+            draft,
+            "Coverage items to satisfy:",
+            "\n".join(f"- {item}" for item in coverage),
+            "Preferred structure cues:",
+            "\n".join(f"- {item}" for item in structure),
+            "Avoid these failure patterns:",
+            "\n".join(f"- {item}" for item in anti_patterns),
+        ]
+        task_native_items = self._task_priority_items(task)
+        if task_native_items:
+            sections.extend(
+                [
+                    "Task-native signals that must remain explicit in the answer:",
+                    "\n".join(f"- {item}" for item in task_native_items),
+                ]
+            )
+        if missing_items:
+            sections.extend(
+                [
+                    "Items missing from the current draft:",
+                    "\n".join(f"- {item}" for item in missing_items),
+                ]
+            )
+        if guidance:
+            sections.extend(
+                [
+                    "Learned success cues:",
+                    "\n".join(f"- {item}" for item in guidance),
+                ]
+            )
+        if support_output:
+            sections.extend(
+                [
+                    "Support branch analysis:",
+                    support_output,
+                ]
+            )
+        if examples:
+            sections.extend(
+                [
+                    "Compact examples from successful prior outputs:",
+                    "\n".join(f"- {item}" for item in examples),
+                ]
+            )
+        sections.append(
+            "Revise the draft so it better satisfies the task while preserving any correct content. "
+            "Make the answer explicit, concrete, and easy to scan. "
+            "Do not remove explicit task-native signals that are already present. "
+            "If the task asks for confidence, end with a calibrated numeric confidence line such as confidence=0.72. "
+            "Return only the revised answer."
+        )
+        return "\n\n".join(section for section in sections if section)
+
+    def _generate_refinement_candidate(
+        self,
+        *,
+        task: TaskInput,
+        branch_name: str,
+        branch_output,
+        playbook,
+        required_items: list[str],
+        missing_before: list[str],
+        support_output: str,
+    ) -> dict[str, Any] | None:
+        prompt = self._render_refinement_prompt(
+            task,
+            branch_name,
+            branch_output.output,
+            playbook,
+            required_items,
+            missing_before,
+            support_output=support_output,
+        )
+        max_chars = max(400, self.config.execution_adaptation.max_prompt_chars)
+        if len(prompt) > max_chars:
+            prompt = prompt[:max_chars].rstrip() + "\n\nReturn only the revised answer."
+
+        refined_text, meta = self.backend.generate(prompt, task, f"{branch_name}__adaptive_refine")
+        refined_text = refined_text.strip()
+        if not refined_text:
+            return None
+
+        return {
+            "text": refined_text,
+            "meta": meta,
+            "score": self.judge.score_output(refined_text, task).reward,
+            "missing_after": self._missing_coverage_items(refined_text, required_items),
+            "strategy": "support_pass" if support_output else "playbook_only",
+        }
+
+    def _support_branch_analysis(
+        self,
+        task: TaskInput,
+        primary_branch_name: str,
+        draft: str,
+        playbook,
+        missing_items: list[str],
+    ) -> str:
+        support_branch_name = self._support_branch_for_task(task, primary_branch_name, missing_items)
+        if not support_branch_name:
+            return ""
+
+        support_branch = self.branches.get(support_branch_name)
+        if support_branch is None or not support_branch.is_active:
+            return ""
+
+        context_sections = [
+            "Current draft to inspect:",
+            draft,
+        ]
+        if missing_items:
+            context_sections.extend(
+                [
+                    "Likely missing items:",
+                    "\n".join(f"- {item}" for item in missing_items),
+                ]
+            )
+        if playbook.guidance:
+            context_sections.extend(
+                [
+                    "Learned success cues:",
+                    "\n".join(f"- {item}" for item in playbook.guidance[:2]),
+                ]
+            )
+        support_context = "\n\n".join(section for section in context_sections if section).strip()
+        support_output = self.executor.run_branch(
+            support_branch,
+            task,
+            task.task_type,
+            context=support_context[:700],
+        )
+        return support_output.output.strip()
+
+    @staticmethod
+    def _support_branch_for_task(task: TaskInput, primary_branch_name: str, missing_items: list[str]) -> str:
+        missing_l = " ".join(item.lower() for item in missing_items)
+        text_l = task.text.lower()
+        if task.task_type == "planning" or primary_branch_name.startswith("planner"):
+            if any(token in (missing_l + " " + text_l) for token in ("rollback", "risk", "owner", "communication")):
+                return "verification_constraint_checker"
+            return "verification_consistency_auditor"
+        if task.task_type == "code":
+            if "review" in text_l or "checklist" in text_l:
+                return "critique_failure_hunter"
+            if any(token in (missing_l + " " + text_l) for token in ("consistency", "contradiction", "uncertainty", "confidence")):
+                if primary_branch_name != "verification_consistency_auditor":
+                    return "verification_consistency_auditor"
+                return "verification_constraint_checker"
+            if any(token in missing_l for token in ("tests", "rollback", "monitoring", "validation", "owner")):
+                if primary_branch_name != "verification_constraint_checker":
+                    return "verification_constraint_checker"
+                return "critique_failure_hunter"
+            if primary_branch_name == "verification_constraint_checker":
+                return "verification_consistency_auditor"
+            return "verification_constraint_checker"
+        if task.task_type == "general":
+            if any(token in text_l for token in ("consistency", "contradiction", "uncertainty", "confidence")):
+                return "verification_consistency_auditor"
+            if any(token in text_l for token in ("tradeoff", "decision note", "recommendation")):
+                return "verification_consistency_auditor"
+            return "critique_adversarial_probe"
+        if task.task_type == "factual":
+            return "verification_consistency_auditor"
+        return ""
+
+    @staticmethod
+    def _merge_coverage_items(primary: list[str], secondary: list[str], limit: int = 8) -> list[str]:
+        merged: list[str] = []
+        for item in [*(primary or []), *(secondary or [])]:
+            cleaned = str(item).strip()
+            if not cleaned or cleaned in merged:
+                continue
+            merged.append(cleaned)
+            if len(merged) >= max(1, limit):
+                break
+        return merged
+
+    @staticmethod
+    def _task_priority_items(task: TaskInput, limit: int = 8) -> list[str]:
+        items: list[str] = []
+        for source in (task.metadata.get("required_substrings", []), task.metadata.get("expected_keywords", [])):
+            if not isinstance(source, list):
+                continue
+            for raw in source:
+                cleaned = str(raw).strip()
+                if cleaned and cleaned not in items:
+                    items.append(cleaned)
+                    if len(items) >= max(1, limit):
+                        return items
+
+        text_l = task.text.lower()
+        heuristic_items = [
+            ("consistency", "consistency"),
+            ("contradiction", "contradictions"),
+            ("uncertainty", "uncertainty calibration"),
+            ("confidence", "confidence"),
+            ("owner", "owner"),
+            ("rollback", "rollback"),
+            ("mitigation", "mitigation"),
+            ("monitoring", "monitoring"),
+            ("test", "tests"),
+        ]
+        for needle, item in heuristic_items:
+            if needle in text_l and item not in items:
+                items.append(item)
+            if len(items) >= max(1, limit):
+                break
+        return items[: max(1, limit)]
+
+    @staticmethod
+    def _missing_coverage_items(output: str, coverage_items: list[str]) -> list[str]:
+        output_l = output.lower()
+        missing: list[str] = []
+        for item in coverage_items:
+            normalized = str(item).strip().lower()
+            if not normalized:
+                continue
+            variants = {normalized, normalized.replace("-", " ")}
+            if normalized.endswith("s"):
+                variants.add(normalized[:-1])
+            else:
+                variants.add(f"{normalized}s")
+            if any(variant and variant in output_l for variant in variants):
+                continue
+            missing.append(item)
+        return missing
 
     @staticmethod
     def _candidate_leaves(route: RoutingDecision, outputs: dict[str, Any]) -> list[str]:

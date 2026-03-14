@@ -89,7 +89,15 @@ def build_parser() -> argparse.ArgumentParser:
     live_cmd.add_argument("--base-url", type=str, default="https://api.openai.com/v1")
     live_cmd.add_argument("--temperature", type=float, default=0.2)
     live_cmd.add_argument("--max-output-tokens", type=int, default=700)
+    live_cmd.add_argument("--api-mode", type=str, default="chat_completions", choices=["chat_completions", "responses"])
+    live_cmd.add_argument("--reasoning-effort", type=str, default="")
+    live_cmd.add_argument("--judge-api-mode", type=str, default="")
+    live_cmd.add_argument("--judge-reasoning-effort", type=str, default="")
+    live_cmd.add_argument("--judge-temperature", type=float, default=0.0)
+    live_cmd.add_argument("--judge-max-output-tokens", type=int, default=500)
     live_cmd.add_argument("--train-rounds", type=int, default=2)
+    live_cmd.add_argument("--output-subdir", type=str, default="live_model_validation")
+    live_cmd.add_argument("--report-prefix", type=str, default="live_model_validation_report")
     live_cmd.add_argument("--disable-agent-runtimes", action="store_true")
 
     ablate_cmd = sub.add_parser("live-ablate", help="Run live ablation for frozen, memory-only, weight-only, and full adaptive policies")
@@ -100,7 +108,15 @@ def build_parser() -> argparse.ArgumentParser:
     ablate_cmd.add_argument("--base-url", type=str, default="https://api.openai.com/v1")
     ablate_cmd.add_argument("--temperature", type=float, default=0.2)
     ablate_cmd.add_argument("--max-output-tokens", type=int, default=700)
+    ablate_cmd.add_argument("--api-mode", type=str, default="chat_completions", choices=["chat_completions", "responses"])
+    ablate_cmd.add_argument("--reasoning-effort", type=str, default="")
+    ablate_cmd.add_argument("--judge-api-mode", type=str, default="")
+    ablate_cmd.add_argument("--judge-reasoning-effort", type=str, default="")
+    ablate_cmd.add_argument("--judge-temperature", type=float, default=0.0)
+    ablate_cmd.add_argument("--judge-max-output-tokens", type=int, default=500)
     ablate_cmd.add_argument("--train-rounds", type=int, default=2)
+    ablate_cmd.add_argument("--output-subdir", type=str, default="live_model_ablation_validation")
+    ablate_cmd.add_argument("--report-prefix", type=str, default="live_model_ablation_report")
     ablate_cmd.add_argument("--disable-agent-runtimes", action="store_true")
 
     improve_cmd = sub.add_parser("auto-improve", help="Run multi-round config tuning with anti-bias objective")
@@ -294,8 +310,16 @@ def main() -> None:
             base_url=args.base_url,
             temperature=args.temperature,
             max_output_tokens=args.max_output_tokens,
+            api_mode=args.api_mode,
+            reasoning_effort=args.reasoning_effort or None,
+            judge_api_mode=args.judge_api_mode or None,
+            judge_reasoning_effort=args.judge_reasoning_effort or None,
+            judge_temperature=args.judge_temperature,
+            judge_max_output_tokens=args.judge_max_output_tokens,
             train_rounds=args.train_rounds,
             use_agent_runtimes=not args.disable_agent_runtimes,
+            output_subdir=args.output_subdir,
+            report_prefix=args.report_prefix,
         )
         print(json.dumps(report, indent=2))
         return
@@ -310,8 +334,16 @@ def main() -> None:
             base_url=args.base_url,
             temperature=args.temperature,
             max_output_tokens=args.max_output_tokens,
+            api_mode=args.api_mode,
+            reasoning_effort=args.reasoning_effort or None,
+            judge_api_mode=args.judge_api_mode or None,
+            judge_reasoning_effort=args.judge_reasoning_effort or None,
+            judge_temperature=args.judge_temperature,
+            judge_max_output_tokens=args.judge_max_output_tokens,
             train_rounds=args.train_rounds,
             use_agent_runtimes=not args.disable_agent_runtimes,
+            output_subdir=args.output_subdir,
+            report_prefix=args.report_prefix,
         )
         print(json.dumps(report, indent=2))
         return

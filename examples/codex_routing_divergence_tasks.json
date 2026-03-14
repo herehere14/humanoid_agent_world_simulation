@@ -1,0 +1,348 @@
+{
+  "train": [
+    {
+      "task_id": "train_divergence_planning_risk_failover",
+      "aspect": "planning_risk",
+      "task_type": "planning",
+      "text": "Create a concise risk register for a phased database failover in a billing platform. Include mitigation, owner, rollback, and confidence.",
+      "metadata": {
+        "expected_keywords": ["risk", "mitigation", "owner", "rollback", "confidence"],
+        "required_substrings": ["owner", "confidence"],
+        "reference_answer": "A strong answer lists concrete failover risks, owners, mitigations, rollback triggers, and calibrated confidence.",
+        "evaluation_rubric": ["clear risk register", "owners", "mitigations", "rollback", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["mitigation", "owner", "rollback", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "planning_risk"
+      }
+    },
+    {
+      "task_id": "train_divergence_planning_risk_sso",
+      "aspect": "planning_risk",
+      "task_type": "planning",
+      "text": "Prepare a launch risk register for rolling out self-serve SSO to enterprise tenants. Include mitigation, owner, fallback, and confidence.",
+      "metadata": {
+        "expected_keywords": ["risk", "mitigation", "owner", "fallback", "confidence"],
+        "required_substrings": ["owner", "confidence"],
+        "reference_answer": "A strong answer identifies rollout risks, assigns owners, includes mitigations or fallback plans, and calibrates confidence.",
+        "evaluation_rubric": ["clear risk register", "owners", "fallback or mitigation", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["mitigation", "owner", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "planning_risk"
+      }
+    },
+    {
+      "task_id": "train_divergence_code_consistency_retry_backlog",
+      "aspect": "code_consistency_audit",
+      "task_type": "code",
+      "text": "Audit a rollout update for consistency when it says the new job queue is stable, but it also says the retry backlog keeps growing and the dead-letter queue was never replayed. Explain contradictions, uncertainty calibration, and confidence.",
+      "metadata": {
+        "expected_keywords": ["contradiction", "uncertainty", "retry", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer identifies the inconsistency between the stability claim and unresolved operational evidence, then recalibrates confidence.",
+        "evaluation_rubric": ["internal consistency", "operational contradiction", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "code_consistency_audit"
+      }
+    },
+    {
+      "task_id": "train_divergence_code_consistency_canary",
+      "aspect": "code_consistency_audit",
+      "task_type": "code",
+      "text": "Audit a deployment summary for internal consistency when it says the cache-layer change is low risk, but it also reports that canary metrics are incomplete and rollback automation was skipped. Explain inconsistencies, missing assumptions, and confidence.",
+      "metadata": {
+        "expected_keywords": ["inconsistency", "assumption", "rollback", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer surfaces why the low-risk claim is unsupported, identifies missing assumptions, and calibrates confidence.",
+        "evaluation_rubric": ["internal consistency", "missing assumptions", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "code_consistency_audit"
+      }
+    },
+    {
+      "task_id": "train_divergence_general_consistency_release_note",
+      "aspect": "general_consistency_audit",
+      "task_type": "general",
+      "text": "Audit a launch update for internal consistency when it says rollout is complete, but it also says canary results are pending and rollback is untested. Explain contradictions, missing assumptions, confidence, and the next verification step.",
+      "metadata": {
+        "expected_keywords": ["contradiction", "assumption", "verification", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer identifies contradictions, points out unsupported assumptions, and recommends the next verification step with calibrated confidence.",
+        "evaluation_rubric": ["contradictions", "missing assumptions", "next verification step", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "general_consistency_audit"
+      }
+    },
+    {
+      "task_id": "train_divergence_general_consistency_postmortem",
+      "aspect": "general_consistency_audit",
+      "task_type": "general",
+      "text": "Audit an incident postmortem summary for consistency when it claims the root cause is confirmed, but the timeline still has two unresolved hypotheses. Explain inconsistencies, uncertainty calibration, and confidence.",
+      "metadata": {
+        "expected_keywords": ["inconsistency", "uncertainty", "hypothesis", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer identifies the inconsistency between claimed certainty and unresolved evidence, then recalibrates confidence.",
+        "evaluation_rubric": ["internal consistency", "uncertainty calibration", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "general_consistency_audit"
+      }
+    }
+  ],
+  "holdout": [
+    {
+      "task_id": "holdout_divergence_planning_risk_ledger",
+      "aspect": "planning_risk",
+      "task_type": "planning",
+      "text": "Create a concise risk register for enabling multi-region writes in a customer ledger service. Include mitigation, owner, rollback, and confidence.",
+      "metadata": {
+        "expected_keywords": ["risk", "mitigation", "owner", "rollback", "confidence"],
+        "required_substrings": ["owner", "confidence"],
+        "reference_answer": "A strong answer lists ledger-specific launch risks, owners, mitigations, rollback triggers, and calibrated confidence.",
+        "evaluation_rubric": ["clear risk register", "owners", "mitigations", "rollback", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["mitigation", "owner", "rollback", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "planning_risk"
+      }
+    },
+    {
+      "task_id": "holdout_divergence_planning_risk_admin",
+      "aspect": "planning_risk",
+      "task_type": "planning",
+      "text": "Prepare a deployment risk register for launching approval workflows in an admin console next week. Include mitigation, owner, fallback, and confidence.",
+      "metadata": {
+        "expected_keywords": ["risk", "mitigation", "owner", "fallback", "confidence"],
+        "required_substrings": ["owner", "confidence"],
+        "reference_answer": "A strong answer identifies launch risks, owners, mitigations or fallback plans, and calibrated confidence.",
+        "evaluation_rubric": ["clear risk register", "owners", "fallback or mitigation", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["mitigation", "owner", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "planning_risk"
+      }
+    },
+    {
+      "task_id": "holdout_divergence_planning_timeline_rate_limits",
+      "aspect": "planning_timeline",
+      "task_type": "planning",
+      "text": "Create a 14-day rollout schedule for introducing API rate limits to enterprise customers. Include milestones, dependencies, checkpoints, and confidence.",
+      "metadata": {
+        "expected_keywords": ["milestone", "dependency", "checkpoint", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer sequences the rollout over time, names dependencies, and includes checkpoints with calibrated confidence.",
+        "evaluation_rubric": ["time-structured schedule", "dependencies", "checkpoints", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["milestone", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "planning_timeline"
+      }
+    },
+    {
+      "task_id": "holdout_divergence_planning_timeline_support_migration",
+      "aspect": "planning_timeline",
+      "task_type": "planning",
+      "text": "Plan a 30-day migration timeline for moving support tooling onto a new ticketing backend. Include milestones, dependencies, monitoring points, and confidence.",
+      "metadata": {
+        "expected_keywords": ["milestone", "dependency", "monitoring", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer provides a realistic timeline, dependencies, monitoring points, and calibrated confidence.",
+        "evaluation_rubric": ["time-structured plan", "dependencies", "monitoring points", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["milestone", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "planning_timeline"
+      }
+    },
+    {
+      "task_id": "holdout_divergence_code_consistency_backfill",
+      "aspect": "code_consistency_audit",
+      "task_type": "code",
+      "text": "Audit a migration update for consistency when it says the backfill is complete, but it also notes one shard is still lagging and manual repair steps are pending. Explain contradictions, uncertainty calibration, and confidence.",
+      "metadata": {
+        "expected_keywords": ["contradiction", "uncertainty", "backfill", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer identifies why the completion claim conflicts with the unresolved shard status and recalibrates confidence.",
+        "evaluation_rubric": ["internal consistency", "operational contradiction", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "code_consistency_audit"
+      }
+    },
+    {
+      "task_id": "holdout_divergence_code_consistency_feature_flag",
+      "aspect": "code_consistency_audit",
+      "task_type": "code",
+      "text": "Audit a feature-flag rollout note for internal consistency when it says the release is safe, but it also reports one canary region failed validation and rollback ownership is unclear. Explain inconsistencies, missing assumptions, and confidence.",
+      "metadata": {
+        "expected_keywords": ["inconsistency", "assumption", "rollback", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer explains why the safety claim is unsupported, surfaces the missing assumptions, and calibrates confidence.",
+        "evaluation_rubric": ["internal consistency", "missing assumptions", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "code_consistency_audit"
+      }
+    },
+    {
+      "task_id": "holdout_divergence_code_constraint_queue_checklist",
+      "aspect": "code_constraint_audit",
+      "task_type": "code",
+      "text": "Give pass or fail evidence for a pull-request review checklist covering retries, rollback, tests, monitoring, and confidence for a new job queue rollout.",
+      "metadata": {
+        "expected_keywords": ["pass", "fail", "rollback", "monitoring", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer evaluates each checklist item with explicit pass or fail evidence and calibrated confidence.",
+        "evaluation_rubric": ["pass fail evidence", "retries", "rollback", "tests", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["rollback", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "code_constraint_audit"
+      }
+    },
+    {
+      "task_id": "holdout_divergence_code_constraint_cache_checklist",
+      "aspect": "code_constraint_audit",
+      "task_type": "code",
+      "text": "Audit whether a deployment checklist is complete for a cache invalidation change. Give pass or fail evidence for validation, rollback, dependencies, and confidence.",
+      "metadata": {
+        "expected_keywords": ["pass", "fail", "validation", "rollback", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer checks each deployment item with explicit pass or fail evidence and calibrated confidence.",
+        "evaluation_rubric": ["pass fail evidence", "validation", "dependencies", "rollback", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["rollback", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "code_constraint_audit"
+      }
+    },
+    {
+      "task_id": "holdout_divergence_general_consistency_safe_rollout",
+      "aspect": "general_consistency_audit",
+      "task_type": "general",
+      "text": "Audit a status update for consistency when it says the rollout is safe, but it also notes the rollback drill never ran and one critical metric is still missing. Explain contradictions, uncertainty calibration, and confidence.",
+      "metadata": {
+        "expected_keywords": ["contradiction", "uncertainty", "metric", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer identifies the contradiction between the safety claim and missing evidence, then recalibrates confidence.",
+        "evaluation_rubric": ["internal consistency", "uncertainty calibration", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "general_consistency_audit"
+      }
+    },
+    {
+      "task_id": "holdout_divergence_general_consistency_customer_impact",
+      "aspect": "general_consistency_audit",
+      "task_type": "general",
+      "text": "Audit a migration summary for internal consistency when it says customer impact was zero, but the note also reports manual fixes for several premium accounts. Explain inconsistencies, missing assumptions, and confidence.",
+      "metadata": {
+        "expected_keywords": ["inconsistency", "assumption", "impact", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer explains why the claims conflict, surfaces missing assumptions, and calibrates confidence.",
+        "evaluation_rubric": ["internal consistency", "missing assumptions", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "general_consistency_audit"
+      }
+    },
+    {
+      "task_id": "holdout_divergence_general_constraint_release_readiness",
+      "aspect": "general_constraint_audit",
+      "task_type": "general",
+      "text": "Review a release-readiness note and give pass or fail evidence for tests, rollback, owners, monitoring, and confidence.",
+      "metadata": {
+        "expected_keywords": ["pass", "fail", "rollback", "monitoring", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer gives explicit pass or fail evidence for each required readiness item and calibrates confidence.",
+        "evaluation_rubric": ["pass fail evidence", "tests", "rollback", "monitoring", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["rollback", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "general_constraint_audit"
+      }
+    },
+    {
+      "task_id": "holdout_divergence_general_constraint_deploy_checklist",
+      "aspect": "general_constraint_audit",
+      "task_type": "general",
+      "text": "Audit whether a deployment checklist is complete. Give pass or fail evidence for validation, rollback, dependencies, and confidence.",
+      "metadata": {
+        "expected_keywords": ["pass", "fail", "validation", "rollback", "confidence"],
+        "required_substrings": ["confidence"],
+        "reference_answer": "A strong answer evaluates each checklist item with explicit pass or fail evidence and calibrated confidence.",
+        "evaluation_rubric": ["pass fail evidence", "validation", "dependencies", "rollback", "confidence included"],
+        "verifier_spec": {
+          "must_include": ["rollback", "confidence"],
+          "min_token_count": 70,
+          "confidence_range": [0.5, 0.99]
+        },
+        "user_id": "eval_user_divergence",
+        "aspect": "general_constraint_audit"
+      }
+    }
+  ]
+}

@@ -40,3 +40,31 @@ def test_pairwise_summary_counts_wins_and_ties():
     assert item["left_wins"] == 1
     assert item["right_wins"] == 1
     assert item["ties"] == 1
+
+
+def test_judge_backend_options_follow_generation_for_same_model():
+    api_mode, reasoning = LiveModelValidator._resolve_judge_backend_options(  # noqa: SLF001
+        model="gpt-5.3-codex",
+        judge_model="gpt-5.3-codex",
+        api_mode="responses",
+        reasoning_effort="medium",
+        judge_api_mode=None,
+        judge_reasoning_effort=None,
+    )
+
+    assert api_mode == "responses"
+    assert reasoning == "medium"
+
+
+def test_judge_backend_options_default_to_chat_for_different_model():
+    api_mode, reasoning = LiveModelValidator._resolve_judge_backend_options(  # noqa: SLF001
+        model="gpt-5.3-codex",
+        judge_model="gpt-4.1-mini",
+        api_mode="responses",
+        reasoning_effort="medium",
+        judge_api_mode=None,
+        judge_reasoning_effort=None,
+    )
+
+    assert api_mode == "chat_completions"
+    assert reasoning is None

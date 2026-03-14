@@ -203,8 +203,18 @@ class DetailedHierarchicalValidator:
         cfg.router.min_candidates = 1
         cfg.router.exploration = 0.12 if adaptive else 0.02
         cfg.router.memory_coef = 0.2
+        cfg.router.sibling_probe_score_gap = 0.2
+        if adaptive:
+            cfg.router.memory_coef = 0.35
+            cfg.router.route_override_min_support = 3
+            cfg.router.route_override_min_win_rate = 0.6
+            cfg.router.route_override_min_margin = 0.01
         cfg.memory.bias_scale = max(0.2, min(0.6, cfg.memory.bias_scale))
         cfg.memory.user_bias_mix = 0.0
+        cfg.memory.routing_promotion_min_support = 2 if adaptive else 3
+        cfg.memory.routing_promotion_min_win_rate = 0.6 if adaptive else 0.7
+        cfg.memory.routing_promotion_min_margin = 0.01 if adaptive else 0.03
+        cfg.memory.routing_pair_replay_min_samples = 2
         cfg.optimizer.learning_rate = 0.08
         cfg.optimizer.weight_decay = 0.03
         # Synthetic validation uses dense, trustworthy rewards, so keep optimizer

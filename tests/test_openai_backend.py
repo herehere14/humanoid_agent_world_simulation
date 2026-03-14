@@ -74,3 +74,40 @@ def test_openai_backend_retries_transient_network_errors(monkeypatch):
     assert text == "hello again"
     assert meta["total_tokens"] == 9
     assert attempts["count"] == 3
+
+
+def test_openai_backend_supports_responses_api(monkeypatch):
+    payload = {
+        "id": "resp_456",
+        "output": [
+            {
+                "type": "message",
+                "content": [
+                    {"type": "output_text", "text": "ok from responses"},
+                ],
+            }
+        ],
+        "usage": {"input_tokens": 13, "output_tokens": 8, "total_tokens": 21},
+    }
+
+    def fake_urlopen(req, timeout):  # noqa: ANN001
+        assert timeout == 12
+        assert req.full_url.endswith("/responses")
+        body = json.loads(req.data.decode("utf-8"))
+        assert body["model"] == "gpt-5.3-codex"
+        assert body["input"] == "say hi"
+        assert body["instructions"]
+        return _FakeResponse(payload)
+
+    monkeypatch.setattr("prompt_forest.backend.openai_chat.urlopen", fake_urlopen)
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+
+    backend = OpenAIChatBackend(model="gpt-5.3-codex", timeout_seconds=12, api_mode="responses")
+    task = TaskInput(task_id="t3", text="hi", task_type="general")
+    text, meta = backend.generate("say hi", task, "branch_z")
+
+    assert text == "ok from responses"
+    assert meta["response_id"] == "resp_456"
+    assert meta["prompt_tokens"] == 13
+    assert meta["completion_tokens"] == 8
+    assert meta["total_tokens"] == 21

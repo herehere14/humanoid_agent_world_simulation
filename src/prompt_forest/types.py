@@ -59,6 +59,18 @@ class RoutingDecision:
     activated_branches: list[str]
     branch_scores: dict[str, float]
     activated_paths: list[list[str]] = field(default_factory=list)
+    sibling_decisions: dict[str, dict[str, Any]] = field(default_factory=dict)
+
+
+@dataclass
+class SiblingPreferenceSignal:
+    scores: dict[str, float] = field(default_factory=dict)
+    preferred_child: str = ""
+    override_child: str = ""
+    support: int = 0
+    win_rate: float = 0.0
+    expected_margin: float = 0.0
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass

@@ -35,11 +35,27 @@ class LiveAblationValidator(LiveModelValidator):
         base_url: str = "https://api.openai.com/v1",
         temperature: float = 0.2,
         max_output_tokens: int = 700,
+        api_mode: str = "chat_completions",
+        reasoning_effort: str | None = None,
+        judge_api_mode: str | None = None,
+        judge_reasoning_effort: str | None = None,
+        judge_temperature: float = 0.0,
+        judge_max_output_tokens: int = 500,
         train_rounds: int = 2,
         use_agent_runtimes: bool = False,
         policies: list[str] | None = None,
+        output_subdir: str = "live_model_ablation_validation",
+        report_prefix: str = "live_model_ablation_report",
     ) -> dict[str, Any]:
         judge_model = judge_model or model
+        judge_api_mode, judge_reasoning_effort = self._resolve_judge_backend_options(
+            model=model,
+            judge_model=judge_model,
+            api_mode=api_mode,
+            reasoning_effort=reasoning_effort,
+            judge_api_mode=judge_api_mode,
+            judge_reasoning_effort=judge_reasoning_effort,
+        )
         policy_names = policies or ["full_adaptive", "frozen", "memory_only", "weight_only"]
         policy_defs = [self._policy_definition(name) for name in policy_names]
 
@@ -49,7 +65,7 @@ class LiveAblationValidator(LiveModelValidator):
         if not train_specs or not holdout_specs:
             raise RuntimeError("Live evaluation dataset must include non-empty train and holdout sections.")
 
-        out_dir = self.root_dir / "artifacts" / "live_model_ablation_validation"
+        out_dir = self.root_dir / "artifacts" / output_subdir
         if out_dir.exists():
             shutil.rmtree(out_dir)
         engines: dict[str, PromptForestEngine] = {}
@@ -66,6 +82,8 @@ class LiveAblationValidator(LiveModelValidator):
                 base_url=base_url,
                 temperature=temperature,
                 max_output_tokens=max_output_tokens,
+                api_mode=api_mode,
+                reasoning_effort=reasoning_effort,
                 seed=42,
             )
             engines[policy.name] = PromptForestEngine(config=cfg, backend=backend)
@@ -75,8 +93,10 @@ class LiveAblationValidator(LiveModelValidator):
             model=judge_model,
             api_key_env=api_key_env,
             base_url=base_url,
-            temperature=0.0,
-            max_output_tokens=500,
+            temperature=judge_temperature,
+            max_output_tokens=judge_max_output_tokens,
+            api_mode=judge_api_mode,
+            reasoning_effort=judge_reasoning_effort,
             seed=7,
             system_prompt=(
                 "You are an impartial evaluator. Return valid JSON only. "
@@ -145,6 +165,12 @@ class LiveAblationValidator(LiveModelValidator):
                 "base_url": base_url,
                 "temperature": temperature,
                 "max_output_tokens": max_output_tokens,
+                "api_mode": api_mode,
+                "reasoning_effort": reasoning_effort or "",
+                "judge_api_mode": judge_api_mode,
+                "judge_reasoning_effort": judge_reasoning_effort or "",
+                "judge_temperature": judge_temperature,
+                "judge_max_output_tokens": judge_max_output_tokens,
             },
             "settings": {
                 "train_rounds": max(1, train_rounds),
@@ -188,8 +214,8 @@ class LiveAblationValidator(LiveModelValidator):
             ],
         }
 
-        json_path = out_dir / "live_model_ablation_report.json"
-        md_path = out_dir / "live_model_ablation_report.md"
+        json_path = out_dir / f"{report_prefix}.json"
+        md_path = out_dir / f"{report_prefix}.md"
         write_json(json_path, report)
         md_path.write_text(self._render_markdown_report(report), encoding="utf-8")
         report["report_paths"] = {"json": str(json_path), "markdown": str(md_path)}

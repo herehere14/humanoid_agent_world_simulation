@@ -56,10 +56,26 @@ class LiveModelValidator:
         base_url: str = "https://api.openai.com/v1",
         temperature: float = 0.2,
         max_output_tokens: int = 700,
+        api_mode: str = "chat_completions",
+        reasoning_effort: str | None = None,
+        judge_api_mode: str | None = None,
+        judge_reasoning_effort: str | None = None,
+        judge_temperature: float = 0.0,
+        judge_max_output_tokens: int = 500,
         train_rounds: int = 2,
         use_agent_runtimes: bool = True,
+        output_subdir: str = "live_model_validation",
+        report_prefix: str = "live_model_validation_report",
     ) -> dict[str, Any]:
         judge_model = judge_model or model
+        judge_api_mode, judge_reasoning_effort = self._resolve_judge_backend_options(
+            model=model,
+            judge_model=judge_model,
+            api_mode=api_mode,
+            reasoning_effort=reasoning_effort,
+            judge_api_mode=judge_api_mode,
+            judge_reasoning_effort=judge_reasoning_effort,
+        )
         raw_dataset = read_json(Path(dataset_path))
         train_specs = list(raw_dataset.get("train", []))
         holdout_specs = list(raw_dataset.get("holdout", []))
@@ -71,7 +87,7 @@ class LiveModelValidator:
         self._configure_live_eval(adaptive_cfg, use_agent_runtimes=use_agent_runtimes)
         self._configure_live_eval(frozen_cfg, use_agent_runtimes=use_agent_runtimes)
 
-        out_dir = self.root_dir / "artifacts" / "live_model_validation"
+        out_dir = self.root_dir / "artifacts" / output_subdir
         if out_dir.exists():
             shutil.rmtree(out_dir)
         adaptive_cfg.artifacts_dir = str(out_dir / "adaptive")
@@ -83,6 +99,8 @@ class LiveModelValidator:
             base_url=base_url,
             temperature=temperature,
             max_output_tokens=max_output_tokens,
+            api_mode=api_mode,
+            reasoning_effort=reasoning_effort,
             seed=42,
         )
         frozen_backend = OpenAIChatBackend(
@@ -91,6 +109,8 @@ class LiveModelValidator:
             base_url=base_url,
             temperature=temperature,
             max_output_tokens=max_output_tokens,
+            api_mode=api_mode,
+            reasoning_effort=reasoning_effort,
             seed=42,
         )
         direct_backend = OpenAIChatBackend(
@@ -99,14 +119,18 @@ class LiveModelValidator:
             base_url=base_url,
             temperature=temperature,
             max_output_tokens=max_output_tokens,
+            api_mode=api_mode,
+            reasoning_effort=reasoning_effort,
             seed=42,
         )
         judge_backend = OpenAIChatBackend(
             model=judge_model,
             api_key_env=api_key_env,
             base_url=base_url,
-            temperature=0.0,
-            max_output_tokens=500,
+            temperature=judge_temperature,
+            max_output_tokens=judge_max_output_tokens,
+            api_mode=judge_api_mode,
+            reasoning_effort=judge_reasoning_effort,
             seed=7,
             system_prompt=(
                 "You are an impartial evaluator. Return valid JSON only. "
@@ -168,6 +192,12 @@ class LiveModelValidator:
                 "base_url": base_url,
                 "temperature": temperature,
                 "max_output_tokens": max_output_tokens,
+                "api_mode": api_mode,
+                "reasoning_effort": reasoning_effort or "",
+                "judge_api_mode": judge_api_mode,
+                "judge_reasoning_effort": judge_reasoning_effort or "",
+                "judge_temperature": judge_temperature,
+                "judge_max_output_tokens": judge_max_output_tokens,
             },
             "settings": {
                 "train_rounds": max(1, train_rounds),
@@ -216,13 +246,39 @@ class LiveModelValidator:
             ],
         }
 
-        json_path = out_dir / "live_model_validation_report.json"
-        md_path = out_dir / "live_model_validation_report.md"
+        json_path = out_dir / f"{report_prefix}.json"
+        md_path = out_dir / f"{report_prefix}.md"
         write_json(json_path, report)
         md_path.write_text(self._render_markdown_report(report), encoding="utf-8")
         report["report_paths"] = {"json": str(json_path), "markdown": str(md_path)}
         write_json(json_path, report)
         return report
+
+    @staticmethod
+    def _resolve_judge_backend_options(
+        *,
+        model: str,
+        judge_model: str,
+        api_mode: str,
+        reasoning_effort: str | None,
+        judge_api_mode: str | None,
+        judge_reasoning_effort: str | None,
+    ) -> tuple[str, str | None]:
+        if judge_api_mode:
+            resolved_api_mode = judge_api_mode
+        elif judge_model == model:
+            resolved_api_mode = api_mode
+        else:
+            resolved_api_mode = "chat_completions"
+
+        if judge_reasoning_effort is not None:
+            resolved_reasoning_effort = judge_reasoning_effort
+        elif judge_model == model and resolved_api_mode == api_mode:
+            resolved_reasoning_effort = reasoning_effort
+        else:
+            resolved_reasoning_effort = None
+
+        return resolved_api_mode, resolved_reasoning_effort
 
     def _configure_live_eval(self, cfg: EngineConfig, *, use_agent_runtimes: bool) -> None:
         cfg.router.top_k = 1
@@ -586,6 +642,10 @@ class LiveModelValidator:
             f"- Generated at: `{report['generated_at']}`",
             f"- Generation model: `{report['models']['generation_model']}`",
             f"- Judge model: `{report['models']['judge_model']}`",
+            f"- Generation API mode: `{report['models']['api_mode']}`",
+            f"- Judge API mode: `{report['models']['judge_api_mode']}`",
+            f"- Generation reasoning effort: `{report['models']['reasoning_effort'] or 'default'}`",
+            f"- Judge reasoning effort: `{report['models']['judge_reasoning_effort'] or 'default'}`",
             f"- Dataset: `{report['dataset_path']}`",
             "",
             "## Dataset",

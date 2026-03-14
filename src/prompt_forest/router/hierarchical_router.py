@@ -6,21 +6,21 @@ from typing import Protocol
 from ..branches.hierarchical import HierarchicalPromptForest
 from ..config import RouterConfig
 from ..contracts import infer_output_contract
-from ..types import BranchStatus, RoutingDecision, TaskInput
+from ..types import BranchStatus, RoutingDecision, SiblingPreferenceSignal, TaskInput
 
 
 class MemoryRoutingView(Protocol):
     def branch_visit_counts(self, task_type: str, user_id: str | None = None) -> dict[str, int]:
         ...
 
-    def sibling_routing_scores(
+    def sibling_preference_signal(
         self,
         task: TaskInput,
         task_type: str,
         parent_id: str,
         child_ids: list[str],
         user_id: str | None = None,
-    ) -> dict[str, float]:
+    ) -> SiblingPreferenceSignal:
         ...
 
 
@@ -67,6 +67,7 @@ class HierarchicalRouter:
         contract_hint = infer_output_contract(task.text, task.metadata)
         beam_width = max(1, max(self.config.min_candidates, self.config.top_k))
         flattened_scores: dict[str, float] = {}
+        sibling_decisions: dict[str, dict[str, object]] = {}
         exploration_rate = self._current_exploration()
 
         frontier: list[tuple[str, list[str], float]] = [(forest.root_id, [], 0.0)]
@@ -84,7 +85,7 @@ class HierarchicalRouter:
                     completed_paths.append((path, path_score))
                     continue
 
-                memory_scores = self._memory_scores_for_children(
+                preference_signal = self._preference_signal_for_children(
                     task=task,
                     task_type=task_type,
                     parent_id=node_id,
@@ -98,12 +99,23 @@ class HierarchicalRouter:
                     parent_id=node_id,
                     child_ids=children,
                     forest=forest,
-                    memory_scores=memory_scores,
+                    memory_scores=preference_signal.scores,
                     contract_hint=contract_hint,
                 )
                 if not scores:
                     completed_paths.append((path, path_score))
                     continue
+
+                selected_by_score = max(scores.items(), key=lambda item: item[1])[0]
+                decision_meta = self._sibling_decision_meta(
+                    parent_id=node_id,
+                    child_ids=children,
+                    scores=scores,
+                    signal=preference_signal,
+                    selected_by_score=selected_by_score,
+                )
+                if decision_meta:
+                    sibling_decisions[node_id] = decision_meta
 
                 for child_id, score in scores.items():
                     prev = flattened_scores.get(child_id)
@@ -115,6 +127,7 @@ class HierarchicalRouter:
                     visit_counts=visit_counts,
                     exploration_rate=exploration_rate,
                     max_children=beam_width,
+                    forced_first=str(decision_meta.get("override_child", "")) if decision_meta else "",
                 )
                 for child_id in selected_children:
                     next_frontier.append((child_id, path + [child_id], path_score + scores[child_id]))
@@ -168,6 +181,7 @@ class HierarchicalRouter:
             activated_branches=activated_branches,
             branch_scores=flattened_scores,
             activated_paths=activated_paths,
+            sibling_decisions=sibling_decisions,
         )
 
     @staticmethod
@@ -184,7 +198,7 @@ class HierarchicalRouter:
         path.reverse()
         return path
 
-    def _memory_scores_for_children(
+    def _preference_signal_for_children(
         self,
         *,
         task: TaskInput,
@@ -194,12 +208,12 @@ class HierarchicalRouter:
         forest: HierarchicalPromptForest,
         memory: MemoryRoutingView,
         user_id: str,
-    ) -> dict[str, float]:
+    ) -> SiblingPreferenceSignal:
         if parent_id == forest.root_id:
-            return {}
+            return SiblingPreferenceSignal()
         if not child_ids or not all(not forest.children(child_id) for child_id in child_ids):
-            return {}
-        return memory.sibling_routing_scores(
+            return SiblingPreferenceSignal()
+        return memory.sibling_preference_signal(
             task=task,
             task_type=task_type,
             parent_id=parent_id,
@@ -255,12 +269,19 @@ class HierarchicalRouter:
         visit_counts: dict[str, int],
         exploration_rate: float,
         max_children: int,
+        forced_first: str = "",
     ) -> list[str]:
         ordered = sorted(scores.items(), key=lambda item: item[1], reverse=True)
         take = max(1, min(len(ordered), max_children))
         selected = [name for name, _ in ordered[:take]]
 
-        if self._rng.random() < exploration_rate and len(ordered) > take:
+        if forced_first and forced_first in scores:
+            if forced_first in selected:
+                selected.remove(forced_first)
+            selected.insert(0, forced_first)
+            selected = selected[:take]
+
+        if not forced_first and self._rng.random() < exploration_rate and len(ordered) > take:
             underexplored = [name for name in scores if visit_counts.get(name, 0) <= 1 and name not in selected]
             pool = underexplored or [name for name, _ in ordered if name not in selected]
             if pool:
@@ -274,6 +295,51 @@ class HierarchicalRouter:
             seen.add(name)
             deduped.append(name)
         return deduped
+
+    def _sibling_decision_meta(
+        self,
+        *,
+        parent_id: str,
+        child_ids: list[str],
+        scores: dict[str, float],
+        signal: SiblingPreferenceSignal,
+        selected_by_score: str,
+    ) -> dict[str, object]:
+        if len(child_ids) < 2:
+            return {}
+
+        ordered = sorted(scores.items(), key=lambda item: item[1], reverse=True)
+        probe_candidates: list[str] = []
+        score_gap = 1.0
+        if len(ordered) >= 2:
+            score_gap = max(0.0, ordered[0][1] - ordered[1][1])
+            if score_gap <= self.config.sibling_probe_score_gap:
+                probe_candidates = [child_id for child_id, _ in ordered[: self.config.sibling_probe_top_n]]
+
+        override_child = ""
+        if signal.preferred_child and signal.preferred_child in scores:
+            if (
+                signal.support >= self.config.route_override_min_support
+                and signal.win_rate >= self.config.route_override_min_win_rate
+                and signal.expected_margin >= self.config.route_override_min_margin
+            ):
+                override_child = signal.preferred_child
+
+        return {
+            "parent_id": parent_id,
+            "selected_by_score": selected_by_score,
+            "selected_child": override_child or selected_by_score,
+            "memory_scores": dict(signal.scores),
+            "preferred_child": signal.preferred_child,
+            "override_child": override_child,
+            "support": signal.support,
+            "win_rate": round(signal.win_rate, 4),
+            "expected_margin": round(signal.expected_margin, 4),
+            "score_gap": round(score_gap, 4),
+            "probe_candidates": probe_candidates,
+            "child_scores": {child_id: round(scores.get(child_id, 0.0), 4) for child_id in child_ids if child_id in scores},
+            "details": dict(signal.details),
+        }
 
     def _effective_weight(self, branch) -> float:
         base_weight = float(branch.state.metadata.get("base_weight", branch.state.weight))

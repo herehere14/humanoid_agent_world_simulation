@@ -25,6 +25,8 @@ class OpenAIChatBackend(LLMBackend):
         timeout_seconds: int = 90,
         max_retries: int = 2,
         retry_backoff_seconds: float = 1.5,
+        api_mode: str = "chat_completions",
+        reasoning_effort: str | None = None,
         seed: int | None = 42,
         system_prompt: str = "You are a careful assistant. Follow the user's instructions exactly.",
     ) -> None:
@@ -36,6 +38,8 @@ class OpenAIChatBackend(LLMBackend):
         self.timeout_seconds = timeout_seconds
         self.max_retries = max(0, int(max_retries))
         self.retry_backoff_seconds = max(0.0, float(retry_backoff_seconds))
+        self.api_mode = api_mode
+        self.reasoning_effort = reasoning_effort
         self.seed = seed
         self.system_prompt = system_prompt
         self._calls: list[dict[str, Any]] = []
@@ -46,18 +50,7 @@ class OpenAIChatBackend(LLMBackend):
         if not key:
             raise RuntimeError(f"Missing API key env var: {self.api_key_env}")
 
-        url = f"{self.base_url}/chat/completions"
-        body: dict[str, Any] = {
-            "model": self.model,
-            "temperature": self.temperature,
-            "max_tokens": self.max_output_tokens,
-            "messages": [
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": prompt},
-            ],
-        }
-        if self.seed is not None:
-            body["seed"] = int(self.seed)
+        url, body = self._request_payload(prompt)
 
         payload = json.dumps(body, ensure_ascii=True).encode("utf-8")
         req = Request(
@@ -111,26 +104,19 @@ class OpenAIChatBackend(LLMBackend):
 
         latency_ms = (time.perf_counter() - started) * 1000.0
         data = json.loads(raw)
-        choices = data.get("choices", [])
-        if not choices:
+        text = self._extract_text(data)
+        usage = self._normalize_usage(data.get("usage", {}))
+        if not text:
             self._record_call(
                 endpoint=url,
                 branch_name=branch_name,
                 latency_ms=latency_ms,
-                usage=self._normalize_usage(data.get("usage", {})),
+                usage=usage,
                 ok=False,
-                error="No choices returned from OpenAI-compatible backend.",
+                error="No text returned from OpenAI-compatible backend.",
             )
-            raise RuntimeError("No choices returned from OpenAI-compatible backend.")
+            raise RuntimeError("No text returned from OpenAI-compatible backend.")
 
-        content = choices[0].get("message", {}).get("content", "")
-        if isinstance(content, list):
-            parts = [part.get("text", "") for part in content if isinstance(part, dict)]
-            text = "\n".join(parts).strip()
-        else:
-            text = str(content).strip()
-
-        usage = self._normalize_usage(data.get("usage", {}))
         self._record_call(
             endpoint=url,
             branch_name=branch_name,
@@ -149,6 +135,58 @@ class OpenAIChatBackend(LLMBackend):
         if "id" in data:
             meta["response_id"] = data["id"]
         return text, meta
+
+    def _request_payload(self, prompt: str) -> tuple[str, dict[str, Any]]:
+        if self.api_mode == "responses":
+            url = f"{self.base_url}/responses"
+            body: dict[str, Any] = {
+                "model": self.model,
+                "input": prompt,
+                "instructions": self.system_prompt,
+                "max_output_tokens": self.max_output_tokens,
+            }
+            if self.reasoning_effort:
+                body["reasoning"] = {"effort": self.reasoning_effort}
+            return url, body
+
+        url = f"{self.base_url}/chat/completions"
+        body = {
+            "model": self.model,
+            "temperature": self.temperature,
+            "max_tokens": self.max_output_tokens,
+            "messages": [
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": prompt},
+            ],
+        }
+        if self.seed is not None:
+            body["seed"] = int(self.seed)
+        return url, body
+
+    def _extract_text(self, data: dict[str, Any]) -> str:
+        if self.api_mode == "responses":
+            output = data.get("output", [])
+            parts: list[str] = []
+            for item in output:
+                if not isinstance(item, dict):
+                    continue
+                if item.get("type") != "message":
+                    continue
+                for content in item.get("content", []):
+                    if not isinstance(content, dict):
+                        continue
+                    if content.get("type") == "output_text":
+                        parts.append(str(content.get("text", "")))
+            return "\n".join(part for part in parts if part).strip()
+
+        choices = data.get("choices", [])
+        if not choices:
+            return ""
+        content = choices[0].get("message", {}).get("content", "")
+        if isinstance(content, list):
+            parts = [part.get("text", "") for part in content if isinstance(part, dict)]
+            return "\n".join(parts).strip()
+        return str(content).strip()
 
     def call_log(self) -> list[dict[str, Any]]:
         return [dict(item) for item in self._calls]
@@ -187,8 +225,8 @@ class OpenAIChatBackend(LLMBackend):
     @staticmethod
     def _normalize_usage(usage: dict[str, Any] | None) -> dict[str, int]:
         payload = usage or {}
-        prompt_tokens = int(payload.get("prompt_tokens", 0) or 0)
-        completion_tokens = int(payload.get("completion_tokens", 0) or 0)
+        prompt_tokens = int(payload.get("prompt_tokens", payload.get("input_tokens", 0)) or 0)
+        completion_tokens = int(payload.get("completion_tokens", payload.get("output_tokens", 0)) or 0)
         total_tokens = int(payload.get("total_tokens", prompt_tokens + completion_tokens) or 0)
         return {
             "prompt_tokens": prompt_tokens,

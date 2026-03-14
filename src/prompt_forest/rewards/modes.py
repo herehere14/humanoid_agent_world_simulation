@@ -126,7 +126,8 @@ class HybridReward:
         keyword_ratio = keyword_hits / max(1, len(keywords)) if keywords else 0.0
 
         token_count = len(re.findall(r"\w+", output_n))
-        if keyword_ratio >= 0.8 and (s1 <= 0.3 and s3 <= 0.6):
+        structured_audit = any(marker in output_n for marker in ("evidence:", "verification:", "result:", "summary:"))
+        if keyword_ratio >= 0.8 and (s1 <= 0.3 and s3 <= 0.6) and token_count < 180 and not structured_audit:
             return 0.12
         if keyword_ratio >= 0.7 and token_count < 24:
             return 0.08
