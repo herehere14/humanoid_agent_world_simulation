@@ -516,6 +516,12 @@ def test_memory_execution_playbook_aggregates_coverage_structure_and_failures():
     assert playbook.structure_cues
     assert playbook.success_examples
     assert any("do not omit rollback" in item for item in playbook.anti_patterns)
+    assert playbook.pattern_summaries
+    assert any("risk-register" in item or "owners" in item for item in playbook.pattern_summaries)
+    assert playbook.recommended_flows
+    assert any("owners" in item and "rollback" in item for item in playbook.recommended_flows)
+    assert playbook.case_summaries
+    assert any("best_for=" in item and "flow=" in item for item in playbook.case_summaries)
 
 
 def test_task_checklist_items_extracts_explain_clauses():
