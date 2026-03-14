@@ -9,6 +9,56 @@ This project implements a non-parametric adaptive layer for agent systems:
 
 It is designed as a standalone MVP and as an OpenClaw-compatible control layer for future integration.
 
+## Quick start
+
+If you just cloned the repo and want to run it, use this path:
+
+```bash
+git clone https://github.com/herehere14/openclaw_closedsourcemodel_RL.git
+cd openclaw_closedsourcemodel_RL
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+```
+
+Then try one of these:
+
+```bash
+prompt-forest chat --task-type auto --visibility full --compare-base --split-view
+```
+
+or
+
+```bash
+prompt-forest run-task \
+  --task "Plan a migration rollout with owners, risks, and confidence." \
+  --task-type planning \
+  --visibility full
+```
+
+Important:
+- `requirements.txt` is in the repo root and installs the project itself
+- `requirements-dev.txt` is in the repo root and installs the project plus `pytest`
+- if you only want to use the project, `pip install -r requirements.txt` is enough
+- if you want to run tests too, use `pip install -r requirements-dev.txt`
+
+## What this repo is
+
+This repo is a prompt-routing and adaptation system that sits on top of a base model.
+
+It is not training model weights directly. Instead, it improves behavior through:
+- branch routing
+- specialized prompt branches
+- evaluation and reward signals
+- memory
+- constrained optimizer updates
+
+The easiest way to think about it:
+- `base model`: one direct answer
+- `prompt forest`: choose a branch path, execute specialized prompts, evaluate the result, and adapt over time
+- `compare-base`: show both side by side
+- `split-view`: left pane is the conversation, right pane shows routing, evaluation, optimization, and branch internals live
+
 ## Research framing
 
 This project is positioned as:
@@ -136,14 +186,30 @@ openclaw_closedsourcemodel_RL/
 
 ## Install
 
+### Fastest install
+
 ```bash
-cd /path/to/openclaw_closedsourcemodel_RL
 python -m venv .venv
 source .venv/bin/activate
+pip install -r requirements-dev.txt
+```
+
+### Dependency files
+
+- `requirements.txt`: install the app
+- `requirements-dev.txt`: install the app and test tooling
+- `pyproject.toml`: package metadata and CLI entrypoint
+
+After install, use the `prompt-forest` entrypoint directly.
+
+If you prefer editable install commands instead of the requirements files:
+
+```bash
+pip install -e .
 pip install -e .[dev]
 ```
 
-After install, use the `prompt-forest` entrypoint directly. If you have not installed the package, the fallback is `PYTHONPATH=src python -m prompt_forest.cli ...`.
+If you have not installed the package, the fallback is `PYTHONPATH=src python -m prompt_forest.cli ...`.
 
 ## Run
 
