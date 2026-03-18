@@ -2,7 +2,7 @@
 
 **A hierarchical prompt-routing, reward-shaped optimization, and persistent memory system that makes any frozen LLM learn and improve over time — without touching a single model weight.**
 
-> **Our Vision:** We believe the next frontier of AI isn't just building bigger models — it's building smarter systems *around* models. Prompt Forest proves that meaningful learning, adaptation, and personalization can happen entirely at the control layer. Our goal is to make every frozen foundation model behave as if it were continuously fine-tuned — achieving the benefits of RL-based training through prompt-level policy optimization, hierarchical routing, and memory-driven adaptation. We are building toward a future where any closed-source model can be turned into a self-improving, context-aware agent system — no weights, no fine-tuning, no retraining.
+> **Our Vision:** We believe the next frontier of AI isn't just building bigger models — it's building smarter systems *around* models that truly understand and connect with humans. Prompt Forest proves that meaningful learning, adaptation, and personalization can happen entirely at the control layer. Our goal is to make every frozen foundation model behave as if it were continuously fine-tuned — achieving the benefits of RL-based training through prompt-level policy optimization, hierarchical routing, and memory-driven adaptation. But raw intelligence isn't enough. Through **Human Mode**, we are pioneering emotionally-aware AI agents that don't just solve problems — they *feel* the context, express genuine emotional responses, and build trust through embodied, human-like interaction. We are building toward a future where AI systems are not just self-improving and context-aware, but emotionally intelligent — bridging the gap between machine capability and human connection.
 
 ---
 
@@ -26,6 +26,58 @@
 - **Candidate Branch Lifecycle** — Automatic branch proposal, trial, promotion, and archival based on performance signals
 - **Interactive 3D Frontend** — Real-time visualization with a Minecraft-style 3D avatar featuring 12 emotion animations, particle effects, and live system traces
 - **Full Observability** — Split-view terminal UI and web dashboard showing routing paths, branch decisions, evaluation signals, and optimizer updates in real time
+
+---
+
+## Human Mode — Emotionally Intelligent AI Agents
+
+Most AI systems are purely transactional — input in, output out, no sense of the human on the other side. **Human Mode changes that.**
+
+Human Mode is a full emotional intelligence layer built on top of Prompt Forest's adaptive engine. The agent doesn't just answer your question — it reads the emotional context of the interaction and responds with visible, embodied emotion through a real-time 3D avatar.
+
+### How it works
+
+The system tracks **12 independent emotional drives** that shift dynamically based on conversation context:
+
+| Drive | What triggers it |
+|---|---|
+| `joy` | Positive outcomes, user satisfaction, successful task completion |
+| `sadness` | User frustration, repeated failures, negative feedback |
+| `anger` | Contradictions, unfair constraints, blocked progress |
+| `fear` | Uncertainty, high-stakes decisions, ambiguous requirements |
+| `surprise` | Unexpected inputs, novel task types, edge cases |
+| `disgust` | Malformed inputs, ethical boundary violations |
+| `curiosity` | Novel domains, exploration opportunities, open-ended research |
+| `confidence` | High reward scores, validated outputs, strong routing matches |
+| `frustration` | Repeated low scores, optimization plateaus, conflicting signals |
+| `empathy` | User emotional cues, sensitive topics, supportive context |
+| `excitement` | Breakthroughs, high-delta improvements, creative tasks |
+| `fatigue` | Long sessions, repetitive tasks, diminishing returns |
+
+### 3D Avatar with Embodied Emotion
+
+Each emotional state maps to **visible physical behavior** on a real-time 3D Minecraft-style avatar:
+
+- **Crying** — both hands raised to face, head shaking, tear particles streaming from both eyes
+- **Anger** — clenched fists, stomping feet, red steam particles rising, furrowed brows
+- **Joy** — jumping animation, waving hands, sparkle particles, wide smile
+- **Fear** — cowering pose, trembling body, sweat drop particles
+- **Curiosity** — head tilting, leaning forward, question mark particles floating above
+- **Fatigue** — drooping posture, slow movements, floating Zzz bubbles
+- **Surprise** — wide eyes, jumped-back pose, raised brows
+- **Confidence** — upright stance, chest out, subtle glow
+- **Empathy** — soft forward lean, gentle nodding, warm blush
+- **Excitement** — rapid bouncing, arm pumping, sparkle burst
+- **Frustration** — fist shaking, pacing, furrowed brows with steam
+- **Disgust** — turned head, squinted eyes, pushed-back posture
+
+The avatar features full facial animation (dynamic brows, mouth shapes, pupil tracking, blush effects) and 6 particle systems (tears, sweat, steam, sparkles, Zzz bubbles, question marks).
+
+### Why this matters
+
+> **Our Human Mode vision:** AI that people actually *want* to interact with. Not because it's useful — but because it feels like it understands. Emotional expression builds trust, makes errors feel recoverable, and transforms AI from a tool into a collaborator. We believe emotionally-aware agents will be the standard for human-AI interaction within the next generation of products — and we're building the foundation now.
+
+Human Mode is not cosmetic. The emotional state feeds back into the routing and adaptation engine — an agent experiencing high `frustration` will route differently than one in high `confidence`. Emotion becomes a **first-class signal** in the optimization loop, creating agents that don't just perform better, but interact better.
 
 ---
 
