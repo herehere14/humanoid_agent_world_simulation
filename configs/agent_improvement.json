@@ -1,0 +1,8 @@
+{
+  "mode": "agent_improvement",
+  "agent_improvement": {
+    "aggressive_adaptation": true,
+    "performance_window": 20,
+    "min_improvement_threshold": 0.02
+  }
+}

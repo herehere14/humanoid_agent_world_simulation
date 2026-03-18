@@ -1,0 +1,113 @@
+{
+  "id": "openclaw-prompt-forest",
+  "name": "Prompt Forest",
+  "version": "0.1.0",
+  "description": "Adaptive prompt routing and feedback loop integration for OpenClaw.",
+  "skills": [
+    "skills/prompt-forest"
+  ],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "pythonBin": {
+        "type": "string"
+      },
+      "projectRoot": {
+        "type": "string"
+      },
+      "configPath": {
+        "type": "string"
+      },
+      "artifactsDir": {
+        "type": "string"
+      },
+      "model": {
+        "type": "string"
+      },
+      "apiKeyEnv": {
+        "type": "string"
+      },
+      "baseUrl": {
+        "type": "string"
+      },
+      "apiMode": {
+        "type": "string",
+        "enum": ["chat_completions", "responses"]
+      },
+      "reasoningEffort": {
+        "type": "string"
+      },
+      "temperature": {
+        "type": "number"
+      },
+      "maxOutputTokens": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "latencyMode": {
+        "type": "string",
+        "enum": ["full", "fast"]
+      },
+      "visibility": {
+        "type": "string",
+        "enum": ["minimal", "eval", "opt", "full"]
+      },
+      "includeTrace": {
+        "type": "boolean"
+      }
+    }
+  },
+  "uiHints": {
+    "pythonBin": {
+      "label": "Python binary",
+      "placeholder": "/path/to/.venv/bin/python"
+    },
+    "projectRoot": {
+      "label": "Project root",
+      "placeholder": "/path/to/openclaw_closedsourcemodel_RL"
+    },
+    "configPath": {
+      "label": "Prompt Forest config",
+      "placeholder": "configs/default.json"
+    },
+    "artifactsDir": {
+      "label": "Artifacts dir",
+      "placeholder": "artifacts"
+    },
+    "model": {
+      "label": "Generation model",
+      "placeholder": "gpt-4.1-mini"
+    },
+    "apiKeyEnv": {
+      "label": "API key env",
+      "placeholder": "OPENAI_API_KEY"
+    },
+    "baseUrl": {
+      "label": "Base URL",
+      "placeholder": "https://api.openai.com/v1"
+    },
+    "apiMode": {
+      "label": "API mode"
+    },
+    "reasoningEffort": {
+      "label": "Reasoning effort",
+      "placeholder": "medium"
+    },
+    "temperature": {
+      "label": "Temperature"
+    },
+    "maxOutputTokens": {
+      "label": "Max output tokens"
+    },
+    "latencyMode": {
+      "label": "Latency mode"
+    },
+    "visibility": {
+      "label": "Trace visibility"
+    },
+    "includeTrace": {
+      "label": "Include trace"
+    }
+  }
+}

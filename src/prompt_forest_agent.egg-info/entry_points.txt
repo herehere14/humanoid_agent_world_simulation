@@ -1,0 +1,3 @@
+[console_scripts]
+prompt-forest = prompt_forest.cli:main
+prompt-forest-openclaw = prompt_forest.openclaw_bridge:main

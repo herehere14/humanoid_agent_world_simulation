@@ -51,6 +51,25 @@ def format_turn_trace(payload: dict[str, Any], visibility: str = "full", top_bra
             f"evaluator_llm={runtime.get('evaluator_llm_enabled', False)} "
             f"optimizer_llm={runtime.get('optimizer_llm_enabled', False)}"
         )
+    timings = payload.get("timings", {}) or {}
+    if timings:
+        stage_keys = [
+            key
+            for key in ("route_ms", "execute_ms", "probe_ms", "compose_ms", "judge_ms", "evaluate_ms", "optimize_ms", "memory_ms")
+            if key in timings
+        ]
+        stage_text = ", ".join(f"{key}={_fmt_float(timings.get(key))}" for key in stage_keys)
+        lines.append(f"[timing] total_ms={_fmt_float(timings.get('total_ms'))}")
+        if stage_text:
+            lines.append(f"[timing] stages={stage_text}")
+        call_keys = [
+            key
+            for key in ("primary_backend_calls", "evaluator_runtime_calls", "optimizer_runtime_calls")
+            if key in timings
+        ]
+        if call_keys:
+            call_text = ", ".join(f"{key}={timings.get(key)}" for key in call_keys)
+            lines.append(f"[timing] calls={call_text}")
 
     raw_scores = routing.get("branch_scores", {}) or {}
     if raw_scores:

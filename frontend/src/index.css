@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: #ffffff;
+  color: #1a1a2e;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.18); }
+
+/* ─── Glass morphism (light) ────────────────────────────────────────────── */
+.glass {
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.glass-strong {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+/* ─── Gradient text ────────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #0066ff, #7c3aed, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-blue {
+  background: linear-gradient(135deg, #0066ff, #2563eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Animated gradient border ─────────────────────────────────────────── */
+.animated-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.animated-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: conic-gradient(from 0deg, #0066ff, #7c3aed, #ec4899, #059669, #0066ff);
+  border-radius: inherit;
+  animation: spin 4s linear infinite;
+  z-index: -1;
+}
+
+.animated-border::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  background: #ffffff;
+  border-radius: inherit;
+  z-index: -1;
+}
+
+/* ─── Section styles ───────────────────────────────────────────────────── */
+.section-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ─── Grid background ──────────────────────────────────────────────────── */
+.grid-bg {
+  background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─── Prose (markdown) light ───────────────────────────────────────────── */
+.prose-clean { color: #1a1a2e; line-height: 1.75; }
+.prose-clean p { margin-bottom: 0.65em; }
+.prose-clean p:last-child { margin-bottom: 0; }
+.prose-clean code {
+  background: rgba(0,102,255,0.06);
+  border: 1px solid rgba(0,102,255,0.12);
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82em;
+  color: #0066ff;
+}
+.prose-clean pre {
+  background: #f8f9fb;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+.prose-clean pre code {
+  background: none; border: none; padding: 0;
+  color: #1a1a2e; font-size: 0.84em;
+}
+.prose-clean ul, .prose-clean ol { padding-left: 1.4em; margin: 6px 0; }
+.prose-clean li { margin-bottom: 3px; }
+.prose-clean h1,.prose-clean h2,.prose-clean h3 {
+  font-weight: 600; margin: 12px 0 6px; color: #0f0f23;
+}
+.prose-clean strong { font-weight: 600; color: #0f0f23; }
+.prose-clean blockquote {
+  border-left: 3px solid rgba(0,102,255,0.3);
+  padding-left: 12px;
+  color: #64748b;
+  margin: 8px 0;
+}
+.prose-clean table { width: 100%; border-collapse: collapse; font-size: 0.88em; }
+.prose-clean th, .prose-clean td {
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 6px 10px;
+  text-align: left;
+}
+.prose-clean th { background: rgba(0,0,0,0.02); font-weight: 600; }
+
+/* ─── Typing cursor ─────────────────────────────────────────────────────── */
+.typing-cursor::after {
+  content: '\25CB';
+  animation: blink 1s step-end infinite;
+  color: #0066ff;
+  margin-left: 1px;
+  font-size: 0.85em;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ─── Recharts overrides ────────────────────────────────────────────────── */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line { stroke: rgba(0,0,0,0.06); }
+.recharts-text { fill: #94a3b8; font-family: 'Inter', sans-serif; font-size: 11px; }
+
+/* ─── Particle canvas ──────────────────────────────────────────────────── */
+.particle-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ─── Trace step animation ─────────────────────────────────────────────── */
+.trace-step {
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: traceAppear 0.4s ease-out forwards;
+}
+
+@keyframes traceAppear {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ─── Shimmer loading ──────────────────────────────────────────────────── */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.02), transparent);
+  animation: shimmer 2s linear infinite;
+}
+
+/* ─── Soft background patterns ─────────────────────────────────────────── */
+.hero-gradient {
+  background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 30%, #fff1f2 60%, #f0fdf4 100%);
+}
+
+.section-alt {
+  background: #f8f9fb;
+}

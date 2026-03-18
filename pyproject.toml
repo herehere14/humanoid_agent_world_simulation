@@ -17,6 +17,7 @@ dev = ["pytest>=8.0"]
 
 [project.scripts]
 prompt-forest = "prompt_forest.cli:main"
+prompt-forest-openclaw = "prompt_forest.openclaw_bridge:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
