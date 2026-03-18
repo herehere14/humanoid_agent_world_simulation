@@ -104,6 +104,9 @@ class ExecutionPlaybook:
     anti_patterns: list[str] = field(default_factory=list)
     success_examples: list[str] = field(default_factory=list)
     guidance: list[str] = field(default_factory=list)
+    case_summaries: list[str] = field(default_factory=list)
+    pattern_summaries: list[str] = field(default_factory=list)
+    recommended_flows: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -1072,16 +1075,26 @@ class MemoryStore:
         coverage = Counter()
         structure = Counter()
         anti = Counter()
+        pattern_counts = Counter()
+        flow_counts = Counter()
         guidance: list[str] = []
         examples: list[str] = []
+        case_summaries: list[str] = []
         seen_examples: set[str] = set()
+        seen_cases: set[str] = set()
 
         current_items = _task_checklist_items(task.text)
+        task_contract = infer_output_contract(task.text, task.metadata) or str(task.metadata.get("output_contract", "")).strip().lower()
         for record in successes:
             for item in _task_checklist_items(record.input_text):
                 coverage[item] += 1
             for cue in _structure_cues(record.selected_output, record.input_text):
                 structure[cue] += 1
+            for tag in _pattern_tags(record.input_text, task_contract):
+                pattern_counts[_describe_pattern_tag(tag)] += 1
+            flow = _flow_signature(record.selected_output, record.input_text)
+            if flow:
+                flow_counts[flow] += 1
 
             hint = self._summarize_execution_record(record)
             if hint and hint not in guidance:
@@ -1091,6 +1104,11 @@ class MemoryStore:
             if excerpt and excerpt not in seen_examples:
                 seen_examples.add(excerpt)
                 examples.append(excerpt)
+
+            case_line = self._case_memory_line(record)
+            if case_line and case_line not in seen_cases:
+                seen_cases.add(case_line)
+                case_summaries.append(case_line)
 
         for record in failures:
             record_items = _task_checklist_items(record.input_text)
@@ -1111,6 +1129,9 @@ class MemoryStore:
             anti_patterns=[cue for cue, _ in anti.most_common(3)],
             success_examples=examples[:2],
             guidance=guidance[:3],
+            case_summaries=case_summaries[:3],
+            pattern_summaries=[item for item, _ in pattern_counts.most_common(4)],
+            recommended_flows=[item for item, _ in flow_counts.most_common(3)],
         )
 
     @staticmethod
@@ -1119,6 +1140,22 @@ class MemoryStore:
         if len(cleaned) <= max_chars:
             return cleaned
         return cleaned[:max_chars].rstrip() + "..."
+
+    @classmethod
+    def _case_memory_line(cls, record: MemoryRecord) -> str:
+        meta = dict(record.task_metadata or {})
+        contract = infer_output_contract(record.input_text, meta) or str(meta.get("output_contract", "")).strip().lower()
+        tags = [_describe_pattern_tag(tag) for tag in _pattern_tags(record.input_text, contract)]
+        flow = _flow_signature(record.selected_output, record.input_text)
+        excerpt = cls._compact_output_excerpt(record.selected_output, max_chars=110)
+        details: list[str] = []
+        if tags:
+            details.append("best_for=" + ", ".join(tags[:3]))
+        if flow:
+            details.append(f"flow={flow}")
+        if excerpt:
+            details.append(f'example="{excerpt}"')
+        return " | ".join(details[:3])
 
     def _scored_execution_records(
         self,
@@ -1133,6 +1170,7 @@ class MemoryStore:
         task_aspect = str(task_meta.get("aspect", "")).strip().lower()
         task_terms = _lexical_terms(task.text)
         task_tags = _pattern_tags(task.text, task_contract)
+        task_items = _task_checklist_items(task.text)
 
         scored: list[tuple[float, MemoryRecord]] = []
         recent_records = self._records[-self.config.similarity_window :]
@@ -1149,10 +1187,12 @@ class MemoryStore:
                     continue
 
             record_aspect = str(record_meta.get("aspect", "")).strip().lower()
+            record_items = _task_checklist_items(record.input_text)
             term_overlap = _jaccard(task_terms, _lexical_terms(record.input_text))
             tag_overlap = _jaccard(task_tags, _pattern_tags(record.input_text, record_contract))
+            item_overlap = _jaccard(task_items, record_items)
 
-            similarity = 0.2 + (0.45 * term_overlap) + (0.2 * tag_overlap)
+            similarity = 0.2 + (0.35 * term_overlap) + (0.2 * tag_overlap) + (0.15 * item_overlap)
             if task_aspect and task_aspect == record_aspect:
                 similarity += 0.1
             similarity += max(0.0, record.reward_score - 0.7) * 0.25
@@ -1237,6 +1277,24 @@ def _pattern_tags(text: str, contract_hint: str) -> tuple[str, ...]:
     return tuple(sorted(tags))
 
 
+def _describe_pattern_tag(tag: str) -> str:
+    mapping = {
+        "risk_register": "use a risk-register frame with owners, mitigations, and rollback",
+        "recovery": "treat the task like incident recovery with mitigation and fallback",
+        "review_checklist": "use an audit/checklist frame with explicit pass-fail criteria",
+        "timeline": "sequence the answer across phases, checkpoints, or time blocks",
+        "recommendation": "end with a direct recommendation after the analysis",
+        "rollback": "make rollback or fallback steps explicit",
+        "owner": "assign explicit owners for each action",
+        "risk": "call out risks directly instead of leaving them implicit",
+        "json": "preserve a strict JSON-style contract",
+        "csv": "preserve a strict CSV-style contract",
+        "bullet": "prefer short bullets over dense prose",
+        "code_patch": "ground the answer in code-specific fixes, tests, and risks",
+    }
+    return mapping.get(tag, tag.replace("_", " "))
+
+
 def _jaccard(left: tuple[str, ...], right: tuple[str, ...]) -> float:
     left_set = set(left)
     right_set = set(right)
@@ -1304,6 +1362,24 @@ def _structure_cues(output: str, task_text: str) -> tuple[str, ...]:
     if "confidence" in output_l or "confidence" in task_l:
         cues.append("finish with calibrated confidence")
     return tuple(cues[:4])
+
+
+def _flow_signature(output: str, task_text: str) -> str:
+    combined = f"{task_text}\n{output}".lower()
+    ordered_steps = [
+        ("timeline", ("timeline", "phase", "day ", "week ", "checkpoint", "schedule")),
+        ("owners", ("owner", "owners", "owner:")),
+        ("risks", ("risk", "risks")),
+        ("mitigation", ("mitigation", "mitigations")),
+        ("rollback", ("rollback", "fallback", "backout")),
+        ("tests", ("test", "tests", "validation", "verify")),
+        ("recommendation", ("recommendation", "recommend")),
+        ("confidence", ("confidence", "confidence=")),
+    ]
+    steps = [label for label, needles in ordered_steps if any(needle in combined for needle in needles)]
+    if len(steps) < 2:
+        return ""
+    return " -> ".join(steps[:5])
 
 
 def _contains_concept(text: str, concept: str) -> bool:
