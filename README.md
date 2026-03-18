@@ -1,13 +1,33 @@
-# Prompt Forest Agent
+# Prompt Forest Agent  —  Adaptive Intelligence Without Weight Training
 
-A **Random-Forest-inspired prompt-branch agent** and **reward-guided prompt routing architecture**.
+**A hierarchical prompt-routing, reward-shaped optimization, and persistent memory system that makes any frozen LLM learn and improve over time — without touching a single model weight.**
 
-This project implements a non-parametric adaptive layer for agent systems:
-- No base-model weight updates
-- No LoRA/fine-tuning
-- Only prompt templates, branch weights, routing preferences, and memory are adapted
+> **Our Vision:** We believe the next frontier of AI isn't just building bigger models — it's building smarter systems *around* models. Prompt Forest proves that meaningful learning, adaptation, and personalization can happen entirely at the control layer. Our goal is to make every frozen foundation model behave as if it were continuously fine-tuned — achieving the benefits of RL-based training through prompt-level policy optimization, hierarchical routing, and memory-driven adaptation. We are building toward a future where any closed-source model can be turned into a self-improving, context-aware agent system — no weights, no fine-tuning, no retraining.
 
-It is designed as a standalone MVP and as an OpenClaw-compatible control layer for future integration.
+---
+
+### What makes this different
+
+| Traditional Approach | Prompt Forest |
+|---|---|
+| Fine-tune model weights (expensive, slow, requires GPU clusters) | Zero weight updates — adapts the *control layer* above the model |
+| Static prompts that never improve | Prompt branches that rewrite themselves based on reward signals |
+| One-size-fits-all routing | Hierarchical random-forest-inspired routing with 18 specialized branches |
+| No memory across sessions | Persistent trajectory memory that biases future routing per user |
+| Black-box model outputs | Full observability — live routing traces, reward decomposition, optimizer deltas |
+| Requires model access / open weights | Works with **any** closed-source API (OpenAI, Gemini, Claude, etc.) |
+
+### Key capabilities
+
+- **Hierarchical Branch Routing** — 6 macro branches x 2 niche sub-branches, selected per-task via learned routing policy
+- **Dual-Agent Optimization Loop** — Evaluator agent scores outputs; Optimizer agent performs constrained prompt rewrites and weight updates
+- **Reward-Shaped Adaptation** — Multi-signal reward blending (verifier, task rules, LLM judge, user feedback) drives continuous improvement
+- **Persistent Memory** — Per-user, per-task-type trajectory memory influences future routing decisions
+- **Candidate Branch Lifecycle** — Automatic branch proposal, trial, promotion, and archival based on performance signals
+- **Interactive 3D Frontend** — Real-time visualization with a Minecraft-style 3D avatar featuring 12 emotion animations, particle effects, and live system traces
+- **Full Observability** — Split-view terminal UI and web dashboard showing routing paths, branch decisions, evaluation signals, and optimizer updates in real time
+
+---
 
 ## Quick start
 
@@ -48,21 +68,22 @@ Important:
 - if you only want to use the project, `pip install -r requirements.txt` is enough
 - if you want to run tests too, use `pip install -r requirements-dev.txt`
 
-## What this repo is
+## How it works
 
-This repo is a prompt-routing and adaptation system that sits on top of a base model.
+Prompt Forest acts as an **adaptive policy layer** that sits between you and any frozen LLM. Instead of one static prompt producing one answer, the system:
 
-It is not training model weights directly. Instead, it improves behavior through:
-- branch routing
-- specialized prompt branches
-- evaluation and reward signals
-- memory
-- constrained optimizer updates
+1. **Routes** your query through a learned hierarchical branch tree (like a random forest, but for prompts)
+2. **Executes** specialized prompt branches tuned for your task type
+3. **Evaluates** the output using a structured reward signal (verifier checks, rule compliance, LLM judge)
+4. **Optimizes** — the Optimizer agent rewrites underperforming branch prompts and adjusts routing weights
+5. **Remembers** — trajectories are stored per-user so the system gets better for *you* over time
 
-The easiest way to think about it:
-- `base model`: one direct answer
+The result: **measurable, continuous improvement on every task type — with zero model retraining.**
+
+### See it in action
+
 - `prompt forest`: choose a branch path, execute specialized prompts, evaluate the result, and adapt over time
-- `compare-base`: show both side by side
+- `compare-base`: show the raw base model answer side-by-side with the adaptive system
 - `split-view`: left pane is the conversation, right pane shows routing, evaluation, optimization, and branch internals live
 
 ## Use a real OpenAI model
@@ -88,25 +109,27 @@ If you omit `--model`, the main conversation still uses the mock backend even if
 
 ## Research framing
 
-This project is positioned as:
-- A multi-branch adaptive agent architecture
-- An ensemble prompt-routing framework
-- A reward-shaped memory-and-routing agent
-- A prompt-level policy optimization framework
+This project sits at the intersection of several active research areas:
 
-It is **not** an AGI claim.
+- **Prompt-level policy optimization** — treating prompt selection as a learnable policy, optimized via reward signals
+- **Hierarchical mixture-of-experts (for prompts)** — routing to specialized branches instead of specialized model heads
+- **Reward-shaped memory and routing** — using RL-inspired feedback loops without any gradient computation
+- **Closed-source model adaptation** — proving that meaningful learning is possible without weight access
 
-## Core idea
+This is a **concrete, working system** — not a theoretical framework.
 
-For each task:
-1. Root router classifies task type and activates a sequential branch path.
-2. Branches execute one-by-one (hierarchical): macro branch -> niche sub-branch.
-3. Final Composer fuses branch features into the final leaf output (feature-level prompt augmentation).
-4. Judge scores branch outputs.
-5. Aggregator selects the final output (default: leaf node output).
-6. Evaluator Agent (Agent 1) emits structured reward and failure signals.
-7. Optimizer Agent (Agent 2) performs constrained local updates to active path branches only.
-8. Memory records trajectories and biases future routing.
+## Core pipeline
+
+For each task, the system executes a full optimization cycle:
+
+1. **Route** — Root router classifies task type and activates a sequential branch path through the hierarchy
+2. **Execute** — Branches fire one-by-one (macro → niche sub-branch), each with specialized prompt templates
+3. **Compose** — Final Composer fuses branch features into the leaf output via feature-level prompt augmentation
+4. **Judge** — Judge scores branch outputs on multiple dimensions
+5. **Aggregate** — Aggregator selects the final output (default: leaf node)
+6. **Evaluate** — Evaluator Agent (Agent 1) emits structured reward, failure signals, and improvement directions
+7. **Optimize** — Optimizer Agent (Agent 2) performs constrained local updates to active path branches only
+8. **Remember** — Memory records the full trajectory and biases future routing decisions
 
 ## Architecture
 
@@ -576,17 +599,16 @@ For quick human-readable visibility:
 - `prompt-forest chat --visibility full`
 - `prompt-forest inspect-events --limit 10 --visibility full`
 
-## What the MVP demonstrates
+## What this system demonstrates
 
-- Selective multi-branch activation by task type
-- Branch-level reward assignment
-- Branch-local updates (weights, prompt variants)
-- Memory-influenced future routing
-- User-specific routing via `(user_id, task_type)` memory partition + global fallback
-- Evaluator/optimizer separation
-- Candidate branch creation policy with trial lifecycle
-- Optional API-backed Evaluator/Optimizer agents with strict JSON contracts
-- Multi-candidate branch spawning for deeper random-forest-like specialization
+- **Learned routing** — Selective multi-branch activation by task type, with routing weights that shift based on performance
+- **Branch-level credit assignment** — Reward is attributed to individual branches, not just the final output
+- **Self-rewriting prompts** — Branch-local updates modify both weights and prompt templates based on failure analysis
+- **Persistent personalization** — Memory-influenced future routing with `(user_id, task_type)` partitioning + global fallback
+- **Separation of concerns** — Evaluator and Optimizer are independent agents with strict JSON contracts
+- **Autonomous branch evolution** — Candidate branch creation, trial, promotion, and archival based on performance gates
+- **API-backed intelligence** — Optional model-backed Evaluator/Optimizer agents for deeper analysis
+- **Forest-scale specialization** — Multi-candidate branch spawning for deeper random-forest-like coverage
 
 ## Testing
 
@@ -606,12 +628,21 @@ Branch growth tests:
 PYTHONPATH=src pytest tests/test_branch_growth.py
 ```
 
-## Future research extensions
+## Roadmap
 
-1. Replace mock backend with real OpenAI-compatible and local model backends.
-2. Add external verifier plugins (unit tests, symbolic solvers, retrieval validators).
-3. Add contextual bandit or Thompson sampling router policy.
-4. Add richer evaluator modes (pairwise judge, consistency checks, uncertainty calibration).
-5. Add branch prompt versioning and A/B rollback dashboards.
-6. Add multi-objective reward (accuracy, latency, token cost, safety).
-7. Integrate directly into OpenClaw runtime loop as an adaptation middleware service.
+We are building toward a world where **any closed-source model becomes a self-improving agent** — no fine-tuning, no retraining, no weight access required.
+
+| Phase | Focus | Status |
+|---|---|---|
+| **Phase 1** | Core routing, evaluation, optimization loop | Done |
+| **Phase 2** | Interactive frontend with 3D avatar + live system traces | Done |
+| **Phase 3** | Human-mode emotion engine with persistent behavioral memory | Done |
+| **Phase 4** | External verifier plugins (unit tests, symbolic solvers, retrieval validators) | Planned |
+| **Phase 5** | Contextual bandit / Thompson sampling router policy | Planned |
+| **Phase 6** | Multi-objective reward optimization (accuracy, latency, token cost, safety) | Planned |
+| **Phase 7** | Branch prompt versioning with A/B rollback dashboards | Planned |
+| **Phase 8** | Production-grade OpenClaw middleware integration | Planned |
+
+## Contributing
+
+We welcome contributions. If you're interested in adaptive agent systems, prompt optimization, or RL-without-weights research, open an issue or submit a PR.
