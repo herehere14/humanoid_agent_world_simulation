@@ -1,0 +1,61 @@
+{
+  "round": 1,
+  "improved": false,
+  "best_objective": 1.067995,
+  "round_best": {
+    "patch": {
+      "router.memory_coef": 0.221801,
+      "router.bandit_value_coef": 0.0,
+      "router.bandit_bonus_coef": 0.0,
+      "router.exploration": 0.141407,
+      "router.exploration_decay": 0.994593,
+      "memory.bias_scale": 0.526598,
+      "memory.recency_decay": 0.982064,
+      "memory.shrinkage_k": 40.0,
+      "optimizer.learning_rate": 0.131926,
+      "optimizer.weight_decay": 0.040298,
+      "optimizer.advantage_baseline_beta": 0.141565,
+      "optimizer.branch_advantage_mix": 0.1,
+      "optimizer.branch_baseline_beta": 0.05
+    },
+    "objective": 1.067995,
+    "full_holdout": 0.7053,
+    "full_minus_frozen": 0.0922,
+    "full_minus_memory_only": 0.0922,
+    "full_win_rate_vs_frozen": 1.0,
+    "full_ci95_low": 0.0922,
+    "fairness_gap": 0.0995,
+    "gain_std": 0.0,
+    "branch_concentration_gap": 0.0037,
+    "report_path": "/Users/justin/openclaw_projects/openclaw_closedsourcemodel_RL/artifacts/auto_improve/round_1_candidate_0.json",
+    "ci_gate_passed": true
+  },
+  "incumbent": {
+    "patch": {
+      "router.memory_coef": 0.221801,
+      "router.bandit_value_coef": 0.0,
+      "router.bandit_bonus_coef": 0.0,
+      "router.exploration": 0.141407,
+      "router.exploration_decay": 0.994593,
+      "memory.bias_scale": 0.526598,
+      "memory.recency_decay": 0.982064,
+      "memory.shrinkage_k": 40.0,
+      "optimizer.learning_rate": 0.131926,
+      "optimizer.weight_decay": 0.040298,
+      "optimizer.advantage_baseline_beta": 0.141565,
+      "optimizer.branch_advantage_mix": 0.1,
+      "optimizer.branch_baseline_beta": 0.05
+    },
+    "objective": 1.067995,
+    "full_holdout": 0.7053,
+    "full_minus_frozen": 0.0922,
+    "full_minus_memory_only": 0.0922,
+    "full_win_rate_vs_frozen": 1.0,
+    "full_ci95_low": 0.0922,
+    "fairness_gap": 0.0995,
+    "gain_std": 0.0,
+    "branch_concentration_gap": 0.0037,
+    "report_path": "/Users/justin/openclaw_projects/openclaw_closedsourcemodel_RL/artifacts/auto_improve/baseline_report.json",
+    "ci_gate_passed": true
+  }
+}

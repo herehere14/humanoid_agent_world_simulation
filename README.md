@@ -188,6 +188,27 @@ Compatibility points:
 - `PromptForestEngine.openclaw_ingest(event)` accepts structured trajectory-like events
 - `OpenClawAdapter.process_trajectory()` wraps external runtime events
 - Tool events, outputs, branch activity, and evaluator signals are accepted as structured metadata
+- `prompt_forest.openclaw_bridge` exposes stable JSON I/O for OpenClaw tools and feedback hooks
+- `extensions/prompt-forest/` is a standalone OpenClaw plugin with tools, config schema, and a bundled skill
+
+### OpenClaw plugin install
+
+If you want this repo to plug directly into OpenClaw as a local extension:
+
+```bash
+openclaw plugins install ./extensions/prompt-forest -l
+```
+
+Then configure `openclaw-prompt-forest` with:
+- `pythonBin`: the Python interpreter for this repo's virtualenv
+- `projectRoot`: the absolute path to this repo
+- `configPath`: usually `configs/default.json`
+- `model` plus `OPENAI_API_KEY` if you want real model generation instead of the mock backend
+
+The plugin registers:
+- `prompt_forest_assist`
+- `prompt_forest_feedback`
+- `prompt_forest_state`
 
 ## Project structure
 
@@ -228,6 +249,8 @@ pip install -r requirements-dev.txt
 - `pyproject.toml`: package metadata and CLI entrypoint
 
 After install, use the `prompt-forest` entrypoint directly.
+
+For OpenClaw-specific subprocess integration, `prompt-forest-openclaw` is also installed.
 
 If you prefer editable install commands instead of the requirements files:
 

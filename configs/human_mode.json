@@ -1,0 +1,38 @@
+{
+  "mode": "human_mode",
+  "human_mode": {
+    "state_decay_rate": 0.05,
+    "state_momentum": 0.7,
+    "stress_amplification": 1.2,
+    "emotional_inertia": 0.6,
+
+    "conflict_threshold": 0.15,
+    "conflict_resolution_strategy": "weighted_compromise",
+    "max_active_conflicts": 3,
+
+    "drive_weights": {
+      "reasoning": 1.0,
+      "impulse": 0.6,
+      "fear": 0.7,
+      "curiosity": 0.8,
+      "empathy": 0.7,
+      "self_protection": 0.6,
+      "ambition": 0.7,
+      "moral": 0.8,
+      "long_term_goals": 0.9,
+      "emotional_regulation": 0.8
+    },
+
+    "coherence_weight": 0.30,
+    "consistency_weight": 0.25,
+    "believability_weight": 0.25,
+    "conflict_handling_weight": 0.20,
+
+    "emotional_memory_decay": 0.92,
+    "experience_bias_strength": 0.4,
+    "trauma_amplification": 1.5,
+
+    "noise_level": 0.08,
+    "bounded_rationality_cap": 0.85
+  }
+}
