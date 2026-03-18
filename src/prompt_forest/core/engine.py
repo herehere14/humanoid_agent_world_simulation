@@ -724,7 +724,14 @@ class PromptForestEngine:
     def _augment_context_for_branch(self, task: TaskInput, branch: PromptBranch, context: str) -> str:
         base_context = str(context or "").strip()
         user_id = str(task.metadata.get("user_id", "global")).strip() or "global"
-        memory_hints = self.memory.execution_guidance(task, branch.name, user_id=user_id, limit=2)
+        playbook = self.memory.execution_playbook(
+            task,
+            branch.name,
+            user_id=user_id,
+            success_limit=3,
+            failure_limit=1,
+            min_similarity=self.config.execution_adaptation.min_similarity,
+        )
         adaptive_hint = str(branch.state.metadata.get("adaptive_execution_hint", "")).strip()
 
         sections: list[str] = []
@@ -734,12 +741,30 @@ class PromptForestEngine:
         guidance_lines: list[str] = []
         if adaptive_hint:
             guidance_lines.append(f"Adaptive branch hint: {adaptive_hint}")
-        for hint in memory_hints:
+        for hint in playbook.guidance[:2]:
             guidance_lines.append(f"Similar success: {hint}")
 
         if guidance_lines:
             guidance = "Execution guidance:\n" + "\n".join(f"- {line}" for line in guidance_lines)
             sections.append(guidance[:520])
+
+        task_native_items = self._task_priority_items(task)
+        if task_native_items:
+            task_native = "Task-native signals to keep explicit:\n" + "\n".join(
+                f"- {item}" for item in task_native_items[:6]
+            )
+            sections.append(task_native[:360])
+
+        if playbook.support >= self.config.execution_adaptation.min_success_support:
+            memory_sections: list[str] = []
+            if playbook.pattern_summaries:
+                memory_sections.extend(f"- {item}" for item in playbook.pattern_summaries[:3])
+            if playbook.recommended_flows:
+                memory_sections.extend(f"- flow: {item}" for item in playbook.recommended_flows[:2])
+            if playbook.case_summaries:
+                memory_sections.extend(f"- case: {item}" for item in playbook.case_summaries[:2])
+            if memory_sections:
+                sections.append(("Reusable branch memory:\n" + "\n".join(memory_sections))[:720])
 
         return "\n\n".join(section for section in sections if section).strip()
 
@@ -865,6 +890,9 @@ class PromptForestEngine:
         anti_patterns = playbook.anti_patterns or ["do not add meta commentary"]
         examples = playbook.success_examples[: self.config.execution_adaptation.max_success_examples]
         guidance = playbook.guidance[: self.config.execution_adaptation.max_success_examples]
+        pattern_summaries = playbook.pattern_summaries[:3]
+        recommended_flows = playbook.recommended_flows[:2]
+        case_summaries = playbook.case_summaries[:2]
 
         sections = [
             "You are improving a branch draft using a learned execution playbook from successful similar tasks.",
@@ -900,6 +928,27 @@ class PromptForestEngine:
                 [
                     "Learned success cues:",
                     "\n".join(f"- {item}" for item in guidance),
+                ]
+            )
+        if pattern_summaries:
+            sections.extend(
+                [
+                    "Reusable patterns from similar successes:",
+                    "\n".join(f"- {item}" for item in pattern_summaries),
+                ]
+            )
+        if recommended_flows:
+            sections.extend(
+                [
+                    "Recommended answer flows that worked before:",
+                    "\n".join(f"- {item}" for item in recommended_flows),
+                ]
+            )
+        if case_summaries:
+            sections.extend(
+                [
+                    "Compact case memories from prior wins:",
+                    "\n".join(f"- {item}" for item in case_summaries),
                 ]
             )
         if support_output:

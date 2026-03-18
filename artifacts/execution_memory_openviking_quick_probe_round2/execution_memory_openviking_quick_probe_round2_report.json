@@ -1,0 +1,2694 @@
+{
+  "generated_at": "2026-03-14T13:48:54.160054+00:00",
+  "dataset_path": "/Users/justin/Documents/New project/repo_inspect/artifacts/codex_routing_divergence_quick_probe_dataset.json",
+  "models": {
+    "generation_model": "gpt-4.1-mini",
+    "judge_model": "gpt-4.1-mini",
+    "api_key_env": "OPENAI_API_KEY",
+    "base_url": "https://api.openai.com/v1",
+    "temperature": 0.2,
+    "max_output_tokens": 1200,
+    "api_mode": "chat_completions",
+    "reasoning_effort": "",
+    "judge_api_mode": "chat_completions",
+    "judge_reasoning_effort": "",
+    "judge_temperature": 0.0,
+    "judge_max_output_tokens": 280
+  },
+  "settings": {
+    "train_rounds": 1,
+    "use_agent_runtimes": false,
+    "train_candidates_per_task": 2,
+    "holdout_candidates_per_task": 1,
+    "composer_enabled": false,
+    "reward_mode": "hybrid_verifier"
+  },
+  "dataset_summary": {
+    "train_tasks_per_round": 4,
+    "train_rounds": 1,
+    "expanded_train_tasks": 4,
+    "holdout_tasks": 4,
+    "train_task_types": {
+      "planning": 2,
+      "code": 1,
+      "general": 1
+    },
+    "holdout_task_types": {
+      "planning": 2,
+      "code": 1,
+      "general": 1
+    },
+    "train_contract_tasks_per_round": 0,
+    "holdout_contract_tasks": 0
+  },
+  "aggregate": {
+    "train": {
+      "full_adaptive": {
+        "episodes": 4,
+        "mean_objective_reward": 0.8333,
+        "first_third_mean_reward": 0.875,
+        "last_third_mean_reward": 0.925,
+        "last_minus_first_third": 0.05,
+        "contract_pass_rate": null,
+        "mean_path_length": 3,
+        "selected_branch_hhi": 0.375,
+        "selected_branch_counts": {
+          "planner_risk_allocator": 2,
+          "verification_constraint_checker": 1,
+          "verification_consistency_auditor": 1
+        },
+        "objective_reward_by_task_type": {
+          "code": 0.6583,
+          "general": 0.925,
+          "planning": 0.875
+        },
+        "optimizer_event_counts": {
+          "rewritten_prompts": 0,
+          "created_candidates": 0,
+          "promoted_candidates": 0,
+          "archived_candidates": 0
+        },
+        "backend_usage": {
+          "call_count": 12,
+          "ok_calls": 12,
+          "error_calls": 0,
+          "prompt_tokens": 2923,
+          "completion_tokens": 6819,
+          "total_tokens": 9742,
+          "total_latency_ms": 116480.276,
+          "mean_latency_ms": 9706.69
+        },
+        "evaluator_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        },
+        "optimizer_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        }
+      },
+      "frozen": {
+        "episodes": 4,
+        "mean_objective_reward": 0.8208,
+        "first_third_mean_reward": 0.875,
+        "last_third_mean_reward": 0.875,
+        "last_minus_first_third": 0.0,
+        "contract_pass_rate": null,
+        "mean_path_length": 3,
+        "selected_branch_hhi": 0.375,
+        "selected_branch_counts": {
+          "planner_risk_allocator": 2,
+          "verification_constraint_checker": 1,
+          "verification_consistency_auditor": 1
+        },
+        "objective_reward_by_task_type": {
+          "code": 0.6583,
+          "general": 0.875,
+          "planning": 0.875
+        },
+        "optimizer_event_counts": {
+          "rewritten_prompts": 0,
+          "created_candidates": 0,
+          "promoted_candidates": 0,
+          "archived_candidates": 0
+        },
+        "backend_usage": {
+          "call_count": 12,
+          "ok_calls": 12,
+          "error_calls": 0,
+          "prompt_tokens": 2834,
+          "completion_tokens": 7201,
+          "total_tokens": 10035,
+          "total_latency_ms": 125350.408,
+          "mean_latency_ms": 10445.867
+        },
+        "evaluator_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        },
+        "optimizer_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        }
+      }
+    },
+    "holdout": {
+      "full_adaptive": {
+        "episodes": 4,
+        "mean_objective_reward": 0.7333,
+        "first_third_mean_reward": 0.7583,
+        "last_third_mean_reward": 0.7583,
+        "last_minus_first_third": 0.0,
+        "contract_pass_rate": null,
+        "mean_path_length": 2,
+        "selected_branch_hhi": 0.5,
+        "selected_branch_counts": {
+          "planner_risk_allocator": 2,
+          "verification_constraint_checker": 2
+        },
+        "objective_reward_by_task_type": {
+          "code": 0.6583,
+          "general": 0.7583,
+          "planning": 0.7583
+        },
+        "optimizer_event_counts": {
+          "rewritten_prompts": 0,
+          "created_candidates": 0,
+          "promoted_candidates": 0,
+          "archived_candidates": 0
+        },
+        "backend_usage": {
+          "call_count": 9,
+          "ok_calls": 9,
+          "error_calls": 0,
+          "prompt_tokens": 2311,
+          "completion_tokens": 4269,
+          "total_tokens": 6580,
+          "total_latency_ms": 65632.007,
+          "mean_latency_ms": 7292.445
+        },
+        "evaluator_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        },
+        "optimizer_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        }
+      },
+      "frozen": {
+        "episodes": 4,
+        "mean_objective_reward": 0.7386,
+        "first_third_mean_reward": 0.8083,
+        "last_third_mean_reward": 0.7583,
+        "last_minus_first_third": -0.05,
+        "contract_pass_rate": null,
+        "mean_path_length": 2,
+        "selected_branch_hhi": 0.5,
+        "selected_branch_counts": {
+          "planner_timeline_optimizer": 2,
+          "verification_constraint_checker": 2
+        },
+        "objective_reward_by_task_type": {
+          "code": 0.6583,
+          "general": 0.7583,
+          "planning": 0.7689
+        },
+        "optimizer_event_counts": {
+          "rewritten_prompts": 0,
+          "created_candidates": 0,
+          "promoted_candidates": 0,
+          "archived_candidates": 0
+        },
+        "backend_usage": {
+          "call_count": 8,
+          "ok_calls": 8,
+          "error_calls": 0,
+          "prompt_tokens": 1570,
+          "completion_tokens": 4392,
+          "total_tokens": 5962,
+          "total_latency_ms": 61982.955,
+          "mean_latency_ms": 7747.869
+        },
+        "evaluator_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        },
+        "optimizer_runtime_usage": {
+          "call_count": 0,
+          "ok_calls": 0,
+          "error_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "total_latency_ms": 0.0,
+          "mean_latency_ms": 0.0
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "adaptive_vs_frozen": {
+      "objective_reward_gain": -0.0053,
+      "pairwise": {
+        "n": 4,
+        "left_wins": 3,
+        "right_wins": 1,
+        "ties": 0,
+        "left_win_rate": 0.75,
+        "right_win_rate": 0.25,
+        "mean_score_left": 8.5,
+        "mean_score_right": 7.5,
+        "by_task_type": {
+          "planning": {
+            "left": 2,
+            "right": 0,
+            "tie": 0
+          },
+          "code": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "general": {
+            "left": 0,
+            "right": 1,
+            "tie": 0
+          }
+        }
+      },
+      "branch_divergence": {
+        "holdout_tasks": 4,
+        "selected_branch_diff_count": 2,
+        "selected_branch_diff_rate": 0.5,
+        "activated_path_diff_count": 2,
+        "activated_path_diff_rate": 0.5,
+        "mean_reward_delta_on_divergent": -0.0106,
+        "mean_reward_delta_on_non_divergent": 0.0,
+        "divergent_tasks": [
+          {
+            "task_id": "holdout_divergence_planning_risk_ledger",
+            "task_type": "planning",
+            "aspect": "planning_risk",
+            "adaptive_branch": "planner_risk_allocator",
+            "frozen_branch": "planner_timeline_optimizer",
+            "adaptive_reward": 0.7583,
+            "frozen_reward": 0.8083,
+            "reward_delta": -0.05,
+            "branch_changed": true,
+            "path_changed": true
+          },
+          {
+            "task_id": "holdout_divergence_planning_risk_admin",
+            "task_type": "planning",
+            "aspect": "planning_risk",
+            "adaptive_branch": "planner_risk_allocator",
+            "frozen_branch": "planner_timeline_optimizer",
+            "adaptive_reward": 0.7583,
+            "frozen_reward": 0.7294,
+            "reward_delta": 0.0289,
+            "branch_changed": true,
+            "path_changed": true
+          }
+        ]
+      },
+      "aspect_summary": {
+        "code_consistency_audit": {
+          "n": 1,
+          "adaptive_mean_reward": 0.6583,
+          "frozen_mean_reward": 0.6583,
+          "adaptive_minus_frozen": 0.0,
+          "branch_diff_count": 0,
+          "adaptive_branch_counts": {
+            "verification_constraint_checker": 1
+          },
+          "frozen_branch_counts": {
+            "verification_constraint_checker": 1
+          }
+        },
+        "general_consistency_audit": {
+          "n": 1,
+          "adaptive_mean_reward": 0.7583,
+          "frozen_mean_reward": 0.7583,
+          "adaptive_minus_frozen": 0.0,
+          "branch_diff_count": 0,
+          "adaptive_branch_counts": {
+            "verification_constraint_checker": 1
+          },
+          "frozen_branch_counts": {
+            "verification_constraint_checker": 1
+          }
+        },
+        "planning_risk": {
+          "n": 2,
+          "adaptive_mean_reward": 0.7583,
+          "frozen_mean_reward": 0.7689,
+          "adaptive_minus_frozen": -0.0106,
+          "branch_diff_count": 2,
+          "adaptive_branch_counts": {
+            "planner_risk_allocator": 2
+          },
+          "frozen_branch_counts": {
+            "planner_timeline_optimizer": 2
+          }
+        }
+      },
+      "weight_delta_summary": [
+        {
+          "branch_name": "planner_risk_allocator",
+          "adaptive_weight": 0.9664,
+          "frozen_weight": 0.93,
+          "delta": 0.0364
+        },
+        {
+          "branch_name": "verification_consistency_auditor",
+          "adaptive_weight": 0.9698,
+          "frozen_weight": 0.95,
+          "delta": 0.0198
+        }
+      ]
+    },
+    "pairwise_summary": {
+      "full_adaptive__vs__frozen": {
+        "n": 4,
+        "left_wins": 3,
+        "right_wins": 1,
+        "ties": 0,
+        "left_win_rate": 0.75,
+        "right_win_rate": 0.25,
+        "mean_score_left": 8.5,
+        "mean_score_right": 7.5,
+        "by_task_type": {
+          "planning": {
+            "left": 2,
+            "right": 0,
+            "tie": 0
+          },
+          "code": {
+            "left": 1,
+            "right": 0,
+            "tie": 0
+          },
+          "general": {
+            "left": 0,
+            "right": 1,
+            "tie": 0
+          }
+        }
+      }
+    }
+  },
+  "pairwise_holdout": [
+    {
+      "task_id": "holdout_divergence_planning_risk_ledger",
+      "split": "holdout",
+      "task_type": "planning",
+      "left_policy": "full_adaptive",
+      "right_policy": "frozen",
+      "winner": "full_adaptive",
+      "score_left": 9.0,
+      "score_right": 7.0,
+      "rationale": "Candidate B provides a clear, concise risk register explicitly listing risks, mitigations, owners, rollback plans, and confidence levels for each risk, fully satisfying the task constraints. It includes multiple ledger-specific risks, detailed rollback strategies, and a calibrated overall confidence score. Candidate A, while thorough and well-structured as a timeline and plan, embeds the risk register within a broader project plan, making it less concise and somewhat less explicit in confidence calibration (some confidence levels are vague or missing). Candidate A also lacks an overall confidence calibration and has less explicit rollback detail per risk. Candidate B is more directly aligned with the task requirements and rubric, making it more useful and complete for risk management in enabling multi-region writes.",
+      "raw_response": {
+        "winner": "B",
+        "score_a": 7,
+        "score_b": 9,
+        "rationale": "Candidate B provides a clear, concise risk register explicitly listing risks, mitigations, owners, rollback plans, and confidence levels for each risk, fully satisfying the task constraints. It includes multiple ledger-specific risks, detailed rollback strategies, and a calibrated overall confidence score. Candidate A, while thorough and well-structured as a timeline and plan, embeds the risk register within a broader project plan, making it less concise and somewhat less explicit in confidence calibration (some confidence levels are vague or missing). Candidate A also lacks an overall confidence calibration and has less explicit rollback detail per risk. Candidate B is more directly aligned with the task requirements and rubric, making it more useful and complete for risk management in enabling multi-region writes."
+      }
+    },
+    {
+      "task_id": "holdout_divergence_planning_risk_admin",
+      "split": "holdout",
+      "task_type": "planning",
+      "left_policy": "full_adaptive",
+      "right_policy": "frozen",
+      "winner": "full_adaptive",
+      "score_left": 9.0,
+      "score_right": 7.0,
+      "rationale": "Candidate B provides a clear, concise risk register with explicit risks, owners, mitigations, fallback actions, and confidence levels for each risk, directly satisfying all required constraints and rubric points. It is well-structured and actionable, making it highly useful for deployment planning. Candidate A, while detailed and structured as a phased deployment plan with owners and confidence checkpoints, does not explicitly list risks or fallback actions per risk, which reduces clarity and completeness as a risk register. It also lacks explicit confidence levels per risk, only mentioning confidence in general terms. Therefore, Candidate B better meets the task requirements and rubric criteria.",
+      "raw_response": {
+        "winner": "B",
+        "score_a": 7,
+        "score_b": 9,
+        "rationale": "Candidate B provides a clear, concise risk register with explicit risks, owners, mitigations, fallback actions, and confidence levels for each risk, directly satisfying all required constraints and rubric points. It is well-structured and actionable, making it highly useful for deployment planning. Candidate A, while detailed and structured as a phased deployment plan with owners and confidence checkpoints, does not explicitly list risks or fallback actions per risk, which reduces clarity and completeness as a risk register. It also lacks explicit confidence levels per risk, only mentioning confidence in general terms. Therefore, Candidate B better meets the task requirements and rubric criteria."
+      }
+    },
+    {
+      "task_id": "holdout_divergence_code_consistency_backfill",
+      "split": "holdout",
+      "task_type": "code",
+      "left_policy": "full_adaptive",
+      "right_policy": "frozen",
+      "winner": "full_adaptive",
+      "score_left": 9.0,
+      "score_right": 7.0,
+      "rationale": "Candidate A provides a more thorough and structured audit, explicitly identifying multiple facets of the inconsistency including missing precise definitions, shard-level reporting, and timelines for manual repair. It clearly states the contradictions and the lack of uncertainty calibration, and it offers a conservative confidence estimate (0.25) that reflects the unresolved issues. Candidate B also identifies contradictions and confidence overstatement but is less comprehensive, missing some explicit constraints such as precise definitions and shard-level details. B's confidence calibration is slightly higher (0.30) but less justified given the unresolved issues. Overall, A better satisfies the primary criteria of correctness, explicit constraint satisfaction, completeness, and confidence calibration, making it the stronger and more useful answer.",
+      "raw_response": {
+        "winner": "A",
+        "score_a": 9,
+        "score_b": 7,
+        "rationale": "Candidate A provides a more thorough and structured audit, explicitly identifying multiple facets of the inconsistency including missing precise definitions, shard-level reporting, and timelines for manual repair. It clearly states the contradictions and the lack of uncertainty calibration, and it offers a conservative confidence estimate (0.25) that reflects the unresolved issues. Candidate B also identifies contradictions and confidence overstatement but is less comprehensive, missing some explicit constraints such as precise definitions and shard-level details. B's confidence calibration is slightly higher (0.30) but less justified given the unresolved issues. Overall, A better satisfies the primary criteria of correctness, explicit constraint satisfaction, completeness, and confidence calibration, making it the stronger and more useful answer."
+      }
+    },
+    {
+      "task_id": "holdout_divergence_general_consistency_safe_rollout",
+      "split": "holdout",
+      "task_type": "general",
+      "left_policy": "full_adaptive",
+      "right_policy": "frozen",
+      "winner": "frozen",
+      "score_left": 7.0,
+      "score_right": 9.0,
+      "rationale": "Both candidates correctly identify the key contradiction between the safety claim and the missing rollback drill and critical metric, and both note the lack of uncertainty calibration and confidence adjustment. Candidate A provides a more thorough and explicit checklist-style audit, clearly stating failures on all relevant constraints and emphasizing the need to recalibrate confidence downward. It also explicitly quantifies confidence at 0.30, reflecting appropriate caution. Candidate B similarly identifies the issues but gives a partial pass on metric reporting without fully integrating its impact, and assigns a higher confidence (0.40) that is less cautious given the contradictions. Candidate A's answer is more complete, internally consistent, and better calibrated in terms of uncertainty and confidence expression, making it the stronger response.",
+      "raw_response": {
+        "winner": "A",
+        "score_a": 9,
+        "score_b": 7,
+        "rationale": "Both candidates correctly identify the key contradiction between the safety claim and the missing rollback drill and critical metric, and both note the lack of uncertainty calibration and confidence adjustment. Candidate A provides a more thorough and explicit checklist-style audit, clearly stating failures on all relevant constraints and emphasizing the need to recalibrate confidence downward. It also explicitly quantifies confidence at 0.30, reflecting appropriate caution. Candidate B similarly identifies the issues but gives a partial pass on metric reporting without fully integrating its impact, and assigns a higher confidence (0.40) that is less cautious given the contradictions. Candidate A's answer is more complete, internally consistent, and better calibrated in terms of uncertainty and confidence expression, making it the stronger response."
+      }
+    }
+  ],
+  "per_policy": {
+    "full_adaptive": {
+      "train": [
+        {
+          "task_id": "train_divergence_planning_risk_failover::round_1",
+          "split": "train",
+          "task_type": "planning",
+          "aspect": "planning_risk",
+          "text": "Create a concise risk register for a phased database failover in a billing platform. Include mitigation, owner, rollback, and confidence.",
+          "selected_output": "**Phased Database Failover Risk Register \u2013 Billing Platform**\n\n| Risk ID | Risk Description                                    | Mitigation                                                                 | Owner(s)                     | Rollback Plan                                         | Confidence       | Escalation / Containment                                  |\n|---------|----------------------------------------------------|---------------------------------------------------------------------------|------------------------------|-------------------------------------------------------|------------------|-----------------------------------------------------------|\n| R1      | Data corruption or loss during failover             | Conduct comprehensive data integrity checks pre- and post-failover; use verified backups; limit failover scope per phase | DB Team Lead                 | Restore from last verified backup; revert to primary DB | Medium-High      | Escalate immediately if integrity check fails; isolate failover environment |\n| R2      | Billing platform instability under new DB load      | Confirm platform stability and performance in staging; monitor metrics in real-time during failover | Platform Lead                | Switch back to original DB instance; pause failover    | Medium           | Trigger rollback if latency or error rates exceed thresholds |\n| R3      | Incomplete synchronization causing data mismatch    | Validate synchronization completeness before cutover; use automated sync verification tools | DB Team Lead                 | Re-sync data; revert to original DB if mismatch persists | Medium           | Escalate if sync lag > defined threshold; contain by halting new writes |\n| R4      | Insufficient runbook or knowledge gaps               | Document lessons learned continuously; update runbooks after each phase; conduct team walkthroughs | Project Manager              | Use previous stable runbook version; engage SMEs for support | High             | Escalate if unclear procedures cause delays; contain by pausing rollout |\n| R5      | Communication breakdown among teams during failover | Establish clear communication protocols and escalation paths; daily sync meetings during failover | Project Manager              | Re-establish communication channels; assign backup contacts | High             | Escalate if communication delays impact decision-making; contain by activating incident command |\n\n---\n\n**Rollout Plan Note:**  \nProceed with failover only after successful completion and sign-off of all data integrity and platform stability validations. Implement phased approach with go/no-go decision points after each phase based on predefined KPIs and risk triggers.\n\n**Overall Confidence:** confidence=0.85",
+          "selected_branch": "planner_risk_allocator",
+          "activated_branches": [
+            "planner",
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "activated_paths": [
+            [
+              "planner",
+              "planner_timeline_optimizer"
+            ],
+            [
+              "planner",
+              "planner_risk_allocator"
+            ]
+          ],
+          "forced_parent": "planner",
+          "forced_children": [
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "internal_reward_score": 0.875,
+          "internal_confidence": 0.6167,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.875,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:5/5|rules_passed|task_specific:2/5|verifier|must_include:4/4|length:275/70|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:5/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:4/4|length:275/70|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 316
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 655,
+            "completion_tokens": 1761,
+            "total_tokens": 2416,
+            "total_latency_ms": 24935.846,
+            "mean_latency_ms": 8311.949
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "train_divergence_planning_risk_sso::round_1",
+          "split": "train",
+          "task_type": "planning",
+          "aspect": "planning_risk",
+          "text": "Prepare a launch risk register for rolling out self-serve SSO to enterprise tenants. Include mitigation, owner, fallback, and confidence.",
+          "selected_output": "| Risk ID | Risk Description                                    | Owner                  | Mitigation                                                                                     | Fallback / Rollback Action                              | Confidence Level | Notes / Escalation Triggers                                  |\n|---------|----------------------------------------------------|------------------------|------------------------------------------------------------------------------------------------|---------------------------------------------------------|------------------|-------------------------------------------------------------|\n| R1      | SSO authentication failures causing tenant lockout| Infrastructure Manager | Extensive pilot testing with selected tenants; implement staged rollout with monitoring         | Immediate rollback to previous auth method per tenant   | Medium-High      | Escalate if >5% tenant auth failures within 24h post-rollout |\n| R2      | Security vulnerabilities exposed by SSO integration| Security Team Lead     | Conduct thorough security audits and penetration testing pre-launch; continuous monitoring      | Disable SSO feature globally; revert to legacy login     | Medium           | Escalate on detection of critical vulnerability or breach   |\n| R3      | Performance degradation impacting tenant access    | Infrastructure Manager | Load testing under peak conditions; optimize SSO service; monitor latency and error rates       | Throttle rollout; rollback for affected tenants          | Medium           | Escalate if latency >2s or error rate >1% sustained >1h     |\n| R4      | Insufficient tenant support readiness and training | Product Manager        | Provide detailed documentation, training sessions, and support escalation paths                | Pause rollout; increase support resources                | High             | Escalate if >10% tenant support tickets related to SSO issues|\n| R5      | Data synchronization issues between identity providers| Infrastructure Manager | Validate identity provider integrations; implement retry and alerting mechanisms               | Rollback affected tenant integrations                     | Medium           | Escalate on repeated sync failures or data mismatches       |\n| R6      | Compliance or regulatory concerns with SSO rollout| Security Team Lead     | Review compliance requirements; engage legal and compliance teams pre-launch                    | Halt rollout pending compliance review                    | High             | Escalate on any regulatory non-compliance findings          |\n\n---\n\n**Rollout Plan Note:** Proceed with rollout only after pilot phase confirms <5% auth failures, no critical security issues, and performance metrics within thresholds. Continuous monitoring and rapid response teams must be on standby during initial 72 hours of full rollout. Escalation triggers must be clearly communicated to all owners.\n\n**Overall Confidence:** confidence=0.78",
+          "selected_branch": "planner_risk_allocator",
+          "activated_branches": [
+            "planner",
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "activated_paths": [
+            [
+              "planner",
+              "planner_timeline_optimizer"
+            ],
+            [
+              "planner",
+              "planner_risk_allocator"
+            ]
+          ],
+          "forced_parent": "planner",
+          "forced_children": [
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "internal_reward_score": 0.875,
+          "internal_confidence": 0.5667,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.875,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:5/5|rules_passed|task_specific:2/5|verifier|must_include:3/3|length:283/70|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:5/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:3/3|length:283/70|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 331
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 745,
+            "completion_tokens": 2309,
+            "total_tokens": 3054,
+            "total_latency_ms": 28879.867,
+            "mean_latency_ms": 9626.622
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "train_divergence_code_consistency_retry_backlog::round_1",
+          "split": "train",
+          "task_type": "code",
+          "aspect": "code_consistency_audit",
+          "text": "Audit a rollout update for consistency when it says the new job queue is stable, but it also says the retry backlog keeps growing and the dead-letter queue was never replayed. Explain contradictions, uncertainty calibration, and confidence.",
+          "selected_output": "Audit Report: Rollout Update Consistency Check\n\n1. Stability Claim vs. Retry Backlog Growth  \n- Requirement: The update states the new job queue is stable.  \n- Observation: The retry backlog keeps growing.  \n- Contradiction: Stability implies steady-state or improving conditions; a growing retry backlog indicates unresolved failures and instability.  \n- Result: FAIL \u2014 The claim of stability contradicts the evidence of backlog growth.\n\n2. Stability Claim vs. Dead-Letter Queue (DLQ) Replay  \n- Requirement: Stability claims should be supported by proper handling of failed jobs, including DLQ replay.  \n- Observation: The dead-letter queue was never replayed.  \n- Contradiction: Without DLQ replay, failed jobs accumulate indefinitely, undermining stability.  \n- Result: FAIL \u2014 Stability claim is unsupported due to missing DLQ replay.\n\n3. Quantitative Metrics on Retry Rates, Backlog Size, and DLQ Status  \n- Requirement: Provide quantitative metrics for retry rates, backlog size, and DLQ status to support stability claims.  \n- Observation: No quantitative metrics provided.  \n- Result: FAIL \u2014 Missing critical quantitative data for uncertainty calibration and confidence assessment.\n\n4. Uncertainty Calibration and Confidence  \n- Requirement: Uncertainty should be calibrated based on observed contradictions and missing data; confidence in stability claims should be low if contradictions exist.  \n- Observation: Contradictions present; retry backlog growth and missing DLQ replay increase uncertainty.  \n- Confidence Calibration: confidence=0.25 (low confidence due to unresolved contradictions and missing metrics).\n\nSummary:  \n- Contradictions identified between stability claims and retry backlog growth.  \n- Contradictions identified between stability claims and lack of DLQ replay.  \n- Missing quantitative metrics prevent proper uncertainty calibration.  \n- Overall consistency rating: Low (statements are internally inconsistent).  \n- Confidence in stability claims: Low (confidence=0.25).\n\nRecommendations (per parent context):  \n- Investigate and resolve causes of retry backlog growth.  \n- Implement and document dead-letter queue replay procedures.  \n- Provide quantitative metrics on retry rates, backlog size, and DLQ status.  \n- Reassess stability claims after corrective actions.\n\nThis audit flags critical contradictions and uncertainty that must be addressed before accepting the rollout as stable.",
+          "selected_branch": "verification_constraint_checker",
+          "activated_branches": [
+            "verification",
+            "verification_constraint_checker",
+            "verification_consistency_auditor"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "verification_constraint_checker"
+            ],
+            [
+              "verification",
+              "verification_consistency_auditor"
+            ]
+          ],
+          "forced_parent": "verification",
+          "forced_children": [
+            "verification_constraint_checker",
+            "verification_consistency_auditor"
+          ],
+          "internal_reward_score": 0.6583,
+          "internal_confidence": 0.5,
+          "failure_reason": "medium_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:0/5|verifier|must_include:1/1|length:305/70|confidence_range:miss|no_user_preference_profile",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.6583,
+            "hybrid_verifier_reason": "medium_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:0/5|verifier|must_include:1/1|length:305/70|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.0,
+            "task_specific_reason": "task_specific:0/5",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "verifier|must_include:1/1|length:305/70|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 323
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 772,
+            "completion_tokens": 1524,
+            "total_tokens": 2296,
+            "total_latency_ms": 23038.871,
+            "mean_latency_ms": 7679.624
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "train_divergence_general_consistency_release_note::round_1",
+          "split": "train",
+          "task_type": "general",
+          "aspect": "general_consistency_audit",
+          "text": "Audit a launch update for internal consistency when it says rollout is complete, but it also says canary results are pending and rollback is untested. Explain contradictions, missing assumptions, confidence, and the next verification step.",
+          "selected_output": "The launch update states that the rollout is complete, yet simultaneously notes that canary results are still pending and that rollback procedures remain untested. This presents a clear contradiction: declaring rollout completion typically implies that all critical validation steps, including canary monitoring and rollback verification, have been satisfactorily concluded. By contrast, the pending canary results and untested rollback indicate that essential safety checks are incomplete.\n\nThis contradiction undermines confidence in the deployment\u2019s stability and safety. Without confirmed canary outcomes, there is uncertainty about whether the new release behaves as expected in production conditions. Furthermore, an untested rollback means that if issues arise, the ability to revert safely is unknown, increasing operational risk.\n\nThe update implicitly assumes that the rollout can be considered complete prior to these validations, which is an unsupported jump. This assumption should be explicitly clarified\u2014perhaps the team considers rollout \u201ccomplete\u201d in terms of code deployment only, with validation steps to follow\u2014but this distinction must be made transparent to avoid misinterpretation.\n\nThe next verification step must be immediate monitoring and analysis of the canary results. If anomalies are detected, rollback procedures should be tested and potentially executed. Only after these steps can the rollout status be confidently finalized.\n\nIn summary, the update\u2019s internal consistency is compromised by contradictions between declared rollout completion and outstanding validation tasks. This reduces confidence and calls for explicit assumption clarification and prompt verification to restore coherence and ensure a reliable launch.\n\nconfidence=0.65",
+          "selected_branch": "verification_consistency_auditor",
+          "activated_branches": [
+            "verification",
+            "verification_constraint_checker",
+            "verification_consistency_auditor"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "verification_constraint_checker"
+            ],
+            [
+              "verification",
+              "verification_consistency_auditor"
+            ]
+          ],
+          "forced_parent": "verification",
+          "forced_children": [
+            "verification_constraint_checker",
+            "verification_consistency_auditor"
+          ],
+          "internal_reward_score": 0.925,
+          "internal_confidence": 0.6167,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.925,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:3/4|verifier|must_include:1/1|length:245/70|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 1.0,
+            "task_specific_reason": "task_specific:3/4",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:1/1|length:245/70|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 239
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 751,
+            "completion_tokens": 1225,
+            "total_tokens": 1976,
+            "total_latency_ms": 39625.692,
+            "mean_latency_ms": 13208.564
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        }
+      ],
+      "holdout": [
+        {
+          "task_id": "holdout_divergence_planning_risk_ledger",
+          "split": "holdout",
+          "task_type": "planning",
+          "aspect": "planning_risk",
+          "text": "Create a concise risk register for enabling multi-region writes in a customer ledger service. Include mitigation, owner, rollback, and confidence.",
+          "selected_output": "**Multi-Region Writes Enablement \u2013 Customer Ledger Service Risk Register**\n\n| Risk ID | Risk Description                               | Mitigation                                                                                   | Owner(s)                         | Rollback                                                                                     | Confidence  |\n|---------|-----------------------------------------------|----------------------------------------------------------------------------------------------|---------------------------------|----------------------------------------------------------------------------------------------|-------------|\n| R1      | Data inconsistency or conflicts across regions| Implement conflict resolution logic; thorough integration and consistency testing pre-launch | Engineering Lead, Performance Engineer | Disable multi-region writes; revert to single-region writes; restore data from backups if needed | Medium      |\n| R2      | Increased latency impacting user experience   | Performance benchmarking and load testing under multi-region writes                          | Performance Engineer             | Rollback deployments to last stable version via CI/CD                                        | Medium      |\n| R3      | Data corruption or loss during replication    | Frequent backups; real-time monitoring and alerting for anomalies                            | Engineering Lead                 | Restore data from backups; disable multi-region writes                                       | Medium      |\n| R4      | Deployment failures or configuration errors   | Automated CI/CD pipelines with canary deployments and rollback triggers                      | Engineering Lead                 | Rollback deployments via CI/CD to last stable version                                        | Medium      |\n| R5      | Insufficient validation/testing coverage      | Expand test coverage to include multi-region scenarios; simulate failover and conflict cases| Engineering Lead, Performance Engineer | Disable multi-region writes; revert to single-region writes                                  | Medium      |\n| R6      | Operational complexity and monitoring gaps    | Enhance monitoring dashboards; define escalation paths and runbook for incident response     | Engineering Lead, Product Manager| Disable multi-region writes; revert to single-region writes                                  | Medium      |\n\n---\n\n**Rollout Plan Note:**  \nProceed with a staged rollout starting with non-critical regions, validating data consistency and performance metrics before full enablement. Establish clear escalation triggers based on monitoring alerts and user impact. Go/no-go decision after successful pilot phase with zero critical incidents.\n\n**Overall Confidence:** 0.65",
+          "selected_branch": "planner_risk_allocator",
+          "activated_branches": [
+            "planner",
+            "planner_risk_allocator"
+          ],
+          "activated_paths": [
+            [
+              "planner",
+              "planner_risk_allocator"
+            ]
+          ],
+          "forced_parent": "planner",
+          "forced_children": [
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "internal_reward_score": 0.7583,
+          "internal_confidence": 0.5,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.7583,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:5/5|rules_passed|task_specific:2/5|verifier|must_include:4/4|length:250/70|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:5/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "verifier|must_include:4/4|length:250/70|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 278
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 812,
+            "completion_tokens": 1288,
+            "total_tokens": 2100,
+            "total_latency_ms": 20314.199,
+            "mean_latency_ms": 6771.4
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "holdout_divergence_planning_risk_admin",
+          "split": "holdout",
+          "task_type": "planning",
+          "aspect": "planning_risk",
+          "text": "Prepare a deployment risk register for launching approval workflows in an admin console next week. Include mitigation, owner, fallback, and confidence.",
+          "selected_output": "| Risk ID | Risk Description                                  | Owner             | Mitigation                                                                 | Fallback / Rollback Action                          | Confidence Level | Notes / Escalation Triggers                          |\n|---------|-------------------------------------------------|-------------------|---------------------------------------------------------------------------|----------------------------------------------------|------------------|-----------------------------------------------------|\n| R1      | Approval workflows fail to trigger or complete  | DevOps Lead       | Pre-deployment functional and integration testing; monitor logs closely   | Rollback to previous stable admin console version  | High             | Escalate if >5% workflow failures within 1 hour    |\n| R2      | Incorrect approval routing or permissions error | Product Manager   | Validate user roles and permissions in staging; conduct user acceptance test (UAT) | Disable new workflows; revert to manual approval process | Medium           | Escalate if user complaints or permission errors detected |\n| R3      | Performance degradation in admin console         | Infrastructure Lead | Load testing under expected peak; monitor system metrics post-deployment  | Rollback deployment; increase resources temporarily | Medium           | Escalate if response time >2x baseline for 10+ mins |\n| R4      | Insufficient user support readiness               | Support Manager   | Train support team on new workflows; prepare escalation procedures        | Activate on-call expert support; pause new workflow usage | High             | Escalate if support tickets spike or unresolved issues >30 mins |\n| R5      | Dependency on deployment phase completion delayed | Project Manager   | Confirm deployment phase completion 24h prior; contingency planning       | Delay workflow launch until dependencies met       | High             | Escalate if deployment phase not complete 12h before launch |\n\n---\n\n**Rollout Plan Note:**  \nLaunch approval workflows only after successful completion of all pre-deployment tests and confirmation of deployment phase completion. Monitor key metrics and user feedback closely for the first 48 hours. Be prepared to execute fallback actions immediately upon critical issue detection.\n\n**Confidence Summary:**  \nOverall confidence in mitigation effectiveness: 0.78 (Medium-High)",
+          "selected_branch": "planner_risk_allocator",
+          "activated_branches": [
+            "planner",
+            "planner_risk_allocator"
+          ],
+          "activated_paths": [
+            [
+              "planner",
+              "planner_risk_allocator"
+            ]
+          ],
+          "forced_parent": "planner",
+          "forced_children": [
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "internal_reward_score": 0.7583,
+          "internal_confidence": 0.5,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.7583,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:5/5|rules_passed|task_specific:2/5|verifier|must_include:3/3|length:244/70|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:5/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "verifier|must_include:3/3|length:244/70|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 290
+          },
+          "backend_usage": {
+            "call_count": 2,
+            "ok_calls": 2,
+            "error_calls": 0,
+            "prompt_tokens": 646,
+            "completion_tokens": 1153,
+            "total_tokens": 1799,
+            "total_latency_ms": 17963.079,
+            "mean_latency_ms": 8981.54
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "holdout_divergence_code_consistency_backfill",
+          "split": "holdout",
+          "task_type": "code",
+          "aspect": "code_consistency_audit",
+          "text": "Audit a migration update for consistency when it says the backfill is complete, but it also notes one shard is still lagging and manual repair steps are pending. Explain contradictions, uncertainty calibration, and confidence.",
+          "selected_output": "Audit Report: Migration Update Consistency and Constraint Verification\n\n1. Contradictions  \n- Evidence: The update states \"backfill is complete\" but also notes \"one shard is still lagging\" and \"manual repair steps are pending.\"  \n- Analysis: Declaring backfill complete implies all shards have fully caught up with data migration. The presence of a lagging shard and outstanding manual repair contradicts this claim.  \n- Result: FAIL \u2013 Contradiction present between \"backfill complete\" and shard-level lag/manual repair status.\n\n2. Uncertainty Calibration  \n- Evidence: The update does not adjust confidence or uncertainty levels to reflect the lagging shard and pending manual repair.  \n- Analysis: Uncertainty should increase and confidence decrease until all shards are synchronized and repairs done. No such calibration is evident.  \n- Result: FAIL \u2013 Uncertainty calibration missing or inadequate.\n\n3. Precise Definitions of \"Backfill Complete\" and Consistency Criteria  \n- Evidence: The update lacks explicit definitions of what constitutes \"backfill complete\" and the criteria for data consistency.  \n- Analysis: Without precise definitions, the status report is ambiguous and prone to misinterpretation.  \n- Result: FAIL \u2013 Missing precise definitions of \"backfill complete\" and consistency criteria.\n\n4. Explicit Shard-Level Status Reporting  \n- Evidence: The update mentions \"one shard is still lagging\" but does not provide explicit shard identifiers, lag metrics, or detailed status.  \n- Analysis: Explicit shard-level status is necessary for clarity and targeted troubleshooting.  \n- Result: FAIL \u2013 Shard-level statuses are not explicitly reported.\n\n5. Expected Timelines or Conditions for Manual Repair Completion  \n- Evidence: The update notes manual repair steps are pending but does not specify expected timelines or conditions for completion.  \n- Analysis: Including timelines or conditions is critical for planning and confidence assessment.  \n- Result: FAIL \u2013 Missing expected timelines or conditions for manual repair completion.\n\n6. Conservative Confidence Estimates Until Full Synchronization  \n- Evidence: The update does not reflect conservative confidence estimates given the incomplete shard synchronization and pending manual repair.  \n- Analysis: Confidence should be lowered until all shards are fully synchronized and repairs completed.  \n- Result: FAIL \u2013 Confidence estimates are not conservatively calibrated.\n\nSummary:  \nThe migration update fails to meet all six explicit constraints. It contains contradictions, lacks uncertainty calibration, precise definitions, explicit shard-level reporting, timelines for manual repair, and conservative confidence estimates. These deficiencies undermine accurate understanding of system state and data consistency confidence.\n\nCalibrated confidence in the update\u2019s consistency and completeness: confidence=0.25",
+          "selected_branch": "verification_constraint_checker",
+          "activated_branches": [
+            "verification",
+            "verification_constraint_checker"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "verification_constraint_checker"
+            ]
+          ],
+          "forced_parent": "verification",
+          "forced_children": [
+            "verification_constraint_checker",
+            "verification_consistency_auditor"
+          ],
+          "internal_reward_score": 0.6583,
+          "internal_confidence": 0.5,
+          "failure_reason": "medium_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:0/5|verifier|must_include:1/1|length:372/70|confidence_range:miss|no_user_preference_profile",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.6583,
+            "hybrid_verifier_reason": "medium_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:0/5|verifier|must_include:1/1|length:372/70|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.0,
+            "task_specific_reason": "task_specific:0/5",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "verifier|must_include:1/1|length:372/70|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 387
+          },
+          "backend_usage": {
+            "call_count": 2,
+            "ok_calls": 2,
+            "error_calls": 0,
+            "prompt_tokens": 430,
+            "completion_tokens": 1025,
+            "total_tokens": 1455,
+            "total_latency_ms": 14355.776,
+            "mean_latency_ms": 7177.888
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "holdout_divergence_general_consistency_safe_rollout",
+          "split": "holdout",
+          "task_type": "general",
+          "aspect": "general_consistency_audit",
+          "text": "Audit a status update for consistency when it says the rollout is safe, but it also notes the rollback drill never ran and one critical metric is still missing. Explain contradictions, uncertainty calibration, and confidence.",
+          "selected_output": "Constraint Audit Checklist for Status Update:\n\n1. Contradictions  \n   - Requirement: The update must not claim the rollout is safe while simultaneously noting that the rollback drill never ran and a critical metric is missing, as these facts contradict a definitive safety claim.  \n   - Evidence: The update states \"rollout is safe\" but also admits \"rollback drill never ran\" and \"one critical metric is still missing.\"  \n   - Result: FAIL \u2014 Contradiction present between safety claim and incomplete validation steps.\n\n2. Uncertainty Calibration  \n   - Requirement: The update must explicitly acknowledge uncertainty introduced by missing rollback drill and absent critical metric, calibrating confidence accordingly.  \n   - Evidence: The update does not qualify the safety claim with uncertainty or note the impact of missing validations on confidence.  \n   - Result: FAIL \u2014 Uncertainty calibration is absent or insufficient.\n\n3. Confidence  \n   - Requirement: Confidence in the safety claim must be adjusted downward or qualified due to incomplete validations and missing metric.  \n   - Evidence: The update asserts safety without adjusting confidence or providing a confidence level reflecting the gaps.  \n   - Result: FAIL \u2014 Confidence level is not calibrated to reflect uncertainty.\n\n4. Metric  \n   - Requirement: All critical metrics relevant to safety assessment must be reported or their absence explicitly noted with impact on conclusions.  \n   - Evidence: One critical metric is missing and its absence is noted, but impact on safety conclusion is not fully integrated.  \n   - Result: PARTIAL PASS \u2014 Metric absence noted, but impact on safety and confidence is not fully addressed.\n\n5. Consistency  \n   - Requirement: The update must be internally consistent, aligning safety claims with validation status and metric availability.  \n   - Evidence: Safety claim conflicts with incomplete rollback drill and missing metric.  \n   - Result: FAIL \u2014 Internal consistency is lacking.\n\nSummary: The status update fails to meet key constraints related to contradictions, uncertainty calibration, confidence adjustment, and consistency. The presence of contradictory statements and incomplete validations introduces significant uncertainty that is not properly acknowledged or reflected in confidence levels. The update partially meets metric reporting requirements but does not integrate this into the overall assessment.\n\nCalibrated confidence in the safety claim based on current update: confidence=0.40",
+          "selected_branch": "verification_constraint_checker",
+          "activated_branches": [
+            "verification",
+            "verification_constraint_checker"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "verification_constraint_checker"
+            ]
+          ],
+          "forced_parent": "verification",
+          "forced_children": [
+            "verification_constraint_checker",
+            "verification_consistency_auditor"
+          ],
+          "internal_reward_score": 0.7583,
+          "internal_confidence": 0.5,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.7583,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:2/4|verifier|must_include:1/1|length:331/70|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/4",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "verifier|must_include:1/1|length:331/70|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 349
+          },
+          "backend_usage": {
+            "call_count": 2,
+            "ok_calls": 2,
+            "error_calls": 0,
+            "prompt_tokens": 423,
+            "completion_tokens": 803,
+            "total_tokens": 1226,
+            "total_latency_ms": 12998.953,
+            "mean_latency_ms": 6499.477
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        }
+      ],
+      "branch_snapshot": {
+        "analytical": {
+          "weight": 1.05,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "analytical_symbolic_solver",
+            "analytical_causal_decomposer"
+          ],
+          "specialties": [
+            "math",
+            "code",
+            "general"
+          ]
+        },
+        "planner": {
+          "weight": 1.0,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "specialties": [
+            "planning",
+            "general",
+            "code"
+          ]
+        },
+        "retrieval": {
+          "weight": 1.0,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "retrieval_evidence_tracer",
+            "retrieval_source_triage"
+          ],
+          "specialties": [
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "critique": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "critique_failure_hunter",
+            "critique_adversarial_probe"
+          ],
+          "specialties": [
+            "code",
+            "planning",
+            "general"
+          ]
+        },
+        "verification": {
+          "weight": 1.15,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "verification_constraint_checker",
+            "verification_consistency_auditor",
+            "json_lock",
+            "csv_lock",
+            "code_patch_lock",
+            "bullet_lock"
+          ],
+          "specialties": [
+            "math",
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "creative": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "creative_divergent_generator",
+            "creative_constraint_innovator"
+          ],
+          "specialties": [
+            "creative",
+            "planning",
+            "general"
+          ]
+        },
+        "analytical_symbolic_solver": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "analytical",
+          "children": [],
+          "specialties": [
+            "math",
+            "code"
+          ]
+        },
+        "analytical_causal_decomposer": {
+          "weight": 0.92,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "analytical",
+          "children": [],
+          "specialties": [
+            "planning",
+            "general",
+            "code"
+          ]
+        },
+        "planner_timeline_optimizer": {
+          "weight": 0.94,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "planner",
+          "children": [],
+          "specialties": [
+            "planning",
+            "general"
+          ]
+        },
+        "planner_risk_allocator": {
+          "weight": 0.9664,
+          "status": "active",
+          "avg_reward": 0.875,
+          "trial_remaining": 0,
+          "history_len": 2,
+          "depth": 2,
+          "parent": "planner",
+          "children": [],
+          "specialties": [
+            "planning",
+            "code",
+            "general"
+          ]
+        },
+        "retrieval_evidence_tracer": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "retrieval",
+          "children": [],
+          "specialties": [
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "retrieval_source_triage": {
+          "weight": 0.92,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "retrieval",
+          "children": [],
+          "specialties": [
+            "factual",
+            "general"
+          ]
+        },
+        "critique_failure_hunter": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "critique",
+          "children": [],
+          "specialties": [
+            "code",
+            "planning",
+            "general"
+          ]
+        },
+        "critique_adversarial_probe": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "critique",
+          "children": [],
+          "specialties": [
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "verification_constraint_checker": {
+          "weight": 0.97,
+          "status": "active",
+          "avg_reward": 0.6583,
+          "trial_remaining": 0,
+          "history_len": 1,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "math",
+            "factual",
+            "code",
+            "general"
+          ]
+        },
+        "verification_consistency_auditor": {
+          "weight": 0.9698,
+          "status": "active",
+          "avg_reward": 0.925,
+          "trial_remaining": 0,
+          "history_len": 1,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "general",
+            "planning",
+            "factual"
+          ]
+        },
+        "json_lock": {
+          "weight": 0.98,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "math",
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "csv_lock": {
+          "weight": 0.98,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "general",
+            "planning"
+          ]
+        },
+        "code_patch_lock": {
+          "weight": 0.99,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "code",
+            "general"
+          ]
+        },
+        "bullet_lock": {
+          "weight": 0.97,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "general",
+            "planning",
+            "creative"
+          ]
+        },
+        "creative_divergent_generator": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "creative",
+          "children": [],
+          "specialties": [
+            "creative",
+            "general"
+          ]
+        },
+        "creative_constraint_innovator": {
+          "weight": 0.91,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "creative",
+          "children": [],
+          "specialties": [
+            "creative",
+            "planning",
+            "code"
+          ]
+        }
+      },
+      "memory": {
+        "records": 4,
+        "avg_reward": 0.8333,
+        "task_distribution": {
+          "planning": 2,
+          "code": 1,
+          "general": 1
+        },
+        "route_contexts": 4,
+        "user_profiles": 0,
+        "active_sibling_preferences": 0,
+        "shadow_sibling_preferences": 4
+      },
+      "routing_histogram": {
+        "planner": 4,
+        "planner_timeline_optimizer": 2,
+        "planner_risk_allocator": 4,
+        "verification": 4,
+        "verification_constraint_checker": 4,
+        "verification_consistency_auditor": 2
+      },
+      "backend_usage_total": {
+        "call_count": 21,
+        "ok_calls": 21,
+        "error_calls": 0,
+        "prompt_tokens": 5234,
+        "completion_tokens": 11088,
+        "total_tokens": 16322,
+        "total_latency_ms": 182112.283,
+        "mean_latency_ms": 8672.013
+      },
+      "evaluator_runtime_usage_total": {
+        "call_count": 0,
+        "ok_calls": 0,
+        "error_calls": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "total_latency_ms": 0.0,
+        "mean_latency_ms": 0.0
+      },
+      "optimizer_runtime_usage_total": {
+        "call_count": 0,
+        "ok_calls": 0,
+        "error_calls": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "total_latency_ms": 0.0,
+        "mean_latency_ms": 0.0
+      }
+    },
+    "frozen": {
+      "train": [
+        {
+          "task_id": "train_divergence_planning_risk_failover::round_1",
+          "split": "train",
+          "task_type": "planning",
+          "aspect": "planning_risk",
+          "text": "Create a concise risk register for a phased database failover in a billing platform. Include mitigation, owner, rollback, and confidence.",
+          "selected_output": "**Phased Database Failover Risk Register \u2013 Billing Platform**\n\n| Risk ID | Risk Description                              | Owner                | Mitigation                                                                                  | Rollback Action                                                                                 | Confidence       | Escalation / Containment                          |\n|---------|-----------------------------------------------|----------------------|---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|------------------|--------------------------------------------------|\n| R1      | Data inconsistency between primary and failover DB | DBA Team Lead        | Pre-failover data sync validation; continuous replication monitoring; pause failover if lag > threshold | Trigger rollback: restore primary DB, redirect traffic back; verify data integrity before resume | Medium-High      | Escalate to Platform Ops if replication lag > 5 min; contain by halting failover progress     |\n| R2      | Failover triggers service downtime impacting billing | Platform Ops         | Schedule failover during low-usage windows; notify stakeholders; implement phased traffic cutover | Rollback to primary DB; revert traffic routing; communicate status to users                      | Medium          | Escalate to Incident Response if downtime > 5 min; contain by reverting traffic immediately  |\n| R3      | Configuration errors causing failover failure | DBA Team Lead        | Use automated scripts with validation; peer review of failover configs; dry-run rehearsals    | Rollback configs to last known good state; restore primary DB and traffic routing               | High             | Escalate to Change Manager on config validation failure; contain by halting failover          |\n| R4      | Monitoring/alerting gaps delaying failure detection | Platform Ops         | Pre-failover test of monitoring and alerting systems; define clear alert thresholds and owners | Immediate rollback on critical failure alert; manual override to restore primary DB             | Medium          | Escalate to Ops Lead if alerts not received within 2 min of failure; contain by manual checks  |\n| R5      | Insufficient capacity on failover DB causing performance degradation | DBA Team Lead        | Capacity and load testing pre-failover; scale failover DB resources as needed                | Rollback to primary DB; scale resources before retry                                            | Medium          | Escalate to Infrastructure Team if performance degrades > 20%; contain by traffic throttling  |\n\n---\n\n**Rollback Summary:**  \n- Owner: Platform Ops, DBA Team Lead  \n- Trigger: Any critical failure or threshold breach during failover phases  \n- Actions: Immediate rollback execution, restore primary DB, redirect traffic, verify system health before retry  \n\n---\n\n**Rollout-Plan Note:**  \nProceed with failover only after successful completion of pre-failover validations (data sync, config checks, monitoring tests). Implement phased traffic cutover with real-time monitoring. Initiate rollback immediately upon any critical failure or threshold breach. Go/No-Go decision at each phase gate based on health metrics and alert status.\n\n**Overall Confidence:** confidence=0.85",
+          "selected_branch": "planner_risk_allocator",
+          "activated_branches": [
+            "planner",
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "activated_paths": [
+            [
+              "planner",
+              "planner_timeline_optimizer"
+            ],
+            [
+              "planner",
+              "planner_risk_allocator"
+            ]
+          ],
+          "forced_parent": "planner",
+          "forced_children": [
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "internal_reward_score": 0.875,
+          "internal_confidence": 0.5667,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.875,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:5/5|rules_passed|task_specific:2/5|verifier|must_include:4/4|length:353/70|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:5/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:4/4|length:353/70|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 399
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 665,
+            "completion_tokens": 1982,
+            "total_tokens": 2647,
+            "total_latency_ms": 31794.59,
+            "mean_latency_ms": 10598.197
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "train_divergence_planning_risk_sso::round_1",
+          "split": "train",
+          "task_type": "planning",
+          "aspect": "planning_risk",
+          "text": "Prepare a launch risk register for rolling out self-serve SSO to enterprise tenants. Include mitigation, owner, fallback, and confidence.",
+          "selected_output": "**Launch Risk Register: Self-Serve SSO Rollout to Enterprise Tenants**\n\n| Risk ID | Risk Description                                      | Owner                  | Mitigation                                                                                   | Fallback / Rollback Action                                      | Confidence Level | Escalation Trigger / Containment Step                             |\n|---------|------------------------------------------------------|------------------------|----------------------------------------------------------------------------------------------|----------------------------------------------------------------|------------------|------------------------------------------------------------------|\n| R1      | SSO integration failures causing tenant login issues| Engineering Lead       | Extensive pre-launch testing with pilot tenants; automated and manual SSO validation checks | Immediate rollback to previous login system for affected tenants| Medium-High      | >5% login failure rate or >3 critical tenant complaints in 1hr; trigger rollback and incident response |\n| R2      | Security vulnerabilities exposed by new SSO flow    | Security Team Lead     | Conduct thorough security audits and penetration testing; implement monitoring for anomalies | Disable self-serve SSO feature; revert to manual SSO provisioning| Medium           | Detection of suspicious auth patterns or confirmed vulnerability; initiate security incident protocol |\n| R3      | Tenant confusion or misconfiguration leading to support overload | Support Manager        | Provide clear documentation, onboarding webinars, and proactive tenant communication         | Temporarily disable self-serve option; increase support staffing | Medium-High      | >20% increase in support tickets related to SSO in 24hrs; escalate to PM and adjust rollout pace |\n| R4      | Incomplete or inconsistent tenant metadata causing SSO failures | Engineering Lead       | Validate tenant metadata before enabling SSO; implement pre-check scripts                    | Disable SSO for affected tenants; manual remediation of metadata | Medium           | Multiple tenants failing metadata validation; pause rollout and remediate data issues |\n| R5      | Performance degradation under load during rollout    | Engineering Lead       | Load testing; staged rollout with gradual tenant enablement; real-time performance monitoring | Throttle rollout speed; rollback to previous stable version if degradation persists | Medium           | >15% increase in auth latency or error rate sustained over 30min; initiate rollback procedures |\n| R6      | Lack of tenant adoption or opt-in due to poor UX     | Product Manager        | Collect tenant feedback during pilot; improve UI/UX before full rollout                       | Provide alternative login options; extend pilot phase if needed | Medium           | Low opt-in rate (<30%) after initial rollout phase; trigger UX review and communication campaign |\n\n---\n\n**Rollout Plan Note:**  \nBegin with a controlled pilot involving a small subset of enterprise tenants to validate integrations and support readiness. Monitor key metrics (login success rate, support tickets, security alerts) continuously. Escalate immediately on any trigger conditions. Proceed to full rollout only after pilot stability is confirmed for at least 72 hours. Maintain readiness for immediate rollback.\n\n**Overall Confidence:** confidence=0.75",
+          "selected_branch": "planner_risk_allocator",
+          "activated_branches": [
+            "planner",
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "activated_paths": [
+            [
+              "planner",
+              "planner_timeline_optimizer"
+            ],
+            [
+              "planner",
+              "planner_risk_allocator"
+            ]
+          ],
+          "forced_parent": "planner",
+          "forced_children": [
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "internal_reward_score": 0.875,
+          "internal_confidence": 0.5667,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.875,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:5/5|rules_passed|task_specific:2/5|verifier|must_include:3/3|length:369/70|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:5/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/5",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:3/3|length:369/70|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 413
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 672,
+            "completion_tokens": 2392,
+            "total_tokens": 3064,
+            "total_latency_ms": 41058.019,
+            "mean_latency_ms": 13686.006
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "train_divergence_code_consistency_retry_backlog::round_1",
+          "split": "train",
+          "task_type": "code",
+          "aspect": "code_consistency_audit",
+          "text": "Audit a rollout update for consistency when it says the new job queue is stable, but it also says the retry backlog keeps growing and the dead-letter queue was never replayed. Explain contradictions, uncertainty calibration, and confidence.",
+          "selected_output": "Audit Report: Rollout Update Consistency Check\n\n1. Stability Claim vs. Retry Backlog Growth  \n- Requirement: The rollout update must not claim the new job queue is stable if the retry backlog continues to grow.  \n- Evidence: The update states the new job queue is stable but simultaneously reports the retry backlog keeps growing.  \n- Result: FAIL  \n- Contradiction: Stability implies steady-state or improvement; growing retry backlog indicates instability or unresolved failures.\n\n2. Dead-Letter Queue (DLQ) Replay Status  \n- Requirement: DLQ replay processes must be implemented and monitored to ensure failure handling completeness.  \n- Evidence: The DLQ was never replayed according to the update.  \n- Result: FAIL  \n- Contradiction: Without DLQ replay, failure handling is incomplete, undermining stability claims.\n\n3. Retry Handling Effectiveness  \n- Requirement: Retry handling must prevent backlog growth and ensure eventual job completion or dead-lettering.  \n- Evidence: Retry backlog is growing, indicating ineffective retry handling.  \n- Result: FAIL  \n- Contradiction: Growing retry backlog conflicts with effective retry processing.\n\n4. Quantitative Stability Criteria  \n- Requirement: Stability claims must be supported by defined and communicated quantitative criteria.  \n- Evidence: No quantitative stability criteria are provided or referenced.  \n- Result: FAIL  \n- Missing Item: Explicit quantitative metrics defining stability are absent.\n\n5. Continuous Monitoring of Job Queue Metrics  \n- Requirement: Continuous monitoring must validate stability claims and detect anomalies.  \n- Evidence: Monitoring is mentioned as a task but no evidence of continuous validation or anomaly detection is provided.  \n- Result: FAIL  \n- Missing Item: Demonstrable continuous monitoring data or reports are not included.\n\n6. Consistency of Status Reporting  \n- Requirement: Status updates must be internally consistent, avoiding contradictions between stability claims and backlog growth.  \n- Evidence: Contradictory statements about stability and retry backlog growth exist.  \n- Result: FAIL  \n- Contradiction: Inconsistent status undermines trust and clarity.\n\n7. Uncertainty Calibration  \n- Requirement: Uncertainty must be explicitly calibrated given ambiguous definitions and incomplete failure handling.  \n- Evidence: The update shows high uncertainty but lacks explicit calibration or mitigation plans.  \n- Result: FAIL  \n- Missing Item: Explicit uncertainty calibration and mitigation strategies are not documented.\n\nSummary:  \n- Contradictions: Present and significant between stability claims and retry backlog growth, and between failure handling completeness and DLQ replay omission.  \n- Uncertainty: High, due to ambiguous stability definitions and incomplete failure handling processes.  \n- Confidence: Low to Moderate, reflecting unresolved contradictions and missing quantitative criteria.  \n- Retry Handling: Ineffective as backlog grows unchecked.  \n- Consistency: Compromised by contradictory status updates and missing monitoring evidence.\n\nCalibrated Confidence: confidence=0.32",
+          "selected_branch": "verification_constraint_checker",
+          "activated_branches": [
+            "verification",
+            "verification_constraint_checker",
+            "verification_consistency_auditor"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "verification_constraint_checker"
+            ],
+            [
+              "verification",
+              "verification_consistency_auditor"
+            ]
+          ],
+          "forced_parent": "verification",
+          "forced_children": [
+            "verification_constraint_checker",
+            "verification_consistency_auditor"
+          ],
+          "internal_reward_score": 0.6583,
+          "internal_confidence": 0.5,
+          "failure_reason": "medium_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:0/5|verifier|must_include:1/1|length:382/70|confidence_range:miss|no_user_preference_profile",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.6583,
+            "hybrid_verifier_reason": "medium_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:0/5|verifier|must_include:1/1|length:382/70|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.0,
+            "task_specific_reason": "task_specific:0/5",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "verifier|must_include:1/1|length:382/70|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 410
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 764,
+            "completion_tokens": 1525,
+            "total_tokens": 2289,
+            "total_latency_ms": 32360.596,
+            "mean_latency_ms": 10786.865
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "train_divergence_general_consistency_release_note::round_1",
+          "split": "train",
+          "task_type": "general",
+          "aspect": "general_consistency_audit",
+          "text": "Audit a launch update for internal consistency when it says rollout is complete, but it also says canary results are pending and rollback is untested. Explain contradictions, missing assumptions, confidence, and the next verification step.",
+          "selected_output": "The launch update presents a clear contradiction by stating that the rollout is complete while simultaneously indicating that canary results are still pending and rollback procedures remain untested. This inconsistency undermines the internal coherence of the communication and introduces uncertainty regarding the actual stability and safety of the deployment.\n\nSpecifically, declaring rollout completion typically implies that all critical validation steps\u2014including canary testing and rollback verification\u2014have been satisfactorily concluded. The pending canary results mean that the system\u2019s behavior under limited exposure is not yet fully understood, and the untested rollback implies that recovery mechanisms have not been confirmed. These gaps reduce confidence in the deployment\u2019s resilience and increase risk exposure.\n\nThe update appears to assume that the completion of other validations (k validations) suffices to declare rollout completion, but this assumption is unsupported without the canary and rollback validations. This unsupported jump diminishes the overall confidence and introduces a premature finality that is not justified by the current verification status.\n\nFor consistency and improved confidence calibration, the communication should explicitly reflect that the rollout is in a provisional or partial state pending the completion of canary testing and rollback verification. The next verification step must be to obtain and analyze the canary results and conduct rollback tests to confirm system stability and recovery capability. Only after these steps are satisfactorily completed should the rollout be declared fully complete.\n\nIn summary, the contradictions between declared rollout completion and pending critical validations reduce confidence and highlight missing assumptions about what constitutes completion. Accurate uncertainty calibration and manual repair of the communication timeline are necessary to maintain integrity and trust.\n\nconfidence=0.65",
+          "selected_branch": "verification_consistency_auditor",
+          "activated_branches": [
+            "verification",
+            "verification_constraint_checker",
+            "verification_consistency_auditor"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "verification_constraint_checker"
+            ],
+            [
+              "verification",
+              "verification_consistency_auditor"
+            ]
+          ],
+          "forced_parent": "verification",
+          "forced_children": [
+            "verification_constraint_checker",
+            "verification_consistency_auditor"
+          ],
+          "internal_reward_score": 0.875,
+          "internal_confidence": 0.5667,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.875,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:2/4|verifier|must_include:1/1|length:273/70|confidence_range:ok|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/4",
+            "external_verifier_score": 1.0,
+            "external_verifier_reason": "verifier|must_include:1/1|length:273/70|confidence_range:ok",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 267
+          },
+          "backend_usage": {
+            "call_count": 3,
+            "ok_calls": 3,
+            "error_calls": 0,
+            "prompt_tokens": 733,
+            "completion_tokens": 1302,
+            "total_tokens": 2035,
+            "total_latency_ms": 20137.203,
+            "mean_latency_ms": 6712.401
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        }
+      ],
+      "holdout": [
+        {
+          "task_id": "holdout_divergence_planning_risk_ledger",
+          "split": "holdout",
+          "task_type": "planning",
+          "aspect": "planning_risk",
+          "text": "Create a concise risk register for enabling multi-region writes in a customer ledger service. Include mitigation, owner, rollback, and confidence.",
+          "selected_output": "**Multi-Region Writes Enablement: Optimized Timeline and Risk Management Plan**\n\n---\n\n### Phase 1: Preparation & Design (Week 1-2)  \n**Milestones:**  \n- Complete conflict handling design (R1)  \n- Define security integration approach (R5)  \n- Establish operational metrics and logging framework (R2, R3)  \n\n**Key Activities:**  \n- Design conflict resolution algorithms and test scenarios (Owner: Engineering Lead)  \n- Security team integrates early security controls and reviews (Owner: Security Lead)  \n- DevOps sets up enhanced monitoring dashboards (Owner: SRE Lead)  \n\n**Checkpoints:**  \n- End of Week 1: Conflict handling design review and approval (Dependency: must be resolved before deployment)  \n- End of Week 2: Security controls integrated and validated  \n\n**Monitoring Points:**  \n- Continuous review of design documents and initial test results  \n\n---\n\n### Phase 2: Development & Internal Testing (Week 3-4)  \n**Milestones:**  \n- Implement multi-region write capability with conflict handling  \n- Integrate operational metrics and security logging  \n- Conduct internal functional and security tests  \n\n**Key Activities:**  \n- Engineering develops feature with embedded conflict resolution (Owner: Engineering Team)  \n- Security performs penetration and compliance testing (Owner: Security Team)  \n- SRE validates monitoring and alerting systems (Owner: SRE Team)  \n\n**Checkpoints:**  \n- Mid-Week 4: Complete internal testing with no critical issues (Dependency: conflict handling must be stable)  \n\n**Monitoring Points:**  \n- Daily test results and security scan reports  \n\n---\n\n### Phase 3: Staged Deployment & Monitoring (Week 5-6)  \n**Milestones:**  \n- Deploy to limited customer subset in multi-region mode  \n- Monitor replication health and operational metrics (R1, R3)  \n- Review security logs for anomalies (R5)  \n\n**Key Activities:**  \n- Deployment team executes rollout (Owner: Release Manager)  \n- SRE monitors replication and metrics continuously (Owner: SRE Lead)  \n- Security team reviews logs daily (Owner: Security Lead)  \n\n**Checkpoints:**  \n- End of Week 5: Confirm replication health stable and no security issues  \n- Mid-Week 6: Customer feedback and operational metrics review  \n\n**Monitoring Points:**  \n- Real-time dashboards for replication and security logs  \n\n---\n\n### Phase 4: Full Deployment & Post-Deployment Validation (Week 7)  \n**Milestones:**  \n- Complete rollout to all customers  \n- Final validation of conflict handling and security integration  \n- Confirm operational metrics meet SLA targets  \n\n**Key Activities:**  \n- Release Manager coordinates full deployment (Owner: Release Manager)  \n- Engineering and SRE teams on-call for issue resolution (Owners: Engineering Lead, SRE Lead)  \n- Security performs final audit (Owner: Security Lead)  \n\n**Checkpoints:**  \n- Day 3 post-deployment: Stability and security confirmation  \n- Day 7 post-deployment: Final sign-off  \n\n**Monitoring Points:**  \n- Continuous monitoring with alert escalation  \n\n---\n\n### Risk Register Summary (Embedded in Timeline)\n\n| Risk (R#)                  | Mitigation                                    | Owner           | Rollback Plan                          | Confidence       |\n|----------------------------|-----------------------------------------------|-----------------|--------------------------------------|------------------|\n| R1: Conflict Handling       | Design and test conflict resolution early; gate deployment on stability | Engineering Lead | Immediate rollback to single-region writes | High (due to prior testing) |\n| R2: Operational Metrics     | Implement comprehensive monitoring from start | SRE Lead        | Rollback if metrics indicate failures | Medium           |\n| R3: Replication Health      | Continuous health checks and alerts           | SRE Lead        | Rollback on replication degradation  | High             |\n| R5: Security Integration    | Early integration and continuous log review   | Security Lead   | Rollback if security anomalies detected | High             |\n\n---\n\n### Rollback Strategy  \n- Defined per risk, with immediate rollback triggers on critical failures  \n- Rollback execution owned by Release Manager with support from Engineering and SRE  \n- Rollback rehearsed during staging phase to ensure readiness  \n\n---\n\nThis timeline ensures sequential dependency management, early security integration, and robust monitoring with explicit handoffs and checkpoints to minimize risk and enable rapid rollback if needed.",
+          "selected_branch": "planner_timeline_optimizer",
+          "activated_branches": [
+            "planner",
+            "planner_timeline_optimizer"
+          ],
+          "activated_paths": [
+            [
+              "planner",
+              "planner_timeline_optimizer"
+            ]
+          ],
+          "forced_parent": "planner",
+          "forced_children": [
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "internal_reward_score": 0.8083,
+          "internal_confidence": 0.55,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.8083,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:5/5|rules_passed|task_specific:4/5|verifier|must_include:4/4|length:508/70|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:5/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 1.0,
+            "task_specific_reason": "task_specific:4/5",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "verifier|must_include:4/4|length:508/70|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 579
+          },
+          "backend_usage": {
+            "call_count": 2,
+            "ok_calls": 2,
+            "error_calls": 0,
+            "prompt_tokens": 357,
+            "completion_tokens": 1477,
+            "total_tokens": 1834,
+            "total_latency_ms": 20028.884,
+            "mean_latency_ms": 10014.442
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "holdout_divergence_planning_risk_admin",
+          "split": "holdout",
+          "task_type": "planning",
+          "aspect": "planning_risk",
+          "text": "Prepare a deployment risk register for launching approval workflows in an admin console next week. Include mitigation, owner, fallback, and confidence.",
+          "selected_output": "**Deployment Timeline for Launching Approval Workflows in Admin Console**\n\n---\n\n### Phase 1: Preparation & Final Validation (Week -1: 5 days before deployment)\n\n- **Milestones:**\n  - Complete final code freeze and QA sign-off on workflows.\n  - Finalize training materials and conduct refresher sessions for admin users.\n  - Confirm fallback plans and rollback procedures documented and communicated.\n\n- **Key Activities & Dependencies:**\n  - Dependency: Completion of all development and testing.\n  - Handoff: Workflow Dev Lead hands over deployment package to DevOps Lead.\n  - Owner: Workflow Dev Lead (validation), Training Lead (training), DevOps Lead (deployment prep).\n\n- **Monitoring Points:**\n  - Review readiness checklist.\n  - Confirm monitoring tools configured for deployment day.\n\n---\n\n### Phase 2: Deployment & Initial Monitoring (Deployment Day: Day 0)\n\n- **Milestones:**\n  - Deploy approval workflows to production environment.\n  - Verify successful deployment via smoke tests.\n  - Begin intensive monitoring of system performance and user feedback.\n\n- **Key Activities & Dependencies:**\n  - Dependency: Completion of Phase 1.\n  - Handoff: DevOps Lead executes deployment; Workflow Dev Lead supports validation.\n  - Owner: DevOps Lead (deployment), Workflow Dev Lead (validation/support).\n\n- **Monitoring Points:**\n  - Real-time system logs and error tracking.\n  - User feedback channels actively monitored.\n  - Confidence check-in at end of day to assess stability.\n\n---\n\n### Phase 3: Post-Deployment Stabilization (Week +1: 3 business days post-launch)\n\n- **Milestones:**\n  - Address any issues or bugs identified.\n  - Confirm fallback plans remain ready if needed.\n  - Conduct post-launch review meeting.\n\n- **Key Activities & Dependencies:**\n  - Dependency: Successful deployment and initial monitoring.\n  - Owner: Workflow Dev Lead (issue resolution), DevOps Lead (system monitoring), Support Lead (user feedback).\n  - Handoff: Issues escalated from Support to Dev/DevOps as needed.\n\n- **Monitoring Points:**\n  - Daily status updates on system health and user experience.\n  - Confidence reassessment before full transition to steady-state operations.\n\n---\n\n### Phase 4: Transition to Steady State & Continuous Improvement (Week +2 onward)\n\n- **Milestones:**\n  - Transition monitoring to standard operational procedures.\n  - Incorporate user feedback into workflow improvements.\n  - Document lessons learned and update fallback plans accordingly.\n\n- **Key Activities & Dependencies:**\n  - Dependency: Stable system performance post-launch.\n  - Owner: Workflow Dev Lead (improvements), DevOps Lead (operations), Training Lead (ongoing user support).\n\n- **Monitoring Points:**\n  - Weekly performance and feedback reviews.\n  - Confidence level maintained or improved based on system stability.\n\n---\n\n**Summary of Key Handoffs & Dependencies:**\n\n- Development & QA \u2192 Workflow Dev Lead (final validation)\n- Workflow Dev Lead \u2192 DevOps Lead (deployment package)\n- DevOps Lead \u2192 Support & Workflow Dev Lead (post-deployment monitoring & issue resolution)\n- Support \u2192 Workflow Dev Lead & DevOps Lead (escalations)\n\nThis structured timeline ensures clear sequencing, ownership, and monitoring to mitigate risks and enable fallback readiness throughout the launch of approval workflows next week.",
+          "selected_branch": "planner_timeline_optimizer",
+          "activated_branches": [
+            "planner",
+            "planner_timeline_optimizer"
+          ],
+          "activated_paths": [
+            [
+              "planner",
+              "planner_timeline_optimizer"
+            ]
+          ],
+          "forced_parent": "planner",
+          "forced_children": [
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "internal_reward_score": 0.7294,
+          "internal_confidence": 0.5289,
+          "failure_reason": "medium_quality|no_exact_reference|keyword_coverage:4/5|rules_passed|task_specific:4/5|verifier|must_include:2/3|length:392/70|confidence_range:miss|no_user_preference_profile",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.7294,
+            "hybrid_verifier_reason": "medium_quality|no_exact_reference|keyword_coverage:4/5|rules_passed|task_specific:4/5|verifier|must_include:2/3|length:392/70|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 0.8,
+            "keyword_reason": "keyword_coverage:4/5",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 1.0,
+            "task_specific_reason": "task_specific:4/5",
+            "external_verifier_score": 0.5556,
+            "external_verifier_reason": "verifier|must_include:2/3|length:392/70|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 454
+          },
+          "backend_usage": {
+            "call_count": 2,
+            "ok_calls": 2,
+            "error_calls": 0,
+            "prompt_tokens": 358,
+            "completion_tokens": 1269,
+            "total_tokens": 1627,
+            "total_latency_ms": 18641.333,
+            "mean_latency_ms": 9320.666
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "holdout_divergence_code_consistency_backfill",
+          "split": "holdout",
+          "task_type": "code",
+          "aspect": "code_consistency_audit",
+          "text": "Audit a migration update for consistency when it says the backfill is complete, but it also notes one shard is still lagging and manual repair steps are pending. Explain contradictions, uncertainty calibration, and confidence.",
+          "selected_output": "Audit Report: Migration Update Consistency Check\n\n1. Contradictions  \n- Evidence: The update states \"backfill is complete\" but also notes \"one shard is still lagging\" and \"manual repair steps are pending.\"  \n- Analysis: These statements directly contradict each other because a lagging shard and pending manual repairs imply the backfill process is not fully complete.  \n- Result: FAIL \u2013 Contradiction present undermining the claim of backfill completion.\n\n2. Uncertainty Calibration  \n- Evidence: The update does not quantify the impact or scope of the lagging shard or the timeline for manual repairs.  \n- Analysis: Without this information, uncertainty about the true state of backfill completeness remains high.  \n- Result: FAIL \u2013 Insufficient uncertainty calibration regarding lagging shard and manual repair status.\n\n3. Confidence  \n- Evidence: The update claims backfill completion but contradicts this with unresolved issues.  \n- Analysis: Confidence in full backfill completion should be low until all shards are caught up and manual repairs are done.  \n- Result: FAIL \u2013 Confidence overstated; should be calibrated low (e.g., confidence=0.30).\n\n4. Consistency  \n- Evidence: The update mixes definitive completion language with outstanding issues.  \n- Analysis: This inconsistency can mislead stakeholders about the migration status.  \n- Result: FAIL \u2013 Update lacks internal consistency.\n\n5. Backfill Reporting  \n- Evidence: The update does not clarify that backfill is \"mostly complete\" with caveats.  \n- Analysis: To maintain accurate reporting, the update should explicitly state partial completion and dependencies on resolving lag and repairs.  \n- Result: FAIL \u2013 Missing nuanced backfill status reporting.\n\n6. Manual Repair Mention  \n- Evidence: Manual repair steps are noted but not integrated into the backfill completion claim.  \n- Analysis: This omission creates an unresolved gap in the update.  \n- Result: FAIL \u2013 Manual repair status not properly contextualized.\n\nSummary:  \n- Contradictions detected between claimed backfill completion and lagging shard/manual repair status.  \n- Uncertainty about the lagging shard\u2019s impact and repair timeline is unaddressed.  \n- Confidence in full backfill completion is overstated and should be low (confidence=0.30).  \n- Consistency and clarity in reporting are lacking; update should state backfill is mostly complete pending final repairs.  \n\nFinal calibrated confidence: confidence=0.30",
+          "selected_branch": "verification_constraint_checker",
+          "activated_branches": [
+            "verification",
+            "verification_constraint_checker"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "verification_constraint_checker"
+            ]
+          ],
+          "forced_parent": "verification",
+          "forced_children": [
+            "verification_constraint_checker",
+            "verification_consistency_auditor"
+          ],
+          "internal_reward_score": 0.6583,
+          "internal_confidence": 0.5,
+          "failure_reason": "medium_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:0/5|verifier|must_include:1/1|length:326/70|confidence_range:miss|no_user_preference_profile",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.6583,
+            "hybrid_verifier_reason": "medium_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:0/5|verifier|must_include:1/1|length:326/70|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.0,
+            "task_specific_reason": "task_specific:0/5",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "verifier|must_include:1/1|length:326/70|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 345
+          },
+          "backend_usage": {
+            "call_count": 2,
+            "ok_calls": 2,
+            "error_calls": 0,
+            "prompt_tokens": 436,
+            "completion_tokens": 919,
+            "total_tokens": 1355,
+            "total_latency_ms": 11773.415,
+            "mean_latency_ms": 5886.708
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        },
+        {
+          "task_id": "holdout_divergence_general_consistency_safe_rollout",
+          "split": "holdout",
+          "task_type": "general",
+          "aspect": "general_consistency_audit",
+          "text": "Audit a status update for consistency when it says the rollout is safe, but it also notes the rollback drill never ran and one critical metric is still missing. Explain contradictions, uncertainty calibration, and confidence.",
+          "selected_output": "Constraint Audit Checklist for Status Update Consistency and Safety Claim\n\n1. Contradiction Check  \n   - Requirement: The update must not assert rollout safety while simultaneously noting that the rollback drill never ran and one critical metric is missing.  \n   - Evidence: The update states \"rollout is safe\" but also reports \"rollback drill never ran\" and \"one critical metric is still missing.\"  \n   - Result: FAIL \u2014 Direct contradiction between safety assertion and incomplete validation steps.\n\n2. Uncertainty Calibration  \n   - Requirement: The update must explicitly acknowledge uncertainty introduced by missing rollback drill and absent critical metric.  \n   - Evidence: The update does not qualify the safety claim with these limitations or express uncertainty.  \n   - Result: FAIL \u2014 Uncertainty calibration is absent; the update presents unwarranted certainty.\n\n3. Confidence Expression  \n   - Requirement: Confidence in rollout safety must be calibrated to reflect incomplete validation and missing data.  \n   - Evidence: The update claims safety without adjusting confidence downward or qualifying the claim.  \n   - Result: FAIL \u2014 Confidence is overstated given the contradictions and missing metric.\n\n4. Metric Completeness  \n   - Requirement: All critical metrics must be reported or their absence clearly qualified before asserting safety.  \n   - Evidence: One critical metric is missing and not qualified in relation to the safety claim.  \n   - Result: FAIL \u2014 Metric completeness requirement unmet.\n\n5. Consistency of Statements  \n   - Requirement: Statements about rollout safety must be consistent with reported validation status and metric availability.  \n   - Evidence: Safety claim conflicts with missing rollback drill and metric.  \n   - Result: FAIL \u2014 Inconsistent statements present.\n\nSummary: The status update fails all key constraints related to contradictions, uncertainty calibration, confidence, metric completeness, and consistency. The safety claim is not supported given the noted gaps. The update should be revised to clearly qualify safety assertions, explicitly acknowledge uncertainty, and avoid definitive claims until all validations and metrics are complete.\n\nCalibrated confidence in current safety claim: confidence=0.30",
+          "selected_branch": "verification_constraint_checker",
+          "activated_branches": [
+            "verification",
+            "verification_constraint_checker"
+          ],
+          "activated_paths": [
+            [
+              "verification",
+              "verification_constraint_checker"
+            ]
+          ],
+          "forced_parent": "verification",
+          "forced_children": [
+            "verification_constraint_checker",
+            "verification_consistency_auditor"
+          ],
+          "internal_reward_score": 0.7583,
+          "internal_confidence": 0.5,
+          "failure_reason": "",
+          "optimizer": {
+            "rewritten_prompts": [],
+            "promoted_candidates": [],
+            "archived_candidates": [],
+            "created_candidates": [],
+            "advisor_used": false,
+            "advisor_error": ""
+          },
+          "objective_metrics": {
+            "hybrid_verifier_reward": 0.7583,
+            "hybrid_verifier_reason": "high_quality|no_exact_reference|keyword_coverage:4/4|rules_passed|task_specific:2/4|verifier|must_include:1/1|length:289/70|confidence_range:miss|no_user_preference_profile",
+            "exact_score": 0.5,
+            "exact_reason": "no_exact_reference",
+            "keyword_score": 1.0,
+            "keyword_reason": "keyword_coverage:4/4",
+            "rule_score": 1.0,
+            "rule_reason": "rules_passed",
+            "task_specific_score": 0.6667,
+            "task_specific_reason": "task_specific:2/4",
+            "external_verifier_score": 0.6667,
+            "external_verifier_reason": "verifier|must_include:1/1|length:289/70|confidence_range:miss",
+            "contract": "",
+            "contract_pass": true,
+            "contract_reason": "no_contract",
+            "output_word_count": 307
+          },
+          "backend_usage": {
+            "call_count": 2,
+            "ok_calls": 2,
+            "error_calls": 0,
+            "prompt_tokens": 419,
+            "completion_tokens": 727,
+            "total_tokens": 1146,
+            "total_latency_ms": 11539.323,
+            "mean_latency_ms": 5769.662
+          },
+          "evaluator_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          },
+          "optimizer_runtime_usage": {
+            "call_count": 0,
+            "ok_calls": 0,
+            "error_calls": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "total_latency_ms": 0.0,
+            "mean_latency_ms": 0.0
+          }
+        }
+      ],
+      "branch_snapshot": {
+        "analytical": {
+          "weight": 1.05,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "analytical_symbolic_solver",
+            "analytical_causal_decomposer"
+          ],
+          "specialties": [
+            "math",
+            "code",
+            "general"
+          ]
+        },
+        "planner": {
+          "weight": 1.0,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "planner_timeline_optimizer",
+            "planner_risk_allocator"
+          ],
+          "specialties": [
+            "planning",
+            "general",
+            "code"
+          ]
+        },
+        "retrieval": {
+          "weight": 1.0,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "retrieval_evidence_tracer",
+            "retrieval_source_triage"
+          ],
+          "specialties": [
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "critique": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "critique_failure_hunter",
+            "critique_adversarial_probe"
+          ],
+          "specialties": [
+            "code",
+            "planning",
+            "general"
+          ]
+        },
+        "verification": {
+          "weight": 1.15,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "verification_constraint_checker",
+            "verification_consistency_auditor",
+            "json_lock",
+            "csv_lock",
+            "code_patch_lock",
+            "bullet_lock"
+          ],
+          "specialties": [
+            "math",
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "creative": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 1,
+          "parent": "root",
+          "children": [
+            "creative_divergent_generator",
+            "creative_constraint_innovator"
+          ],
+          "specialties": [
+            "creative",
+            "planning",
+            "general"
+          ]
+        },
+        "analytical_symbolic_solver": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "analytical",
+          "children": [],
+          "specialties": [
+            "math",
+            "code"
+          ]
+        },
+        "analytical_causal_decomposer": {
+          "weight": 0.92,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "analytical",
+          "children": [],
+          "specialties": [
+            "planning",
+            "general",
+            "code"
+          ]
+        },
+        "planner_timeline_optimizer": {
+          "weight": 0.94,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "planner",
+          "children": [],
+          "specialties": [
+            "planning",
+            "general"
+          ]
+        },
+        "planner_risk_allocator": {
+          "weight": 0.93,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "planner",
+          "children": [],
+          "specialties": [
+            "planning",
+            "code",
+            "general"
+          ]
+        },
+        "retrieval_evidence_tracer": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "retrieval",
+          "children": [],
+          "specialties": [
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "retrieval_source_triage": {
+          "weight": 0.92,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "retrieval",
+          "children": [],
+          "specialties": [
+            "factual",
+            "general"
+          ]
+        },
+        "critique_failure_hunter": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "critique",
+          "children": [],
+          "specialties": [
+            "code",
+            "planning",
+            "general"
+          ]
+        },
+        "critique_adversarial_probe": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "critique",
+          "children": [],
+          "specialties": [
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "verification_constraint_checker": {
+          "weight": 0.97,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "math",
+            "factual",
+            "code",
+            "general"
+          ]
+        },
+        "verification_consistency_auditor": {
+          "weight": 0.95,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "general",
+            "planning",
+            "factual"
+          ]
+        },
+        "json_lock": {
+          "weight": 0.98,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "math",
+            "factual",
+            "general",
+            "code"
+          ]
+        },
+        "csv_lock": {
+          "weight": 0.98,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "general",
+            "planning"
+          ]
+        },
+        "code_patch_lock": {
+          "weight": 0.99,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "code",
+            "general"
+          ]
+        },
+        "bullet_lock": {
+          "weight": 0.97,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "verification",
+          "children": [],
+          "specialties": [
+            "general",
+            "planning",
+            "creative"
+          ]
+        },
+        "creative_divergent_generator": {
+          "weight": 0.9,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "creative",
+          "children": [],
+          "specialties": [
+            "creative",
+            "general"
+          ]
+        },
+        "creative_constraint_innovator": {
+          "weight": 0.91,
+          "status": "active",
+          "avg_reward": 0.0,
+          "trial_remaining": 0,
+          "history_len": 0,
+          "depth": 2,
+          "parent": "creative",
+          "children": [],
+          "specialties": [
+            "creative",
+            "planning",
+            "code"
+          ]
+        }
+      },
+      "memory": {
+        "records": 0,
+        "avg_reward": 0.0,
+        "route_contexts": 0,
+        "user_profiles": 0,
+        "active_sibling_preferences": 0,
+        "shadow_sibling_preferences": 0
+      },
+      "routing_histogram": {
+        "planner": 4,
+        "planner_timeline_optimizer": 4,
+        "planner_risk_allocator": 2,
+        "verification": 4,
+        "verification_constraint_checker": 4,
+        "verification_consistency_auditor": 2
+      },
+      "backend_usage_total": {
+        "call_count": 20,
+        "ok_calls": 20,
+        "error_calls": 0,
+        "prompt_tokens": 4404,
+        "completion_tokens": 11593,
+        "total_tokens": 15997,
+        "total_latency_ms": 187333.363,
+        "mean_latency_ms": 9366.668
+      },
+      "evaluator_runtime_usage_total": {
+        "call_count": 0,
+        "ok_calls": 0,
+        "error_calls": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "total_latency_ms": 0.0,
+        "mean_latency_ms": 0.0
+      },
+      "optimizer_runtime_usage_total": {
+        "call_count": 0,
+        "ok_calls": 0,
+        "error_calls": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "total_latency_ms": 0.0,
+        "mean_latency_ms": 0.0
+      }
+    }
+  },
+  "judge_backend_usage_total": {
+    "call_count": 4,
+    "ok_calls": 4,
+    "error_calls": 0,
+    "prompt_tokens": 4997,
+    "completion_tokens": 678,
+    "total_tokens": 5675,
+    "total_latency_ms": 11250.304,
+    "mean_latency_ms": 2812.576
+  },
+  "limitations": [
+    "This benchmark fixes the parent branch per task so it measures sibling adaptation rather than full-tree macro routing.",
+    "Training evaluates multiple sibling leaves per task to let adaptive update from the best-performing leaf under that parent.",
+    "Holdout executes only the policy-chosen sibling leaf, using current learned weights and sibling memory under the forced parent.",
+    "Pairwise judging uses an LLM judge and should be read together with the objective verifier score."
+  ],
+  "report_paths": {
+    "json": "/Users/justin/Documents/New project/repo_inspect/artifacts/execution_memory_openviking_quick_probe_round2/execution_memory_openviking_quick_probe_round2_report.json",
+    "markdown": "/Users/justin/Documents/New project/repo_inspect/artifacts/execution_memory_openviking_quick_probe_round2/execution_memory_openviking_quick_probe_round2_report.md"
+  }
+}

@@ -89,6 +89,11 @@ def test_engine_augments_branch_context_with_memory_and_adaptive_hints():
     assert "upstream summary" in context
     assert "Adaptive branch hint" in context
     assert "Similar success" in context
+    assert "Task-native signals to keep explicit" in context
+    assert "owner" in context.lower()
+    assert "rollback" in context.lower()
+    assert "Reusable branch memory" in context
+    assert "flow:" in context or "case:" in context
 
 
 def test_engine_refines_leaf_output_with_learned_playbook_when_score_improves():

@@ -313,6 +313,7 @@ def create_default_hierarchical_forest() -> HierarchicalPromptForest:
                     "Verify required constraints one by one and produce pass or fail evidence for each explicit requirement, field, rule, or contract. "
                     "Prefer checklist, requirement coverage, and missing-item detection over broad narrative critique. "
                     "If a requirement is absent, say exactly what is missing. "
+                    "Preserve the task's exact audit terms when they matter, especially phrases like contradictions, uncertainty calibration, manual repair, timeline, and confidence. "
                     "For audit or consistency tasks, explicitly name the contradiction or unresolved gap and end with a calibrated confidence line in the form confidence=0.xx."
                 ),
                 0.97,
@@ -329,6 +330,7 @@ def create_default_hierarchical_forest() -> HierarchicalPromptForest:
                     "Audit cross-step consistency, contradictions, unsupported jumps, and confidence calibration. "
                     "Prefer reasoning integrity, tradeoff coherence, and uncertainty calibration over checklist coverage. "
                     "Do not frame the answer as a pass or fail checklist unless the task explicitly demands that format. "
+                    "Preserve the task's exact audit terms when they matter, especially phrases like contradictions, uncertainty calibration, manual repair, timeline, and confidence. "
                     "When you find a contradiction, state it explicitly, explain the uncertainty impact, and end with a calibrated confidence line in the form confidence=0.xx."
                 ),
                 0.95,
