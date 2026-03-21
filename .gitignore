@@ -2,6 +2,12 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .venv/
+
+# Large data files
+*.pkl
+*.csv
 artifacts/*.jsonl
 artifacts/**/*.jsonl
 artifacts/*.log
+artifacts/empathetic_dialogues/
+artifacts/ethics_dataset/

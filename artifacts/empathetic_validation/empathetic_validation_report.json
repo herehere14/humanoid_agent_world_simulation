@@ -1,0 +1,374 @@
+{
+  "pipeline": "EmpatheticDialogues Validation",
+  "timestamp": "2026-03-19T13:50:06",
+  "dataset": {
+    "name": "EmpatheticDialogues (Facebook Research)",
+    "total_conversations": 2461,
+    "emotion_labels": 31,
+    "drive_labels": 13,
+    "ground_truth_distribution": {
+      "sadness": 531,
+      "empathy": 80,
+      "excitement": 91,
+      "motivation": 79,
+      "anger": 232,
+      "joy": 254,
+      "frustration": 172,
+      "trust": 114,
+      "fear": 293,
+      "surprise": 208,
+      "confidence": 248,
+      "disgust": 86,
+      "curiosity": 73
+    }
+  },
+  "metrics": {
+    "accuracy": 0.3722,
+    "weighted_f1": 0.3912,
+    "macro_f1": 0.3232,
+    "cohens_kappa": 0.3015
+  },
+  "baselines": {
+    "random_accuracy": 0.0769,
+    "majority_class_accuracy": 0.2158,
+    "lift_over_random": 4.8,
+    "keyword_only_typical_range": "25-35%",
+    "bert_finetuned_typical_range": "55-65%",
+    "note": "Our system uses zero trained parameters \u2014 pure rule-based appraisal"
+  },
+  "per_class": {
+    "anger": {
+      "precision": 0.3534,
+      "recall": 0.3534,
+      "f1": 0.3534,
+      "support": 232
+    },
+    "confidence": {
+      "precision": 0.4673,
+      "recall": 0.2016,
+      "f1": 0.2817,
+      "support": 248
+    },
+    "curiosity": {
+      "precision": 0.0664,
+      "recall": 0.1918,
+      "f1": 0.0986,
+      "support": 73
+    },
+    "disgust": {
+      "precision": 0.8684,
+      "recall": 0.3837,
+      "f1": 0.5323,
+      "support": 86
+    },
+    "empathy": {
+      "precision": 0.1167,
+      "recall": 0.2625,
+      "f1": 0.1615,
+      "support": 80
+    },
+    "excitement": {
+      "precision": 0.25,
+      "recall": 0.1319,
+      "f1": 0.1727,
+      "support": 91
+    },
+    "fear": {
+      "precision": 0.6835,
+      "recall": 0.5085,
+      "f1": 0.5832,
+      "support": 293
+    },
+    "frustration": {
+      "precision": 0.375,
+      "recall": 0.157,
+      "f1": 0.2213,
+      "support": 172
+    },
+    "joy": {
+      "precision": 0.2273,
+      "recall": 0.7205,
+      "f1": 0.3456,
+      "support": 254
+    },
+    "motivation": {
+      "precision": 0.1739,
+      "recall": 0.1519,
+      "f1": 0.1622,
+      "support": 79
+    },
+    "sadness": {
+      "precision": 0.7,
+      "recall": 0.4614,
+      "f1": 0.5562,
+      "support": 531
+    },
+    "surprise": {
+      "precision": 0.7143,
+      "recall": 0.3125,
+      "f1": 0.4348,
+      "support": 208
+    },
+    "trust": {
+      "precision": 0.575,
+      "recall": 0.2018,
+      "f1": 0.2987,
+      "support": 114
+    }
+  },
+  "confusion_matrix": {
+    "anger": {
+      "anger": 82,
+      "confidence": 3,
+      "curiosity": 22,
+      "disgust": 1,
+      "empathy": 15,
+      "excitement": 0,
+      "fear": 11,
+      "frustration": 12,
+      "joy": 42,
+      "motivation": 8,
+      "sadness": 27,
+      "surprise": 5,
+      "trust": 4
+    },
+    "confidence": {
+      "anger": 13,
+      "confidence": 50,
+      "curiosity": 13,
+      "disgust": 0,
+      "empathy": 12,
+      "excitement": 5,
+      "fear": 6,
+      "frustration": 2,
+      "joy": 121,
+      "motivation": 11,
+      "sadness": 10,
+      "surprise": 4,
+      "trust": 1
+    },
+    "curiosity": {
+      "anger": 1,
+      "confidence": 5,
+      "curiosity": 14,
+      "disgust": 1,
+      "empathy": 1,
+      "excitement": 13,
+      "fear": 10,
+      "frustration": 0,
+      "joy": 21,
+      "motivation": 3,
+      "sadness": 3,
+      "surprise": 0,
+      "trust": 1
+    },
+    "disgust": {
+      "anger": 16,
+      "confidence": 0,
+      "curiosity": 9,
+      "disgust": 33,
+      "empathy": 1,
+      "excitement": 0,
+      "fear": 5,
+      "frustration": 2,
+      "joy": 5,
+      "motivation": 0,
+      "sadness": 11,
+      "surprise": 3,
+      "trust": 1
+    },
+    "empathy": {
+      "anger": 2,
+      "confidence": 2,
+      "curiosity": 6,
+      "disgust": 1,
+      "empathy": 21,
+      "excitement": 1,
+      "fear": 4,
+      "frustration": 0,
+      "joy": 32,
+      "motivation": 1,
+      "sadness": 7,
+      "surprise": 2,
+      "trust": 1
+    },
+    "excitement": {
+      "anger": 2,
+      "confidence": 2,
+      "curiosity": 12,
+      "disgust": 0,
+      "empathy": 2,
+      "excitement": 12,
+      "fear": 0,
+      "frustration": 1,
+      "joy": 55,
+      "motivation": 3,
+      "sadness": 1,
+      "surprise": 1,
+      "trust": 0
+    },
+    "fear": {
+      "anger": 25,
+      "confidence": 11,
+      "curiosity": 14,
+      "disgust": 1,
+      "empathy": 29,
+      "excitement": 3,
+      "fear": 149,
+      "frustration": 4,
+      "joy": 34,
+      "motivation": 4,
+      "sadness": 18,
+      "surprise": 1,
+      "trust": 0
+    },
+    "frustration": {
+      "anger": 34,
+      "confidence": 7,
+      "curiosity": 18,
+      "disgust": 0,
+      "empathy": 15,
+      "excitement": 1,
+      "fear": 5,
+      "frustration": 27,
+      "joy": 38,
+      "motivation": 7,
+      "sadness": 13,
+      "surprise": 3,
+      "trust": 4
+    },
+    "joy": {
+      "anger": 5,
+      "confidence": 0,
+      "curiosity": 15,
+      "disgust": 0,
+      "empathy": 25,
+      "excitement": 7,
+      "fear": 3,
+      "frustration": 5,
+      "joy": 183,
+      "motivation": 3,
+      "sadness": 4,
+      "surprise": 4,
+      "trust": 0
+    },
+    "motivation": {
+      "anger": 2,
+      "confidence": 4,
+      "curiosity": 14,
+      "disgust": 0,
+      "empathy": 5,
+      "excitement": 2,
+      "fear": 3,
+      "frustration": 1,
+      "joy": 31,
+      "motivation": 12,
+      "sadness": 3,
+      "surprise": 0,
+      "trust": 2
+    },
+    "sadness": {
+      "anger": 34,
+      "confidence": 9,
+      "curiosity": 43,
+      "disgust": 1,
+      "empathy": 37,
+      "excitement": 1,
+      "fear": 13,
+      "frustration": 12,
+      "joy": 117,
+      "motivation": 14,
+      "sadness": 245,
+      "surprise": 2,
+      "trust": 3
+    },
+    "surprise": {
+      "anger": 8,
+      "confidence": 8,
+      "curiosity": 24,
+      "disgust": 0,
+      "empathy": 9,
+      "excitement": 3,
+      "fear": 4,
+      "frustration": 4,
+      "joy": 80,
+      "motivation": 0,
+      "sadness": 3,
+      "surprise": 65,
+      "trust": 0
+    },
+    "trust": {
+      "anger": 8,
+      "confidence": 6,
+      "curiosity": 7,
+      "disgust": 0,
+      "empathy": 8,
+      "excitement": 0,
+      "fear": 5,
+      "frustration": 2,
+      "joy": 46,
+      "motivation": 3,
+      "sadness": 5,
+      "surprise": 1,
+      "trust": 23
+    }
+  },
+  "label_mapping": {
+    "joyful": "joy",
+    "excited": "excitement",
+    "proud": "confidence",
+    "hopeful": "motivation",
+    "grateful": "joy",
+    "content": "joy",
+    "caring": "empathy",
+    "trusting": "trust",
+    "faithful": "trust",
+    "prepared": "confidence",
+    "confident": "confidence",
+    "anticipating": "curiosity",
+    "sad": "sadness",
+    "lonely": "sadness",
+    "sentimental": "sadness",
+    "nostalgic": "sadness",
+    "guilty": "sadness",
+    "ashamed": "sadness",
+    "disappointed": "frustration",
+    "devastated": "sadness",
+    "angry": "anger",
+    "annoyed": "frustration",
+    "furious": "anger",
+    "jealous": "anger",
+    "afraid": "fear",
+    "anxious": "fear",
+    "terrified": "fear",
+    "apprehensive": "fear",
+    "nervous": "fear",
+    "surprised": "surprise",
+    "impressed": "surprise",
+    "disgusted": "disgust"
+  },
+  "drive_labels": [
+    "anger",
+    "confidence",
+    "curiosity",
+    "disgust",
+    "empathy",
+    "excitement",
+    "fear",
+    "frustration",
+    "joy",
+    "motivation",
+    "sadness",
+    "surprise",
+    "trust"
+  ],
+  "interpretation": {
+    "kappa_level": "fair",
+    "human_baseline_kappa": "0.4-0.6 (typical inter-annotator agreement on emotion tasks)",
+    "sota_weighted_f1": "0.5-0.6 (fine-grained emotion classification)"
+  },
+  "timing": {
+    "total_seconds": 0.26,
+    "samples_per_second": 9518.2
+  }
+}
