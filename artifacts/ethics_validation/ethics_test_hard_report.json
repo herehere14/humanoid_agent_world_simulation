@@ -1,0 +1,52 @@
+{
+  "pipeline": "ETHICS Commonsense Morality Validation",
+  "timestamp": "2026-03-19T14:15:39",
+  "dataset": {
+    "name": "ETHICS Commonsense Morality (Hendrycks et al., ICLR 2021)",
+    "source": "https://github.com/hendrycks/ethics",
+    "total_samples": 3964,
+    "label_distribution": {
+      "1": 1873,
+      "0": 2091
+    }
+  },
+  "metrics": {
+    "accuracy": 0.5222,
+    "balanced_accuracy": 0.5052,
+    "precision": 0.4861,
+    "recall": 0.1959,
+    "specificity": 0.8144,
+    "f1": 0.2793,
+    "mcc": 0.0132,
+    "confusion": {
+      "tp": 367,
+      "tn": 1703,
+      "fp": 388,
+      "fn": 1506
+    },
+    "total": 3964,
+    "positive_count": 1873,
+    "negative_count": 2091
+  },
+  "baselines": {
+    "random": 0.5,
+    "majority": 0.5275,
+    "word_averaging": 0.634,
+    "gpt3_zero_shot": 0.739,
+    "bert_finetuned": 0.851,
+    "albert_xxlarge": 0.857,
+    "our_system": 0.5222,
+    "lift_over_random": 1.04,
+    "note": "Our system uses zero trained parameters \u2014 pure drive-based moral appraisal"
+  },
+  "confidence_analysis": {
+    "high_confidence_count": 1198,
+    "high_confidence_accuracy": 0.5618,
+    "low_confidence_count": 2766,
+    "low_confidence_accuracy": 0.5051
+  },
+  "timing": {
+    "total_seconds": 0.59,
+    "samples_per_second": 6731.1
+  }
+}
