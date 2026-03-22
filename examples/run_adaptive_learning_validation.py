@@ -64,6 +64,7 @@ MAX_PARTICIPANTS = 50  # use a subset for reasonable runtime
 DECK_NAMES = {1: "A", 2: "B", 3: "C", 4: "D"}
 SAFE_DECKS = {3, 4}
 RISKY_DECKS = {1, 2}
+DECK_TO_GROUP = {"A": "risky", "B": "risky", "C": "safe", "D": "safe"}
 
 
 # ---------------------------------------------------------------------------
@@ -286,26 +287,73 @@ def _create_engine(policy: str, seed: int, tmpdir: str) -> PromptForestEngine:
 
 
 # ---------------------------------------------------------------------------
-# Branch score extraction
+# Predictor input extraction
 # ---------------------------------------------------------------------------
 
-def _extract_branch_scores(result: dict[str, Any]) -> dict[str, float]:
-    """Extract branch scores from engine result for the predictor."""
-    scores: dict[str, float] = {}
-    bs = result.get("branch_scores", {})
-    for name, data in bs.items():
-        if isinstance(data, dict):
-            scores[name] = data.get("reward", 0.5)
-        elif isinstance(data, (int, float)):
-            scores[name] = float(data)
-    bw = result.get("branch_weights", {})
-    for name, weight in bw.items():
-        if name not in scores:
-            scores[name] = weight
+def _extract_predictor_inputs(result: dict[str, Any]) -> tuple[dict[str, float], dict[str, float]]:
+    """Extract predictor features from raw routing outputs.
+
+    The behavioral predictor should learn from the router's activation signal,
+    not from post-hoc branch quality judgments. We therefore use the raw
+    routing scores as the primary branch features and keep route metadata and
+    branch weights as separate contextual signals.
+    """
+    routing = result.get("routing", {})
+
+    branch_scores: dict[str, float] = {}
+    for name, score in routing.get("branch_scores", {}).items():
+        if isinstance(score, (int, float)):
+            branch_scores[name] = float(score)
+
+    context_features: dict[str, float] = {}
+    for name, data in result.get("branch_scores", {}).items():
+        if not isinstance(data, dict):
+            continue
+        reward = data.get("reward")
+        confidence = data.get("confidence")
+        if isinstance(reward, (int, float)):
+            context_features[f"judge_reward::{name}"] = float(reward)
+        if isinstance(confidence, (int, float)):
+            context_features[f"judge_conf::{name}"] = float(confidence)
+
+    branch_weights = result.get("branch_weights", {})
+    for name, weight in branch_weights.items():
+        if isinstance(weight, (int, float)):
+            context_features[f"branch_weight::{name}"] = float(weight)
+
+    activated_branches = routing.get("activated_branches", []) or []
+    activated_paths = routing.get("activated_paths", []) or []
+    context_features["route_num_activated_branches"] = float(len(activated_branches))
+    context_features["route_num_paths"] = float(len(activated_paths))
+
+    sorted_scores = sorted(branch_scores.values(), reverse=True)
+    if sorted_scores:
+        context_features["route_top_score"] = float(sorted_scores[0])
+    if len(sorted_scores) >= 2:
+        context_features["route_top_gap"] = float(sorted_scores[0] - sorted_scores[1])
+
     selected = result.get("evaluation_signal", {}).get("selected_branch", "")
-    if selected and selected not in scores:
-        scores[selected] = 1.0
-    return scores
+    if selected:
+        context_features[f"selected_branch::{selected}"] = 1.0
+
+    for branch_name in activated_branches:
+        context_features[f"activated_branch::{branch_name}"] = 1.0
+
+    sibling_decisions = routing.get("sibling_decisions", {}) or {}
+    for parent_id, meta in sibling_decisions.items():
+        if not isinstance(meta, dict):
+            continue
+        support = meta.get("support")
+        win_rate = meta.get("win_rate")
+        expected_margin = meta.get("expected_margin")
+        if isinstance(support, (int, float)):
+            context_features[f"sibling_support::{parent_id}"] = float(support)
+        if isinstance(win_rate, (int, float)):
+            context_features[f"sibling_win_rate::{parent_id}"] = float(win_rate)
+        if isinstance(expected_margin, (int, float)):
+            context_features[f"sibling_margin::{parent_id}"] = float(expected_margin)
+
+    return branch_scores, context_features
 
 
 # ---------------------------------------------------------------------------
@@ -377,7 +425,7 @@ def run_participant_experiment(
                 min_learning_rate=0.03,
                 anneal_rate=0.008,
                 outcome_learning_rate=0.12,
-                sequence_window=5,
+                sequence_window=12,
                 transition_learning_rate=0.10,
             )
 
@@ -388,7 +436,7 @@ def run_participant_experiment(
         cumulative_score = 0.0
 
         for idx, deck_choice in enumerate(train_choices):
-            ground_truth = "safe" if deck_choice in SAFE_DECKS else "risky"
+            actual_group = "safe" if deck_choice in SAFE_DECKS else "risky"
             window_idx = idx // WINDOW_SIZE
 
             # Net outcome for this trial
@@ -426,7 +474,8 @@ def run_participant_experiment(
                 update_memory=update_memory,
             )
 
-            branch_scores = _extract_branch_scores(result)
+            branch_scores, route_context = _extract_predictor_inputs(result)
+            predictor_context = {**context, **route_context}
 
             # Improvement #5: boost branches that are more predictive
             # of this user's behavior (predictor→optimizer connection)
@@ -438,15 +487,15 @@ def run_participant_experiment(
             pred_result = predictor.predict(
                 user_id=participant.participant_id,
                 branch_scores=branch_scores,
-                context=context,
+                context=predictor_context,
             )
             prediction = pred_result.predicted_action
-            is_correct = prediction == ground_truth
+            is_correct = prediction == actual_group
             correct_per_window.setdefault(window_idx, []).append(is_correct)
 
             reward_score = predictor.prediction_accuracy_reward(
                 predicted=prediction,
-                actual=ground_truth,
+                actual=actual_group,
                 confidence=pred_result.confidence,
             )
 
@@ -454,8 +503,8 @@ def run_participant_experiment(
                 predictor.update(
                     user_id=participant.participant_id,
                     branch_scores=branch_scores,
-                    actual_action=ground_truth,
-                    context=context,
+                    actual_action=actual_group,
+                    context=predictor_context,
                     outcome=net_outcome,
                 )
 
@@ -483,8 +532,8 @@ def run_participant_experiment(
                     task_id=result["task"]["task_id"],
                     score=reward_score,
                     accepted=is_correct,
-                    corrected_answer="" if is_correct else f"actual={ground_truth}",
-                    feedback_text=f"trial {idx + 1}: pred={prediction}, actual={ground_truth}",
+                    corrected_answer="" if is_correct else f"actual={actual_group}",
+                    feedback_text=f"trial {idx + 1}: pred={prediction}, actual={actual_group}",
                     user_id=participant.participant_id,
                 )
 
@@ -501,7 +550,7 @@ def run_participant_experiment(
         holdout_rng = random.Random(seed_base + 7777)
 
         for idx, deck_choice in enumerate(holdout_choices):
-            ground_truth = "safe" if deck_choice in SAFE_DECKS else "risky"
+            actual_group = "safe" if deck_choice in SAFE_DECKS else "risky"
 
             if policy == "frozen":
                 # Random baseline
@@ -527,15 +576,16 @@ def run_participant_experiment(
                     adapt=False,
                     update_memory=False,
                 )
-                branch_scores = _extract_branch_scores(result)
+                branch_scores, route_context = _extract_predictor_inputs(result)
+                predictor_context = {**context_h, **route_context}
                 pred_result = predictor.predict(
                     user_id=participant.participant_id,
                     branch_scores=branch_scores,
-                    context=context_h,
+                    context=predictor_context,
                 )
                 prediction = pred_result.predicted_action
 
-            if prediction == ground_truth:
+            if prediction == actual_group:
                 holdout_correct += 1
 
         holdout_accuracies[policy] = holdout_correct / max(1, n_holdout)
@@ -764,7 +814,7 @@ def main() -> None:
         min_learning_rate=0.03,
         anneal_rate=0.008,
         outcome_learning_rate=0.12,
-        sequence_window=5,
+        sequence_window=12,
         transition_learning_rate=0.10,
     )
 

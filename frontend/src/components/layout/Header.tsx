@@ -5,6 +5,7 @@ import { MOCK_ENGINE_STATE } from '@/lib/mockData';
 import { Github, Star, Menu, X } from 'lucide-react';
 
 const navLinks = [
+  { href: '#/world', label: 'World Viewer' },
   { href: '#human-mode', label: 'Human Mode' },
   { href: '#avatar-playground', label: 'Agent' },
   { href: '#sphere', label: 'Sphere' },

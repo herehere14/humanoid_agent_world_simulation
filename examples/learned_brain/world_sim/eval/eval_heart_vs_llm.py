@@ -134,6 +134,12 @@ Current emotional state:
 - Impulse control: {s.impulse_control:.2f}
 - Active emotional wounds: {len(s.wounds)}
 
+Private human read:
+{agent.render_subjective_brief()}
+
+Likely futures:
+{chr(10).join(f"- {b['label']}: {b['summary']}" for b in agent.get_future_branches())}
+
 You are currently: {get_action_description(Action[agent.last_action], agent)}
 Location: {agent.location}
 Time: {world.time_str}

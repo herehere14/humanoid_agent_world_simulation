@@ -28,12 +28,12 @@ from ...types import RoutingDecision, TaskInput
 # Maps drives to the branches they most strongly influence.
 DRIVE_TO_BRANCH: dict[str, list[str]] = {
     "reflection": ["reflective_reasoning", "working_memory", "long_term_memory"],
-    "impulse": ["impulse_response"],
-    "fear": ["fear_risk"],
+    "impulse": ["impulse_response", "instant_gratification", "frustration_reaction"],
+    "fear": ["fear_risk", "loss_aversion", "uncertainty_avoidance"],
     "curiosity": ["curiosity_exploration"],
     "empathy": ["empathy_social"],
-    "self_protection": ["self_protection", "self_justification"],
-    "ambition": ["ambition_reward", "long_term_goals"],
+    "self_protection": ["self_protection", "self_justification", "blame_avoidance"],
+    "ambition": ["ambition_reward", "reward_chasing", "long_term_goals"],
     "moral": ["moral_evaluation"],
     "emotional_regulation": ["emotional_modulation"],
     "long_term_goals": ["long_term_goals"],

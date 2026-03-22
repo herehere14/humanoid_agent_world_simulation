@@ -1,0 +1,9 @@
+{
+  "job_id": "ftjob-VzALQEju0NKK424ZkCn1UCyB",
+  "base_model": "gpt-4o-mini-2024-07-18",
+  "status": "succeeded",
+  "train_file": "file-LVTqwAmTPShGgEz6AMCo63",
+  "val_file": "file-NG5Vad4wa8tLZRynn8FBPZ",
+  "created_at": 1774051002.47152,
+  "fine_tuned_model": "ft:gpt-4o-mini-2024-07-18:justin:emotional-roleplay:DLepAYce"
+}

@@ -423,6 +423,29 @@ class BrainPredictor:
             signal_contributions=contributions,
         )
 
+    def predict_probs(
+        self,
+        user_id: str,
+        brain_output: BrainOutput,
+        context: dict[str, float] | None = None,
+    ) -> dict[str, float]:
+        """Return softmax probabilities over actions.
+
+        Same as predict() but returns a normalized probability distribution
+        suitable for ensemble blending.
+        """
+        import math as _math
+
+        result = self.predict(user_id, brain_output, context)
+        scores = result.action_scores
+        max_s = max(scores.values())
+        exp_scores = {a: _math.exp(scores[a] - max_s) for a in self.actions}
+        total = sum(exp_scores.values())
+        if total < 1e-12:
+            n = len(self.actions)
+            return {a: 1.0 / n for a in self.actions}
+        return {a: exp_scores[a] / total for a, v in scores.items()}
+
     # ------------------------------------------------------------------
     # Brain state clustering
     # ------------------------------------------------------------------

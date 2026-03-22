@@ -129,6 +129,9 @@ class HumanState:
         decay_rate: float = 0.05,
         momentum: float = 0.7,
         noise_level: float = 0.08,
+        adaptive_baselines: bool = False,
+        baseline_lr: float = 0.03,
+        baseline_warmup: int = 15,
     ) -> None:
         self._baselines = dict(DEFAULT_BASELINES)
         self._variables: dict[str, float] = dict(self._baselines)
@@ -141,6 +144,17 @@ class HumanState:
         self._turn_index = 0
         self._history: list[StateSnapshot] = []
         self._active_conflicts: list[DriveConflict] = []
+
+        # Adaptive baselines — learn per-user homeostatic set points
+        self._adaptive_baselines = adaptive_baselines
+        self._baseline_lr = baseline_lr
+        self._baseline_warmup = baseline_warmup
+        self._running_avg: dict[str, float] = dict(self._baselines)
+        self._running_avg_alpha = 0.1  # EMA smoothing for running average
+
+        # Velocity tracking — state change rate
+        self._prev_variables: dict[str, float] = dict(self._variables)
+        self._velocity: dict[str, float] = {k: 0.0 for k in self._variables}
 
     # ── Public API ────────────────────────────────────────────────────────
 
@@ -198,6 +212,33 @@ class HumanState:
         self._apply_cross_effects()
         # Decay toward baselines
         self._decay_toward_baseline()
+
+        # Velocity tracking: compute change from previous state
+        for var in self._variables:
+            old_val = self._prev_variables.get(var, self._variables[var])
+            self._velocity[var] = self._variables[var] - old_val
+        self._prev_variables = dict(self._variables)
+
+        # Adaptive baselines: shift baselines toward user's running average
+        if self._adaptive_baselines and self._turn_index >= self._baseline_warmup:
+            for var in self._variables:
+                # Update running average
+                self._running_avg[var] = (
+                    (1.0 - self._running_avg_alpha) * self._running_avg.get(var, self._variables[var])
+                    + self._running_avg_alpha * self._variables[var]
+                )
+                # Shift baseline toward running average
+                self._baselines[var] += self._baseline_lr * (
+                    self._running_avg[var] - self._baselines[var]
+                )
+        elif self._adaptive_baselines:
+            # During warmup, just track running average
+            for var in self._variables:
+                self._running_avg[var] = (
+                    (1.0 - self._running_avg_alpha) * self._running_avg.get(var, self._variables[var])
+                    + self._running_avg_alpha * self._variables[var]
+                )
+
         # Detect competing-drive conflicts
         self._detect_conflicts()
         # Record history
@@ -380,6 +421,37 @@ class HumanState:
         ranked = sorted(drive_vars, key=lambda v: self._variables[v], reverse=True)
         return ranked[:top_k]
 
+    @property
+    def velocity(self) -> dict[str, float]:
+        """State velocity: how fast each variable is changing."""
+        return dict(self._velocity)
+
+    @property
+    def baselines(self) -> dict[str, float]:
+        """Current baselines (may be adapted per-user)."""
+        return dict(self._baselines)
+
+    def divergence_from_baseline(self) -> dict[str, float]:
+        """How far each variable is from its baseline."""
+        return {
+            var: self._variables.get(var, 0.5) - self._baselines.get(var, 0.5)
+            for var in self._variables
+        }
+
+    def state_interactions(self) -> dict[str, float]:
+        """Key nonlinear state interaction features."""
+        g = self.get
+        return {
+            "frustration_x_impulse": g("frustration") * g("impulse"),
+            "confidence_x_ambition": g("confidence") * g("ambition"),
+            "fear_x_caution": g("fear") * g("caution"),
+            "curiosity_x_confidence": g("curiosity") * g("confidence"),
+            "stress_x_fatigue": g("stress") * g("fatigue"),
+            "motivation_x_goal_commitment": g("motivation") * g("goal_commitment"),
+            "frustration_x_fear": g("frustration") * g("fear"),
+            "impulse_x_curiosity": g("impulse") * g("curiosity"),
+        }
+
     def arousal_level(self) -> float:
         """Overall activation level: high when strong emotions are present."""
         excitatory = [
@@ -407,14 +479,20 @@ class HumanState:
         mapping = {
             "reflective_reasoning": ["reflection", "confidence"],
             "impulse_response": ["impulse"],
+            "instant_gratification": ["impulse", "motivation"],
+            "frustration_reaction": ["frustration", "stress", "impulse"],
             "fear_risk": ["fear", "caution"],
+            "loss_aversion": ["fear", "caution", "stress"],
+            "uncertainty_avoidance": ["fear", "caution", "reflection"],
             "curiosity_exploration": ["curiosity"],
             "empathy_social": ["empathy", "trust"],
+            "blame_avoidance": ["self_protection", "stress"],
             "self_justification": ["self_justification", "self_protection"],
             "long_term_goals": ["long_term_goals", "goal_commitment", "ambition"],
             "emotional_regulation": ["reflection", "emotional_momentum"],
             "moral_evaluation": ["honesty", "empathy"],
             "ambition_reward": ["ambition", "motivation"],
+            "reward_chasing": ["ambition", "motivation", "confidence"],
         }
         for branch_key, drives in mapping.items():
             bias = 0.0

@@ -196,6 +196,14 @@ class MemoryStore:
         if len(self._records) > self.config.max_records:
             self._records = self._records[-self.config.max_records :]
 
+    def annotate_record_metadata(self, task_id: str, updates: dict[str, Any]) -> bool:
+        for record in reversed(self._records):
+            if record.task_id != task_id:
+                continue
+            record.task_metadata.update(updates)
+            return True
+        return False
+
         if self.memory_path:
             append_jsonl(self.memory_path, record.to_dict())
 

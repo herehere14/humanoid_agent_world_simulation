@@ -33,6 +33,7 @@ from typing import Any
 # ---------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data" / "igt_steingroever"
+sys.path.insert(0, str(ROOT))
 
 MAX_PARTICIPANTS = 50
 
@@ -378,6 +379,129 @@ def fit_vpp(participant: IGTParticipant, n_train: int) -> tuple[float, dict[str,
 # Baselines
 # ---------------------------------------------------------------------------
 
+def run_brain_on_participant(
+    participant: IGTParticipant,
+    transition_model: Any,
+    brain_predictor: Any,
+    rl_adapter: Any,
+    n_train: int,
+) -> float:
+    """Run our brain system on one participant, return holdout accuracy."""
+    from src.prompt_forest.brain.controller import BrainController
+    from src.prompt_forest.brain.output import BrainActionTendencies, BrainControlSignals, BrainOutput
+    from src.prompt_forest.modes.human_mode.branches import create_human_mode_forest
+    from src.prompt_forest.modes.human_mode.memory import HumanModeMemory
+    from src.prompt_forest.modes.human_mode.router import HumanModeRouter
+    from src.prompt_forest.state.human_state import HumanState
+    from src.prompt_forest.types import TaskInput
+
+    uid = participant.participant_id
+    state = HumanState(
+        decay_rate=0.05, momentum=0.45, noise_level=0.0,
+        adaptive_baselines=True, baseline_lr=0.012, baseline_warmup=40,
+    )
+    forest = create_human_mode_forest()
+    router = HumanModeRouter(top_k=4, noise_level=0.0)
+    memory = HumanModeMemory(emotional_decay=0.92, trauma_amplification=1.5, experience_bias_strength=0.4)
+    controller = BrainController()
+
+    prev_outcome: float | None = None
+    prev_action: str | None = None
+
+    # Training
+    for idx in range(n_train):
+        actual = "safe" if participant.choices[idx] in SAFE_DECKS else "risky"
+        net = participant.wins[idx] + participant.losses[idx]
+
+        if prev_outcome is not None and prev_action is not None:
+            deltas = transition_model.compute_deltas(
+                user_id=uid, state_vars=state.variables,
+                outcome=prev_outcome, action=prev_action,
+            )
+            state.update(deltas)
+
+        task = TaskInput(task_id=f"{uid}_t{idx}", text=f"trial {idx+1}", task_type="decision", metadata={})
+        route, conflicts = router.route(task, forest, state)
+        for c in conflicts:
+            state.resolve_conflict(c, "weighted_compromise")
+
+        brain_output = controller.build_output(
+            state=state, route=route, conflicts=state.active_conflicts,
+            human_memory=memory,
+            branch_weights={n: b.state.weight for n, b in forest.branches.items() if not b.state.metadata.get("category_node")},
+        )
+
+        context = {
+            "trial_progress": idx / max(1, n_train),
+            "cumulative_score_norm": 0.0,
+        }
+        context.update(transition_model.get_ev_features(uid))
+        context.update(transition_model.get_outcome_features(uid))
+        context.update(brain_predictor.compute_sequence_features(uid))
+
+        prediction = brain_predictor.predict(uid, brain_output, context)
+        rl_adapter.adapt(
+            user_id=uid, brain_output=brain_output,
+            predicted_action=prediction.predicted_action,
+            actual_action=actual, outcome=net, context=context,
+            human_state=state,
+        )
+
+        memory.record(
+            event_id=task.task_id, task=task, state=state,
+            reward=brain_predictor.prediction_accuracy_reward(prediction.predicted_action, actual, prediction.confidence),
+            selected_branch=(route.activated_branches[0] if route.activated_branches else ""),
+            active_branches=list(route.activated_branches),
+        )
+        prev_outcome = net
+        prev_action = actual
+
+    # Holdout
+    holdout_correct = 0
+    n_holdout = len(participant.choices) - n_train
+    for idx in range(n_holdout):
+        global_idx = n_train + idx
+        actual = "safe" if participant.choices[global_idx] in SAFE_DECKS else "risky"
+        net = participant.wins[global_idx] + participant.losses[global_idx]
+
+        if prev_outcome is not None and prev_action is not None:
+            deltas = transition_model.compute_deltas(
+                user_id=uid, state_vars=state.variables,
+                outcome=prev_outcome, action=prev_action,
+            )
+            state.update(deltas)
+
+        task = TaskInput(task_id=f"{uid}_h{idx}", text=f"holdout {global_idx+1}", task_type="decision", metadata={})
+        route, conflicts = router.route(task, forest, state)
+        for c in conflicts:
+            state.resolve_conflict(c, "weighted_compromise")
+
+        brain_output = controller.build_output(
+            state=state, route=route, conflicts=state.active_conflicts,
+            human_memory=memory,
+            branch_weights={n: b.state.weight for n, b in forest.branches.items() if not b.state.metadata.get("category_node")},
+        )
+
+        context = {"trial_progress": 1.0, "cumulative_score_norm": 0.0}
+        context.update(transition_model.get_ev_features(uid))
+        context.update(transition_model.get_outcome_features(uid))
+        context.update(brain_predictor.compute_sequence_features(uid))
+
+        prediction = brain_predictor.predict(uid, brain_output, context)
+        if prediction.predicted_action == actual:
+            holdout_correct += 1
+
+        brain_predictor.observe(
+            uid, actual, net, update_prior=True, update_outcome_bias=True,
+            regime=brain_output.regime, brain_state_summary=brain_output.state_summary,
+        )
+        transition_model.compute_deltas(user_id=uid, state_vars=state.variables, outcome=net, action=actual)
+        prev_outcome = net
+        prev_action = actual
+
+    return holdout_correct / max(1, n_holdout)
+
+
 def majority_class_accuracy(participant: IGTParticipant, n_train: int) -> float:
     """Always predict the most common class from training data."""
     train_safe = sum(1 for c in participant.choices[:n_train] if c in SAFE_DECKS)
@@ -433,11 +557,30 @@ def main() -> None:
     holdout_fraction = 0.3
     results: list[ParticipantComparison] = []
 
-    # We'll also store our system's results (from the main validation)
-    # For now, hardcode the mean from our run (67.6%), or re-run inline
-    # For a fair comparison, we compute all baselines on the exact same split.
+    # Run our brain system on the SAME participants for fair comparison
+    from src.prompt_forest.brain.brain_predictor import BrainPredictor
+    from src.prompt_forest.brain.rl_adapter import BrainRLAdapter
+    from src.prompt_forest.brain.transition_model import LearnedTransitionModel
 
-    print(f"  Fitting cognitive models per-participant (grid search)...")
+    print(f"  === Running Brain System on same participants ===")
+    fb_tm = LearnedTransitionModel(lr=0.08)
+    fb_pred = BrainPredictor(
+        actions=["safe", "risky"], learning_rate=0.14, prior_lr=0.08,
+        context_lr=0.06, min_lr=0.025, anneal_rate=0.005,
+        outcome_lr=0.16, transition_lr=0.14,
+    )
+    fb_adapter = BrainRLAdapter(transition_model=fb_tm, brain_predictor=fb_pred)
+
+    all_brain: list[float] = []
+    for i, p in enumerate(participants):
+        n_train = int(p.n_trials * (1.0 - holdout_fraction))
+        acc = run_brain_on_participant(p, fb_tm, fb_pred, fb_adapter, n_train)
+        all_brain.append(acc)
+        if (i + 1) % 10 == 0 or i == 0:
+            print(f"    [{i+1:>2d}/{len(participants)}] brain={acc:.0%}")
+    print()
+
+    print(f"  === Fitting cognitive models per-participant (grid search) ===")
     print(f"  This tests {len(participants)} participants with 3 models each.")
     print()
 
@@ -473,7 +616,7 @@ def main() -> None:
 
         print(
             f"  EV={ev_acc:.0%}  PVL={pvl_acc:.0%}  VPP={vpp_acc:.0%}  "
-            f"maj={maj_acc:.0%}"
+            f"brain={all_brain[i]:.0%}  maj={maj_acc:.0%}"
         )
 
     print()
@@ -484,7 +627,7 @@ def main() -> None:
     print("-" * 76)
     print()
 
-    our_system_acc = 0.676  # from the main validation run
+    our_system_acc = mean(all_brain)
 
     models = [
         ("Random (50/50)", all_random),
@@ -492,6 +635,7 @@ def main() -> None:
         ("EV (Busemeyer 2002)", all_ev),
         ("PVL-Delta (Ahn 2008)", all_pvl),
         ("VPP (Worthy 2013)", all_vpp),
+        ("Our Brain (Prompt Forest)", all_brain),
     ]
 
     print(f"  {'Model':<30s}  {'Mean':>6s}  {'Std':>6s}  {'Min':>5s}  {'Max':>5s}")
@@ -502,7 +646,6 @@ def main() -> None:
         lo = min(accs)
         hi = max(accs)
         print(f"  {name:<30s}  {m:>5.1%}  {s:>5.1%}  {lo:>4.0%}  {hi:>4.0%}")
-    print(f"  {'Our System (Prompt Forest)':<30s}  {our_system_acc:>5.1%}  {'--':>6s}  {'--':>5s}  {'--':>5s}")
     print()
 
     # Per-group comparison
@@ -523,7 +666,7 @@ def main() -> None:
         print(f"  {group_name} (n={len(indices)}):")
         for name, accs in models:
             g_accs = [accs[i] for i in indices]
-            print(f"    {name:<28s}  {mean(g_accs):.1%}")
+            print(f"    {name:<30s}  {mean(g_accs):.1%}")
         print()
 
     # Head-to-head: how often does each model beat majority-class?
@@ -548,9 +691,9 @@ def main() -> None:
     mean_vpp = mean(all_vpp)
     mean_maj = mean(all_majority)
 
-    print(f"  Our system (67.6%) vs:")
-    print(f"    Random baseline:     +{our_system_acc - 0.50:+.1%}")
-    print(f"    Majority-class:      +{our_system_acc - mean_maj:+.1%}")
+    print(f"  Our Brain ({our_system_acc:.1%}) vs:")
+    print(f"    Random baseline:     {our_system_acc - 0.50:+.1%}")
+    print(f"    Majority-class:      {our_system_acc - mean_maj:+.1%}")
     print(f"    EV model:            {our_system_acc - mean_ev:+.1%}")
     print(f"    PVL-Delta model:     {our_system_acc - mean_pvl:+.1%}")
     print(f"    VPP model:           {our_system_acc - mean_vpp:+.1%}")

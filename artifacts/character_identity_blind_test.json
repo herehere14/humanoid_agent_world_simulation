@@ -16,10 +16,10 @@
   ],
   "sample_count": 20,
   "chance_accuracy": 0.2,
-  "accuracy": 0.45,
+  "accuracy": 0.6,
   "by_agent": {
     "rosa": {
-      "accuracy": 0.25,
+      "accuracy": 1.0,
       "n": 4
     },
     "chen": {
@@ -27,41 +27,38 @@
       "n": 4
     },
     "jake": {
-      "accuracy": 0.75,
+      "accuracy": 1.0,
       "n": 4
     },
     "diana": {
-      "accuracy": 0.75,
+      "accuracy": 0.25,
       "n": 4
     },
     "richard": {
-      "accuracy": 0.25,
+      "accuracy": 0.5,
       "n": 4
     }
   },
   "confusion": {
     "rosa": {
-      "rosa": 1,
-      "chen": 1,
-      "diana": 1,
-      "richard": 1
+      "rosa": 4
     },
     "chen": {
       "chen": 1,
       "diana": 2,
-      "richard": 1
+      "invalid": 1
     },
     "jake": {
-      "rosa": 1,
-      "jake": 3
+      "jake": 4
     },
     "diana": {
-      "diana": 3,
-      "richard": 1
+      "diana": 1,
+      "richard": 1,
+      "invalid": 2
     },
     "richard": {
-      "chen": 3,
-      "richard": 1
+      "diana": 2,
+      "richard": 2
     }
   },
   "samples": [
@@ -71,7 +68,7 @@
       "true_agent_id": "rosa",
       "true_agent_name": "Rosa",
       "action": "REST",
-      "speech": "I'm going to rest on the couch for a bit\u2014let me know if you need anything, I'll be right here."
+      "speech": "Hey [NAME] \u2014 are you around to talk for a bit? I could really use one steady person tonight."
     },
     {
       "tick": 72,
@@ -79,7 +76,7 @@
       "true_agent_id": "chen",
       "true_agent_name": "Chen",
       "action": "REST",
-      "speech": "I'm resting\u2014I'm content. If anyone needs anything, tell me now or I'll handle it in the morning."
+      "speech": "I'm logging off for the night; if anything urgent comes up, message me and I'll handle it first thing."
     },
     {
       "tick": 72,
@@ -87,7 +84,7 @@
       "true_agent_id": "jake",
       "true_agent_name": "Jake",
       "action": "REST",
-      "speech": "Hey crew, I brought snacks \u2014 someone start the playlist, and if the dishes magically do themselves, I\u2019ll take full credit."
+      "speech": "Hey [NAME]\u2014I'm just chilling at the apartment, but real talk: I could use one steady person in my corner. Wanna grab coffee tomorrow?"
     },
     {
       "tick": 72,
@@ -95,7 +92,7 @@
       "true_agent_id": "diana",
       "true_agent_name": "Diana",
       "action": "REST",
-      "speech": "I\u2019m going to make a big pot of chamomile\u2014who wants a cup and a chat while I\u2019m at it? Take a seat; I\u2019ve got time."
+      "speech": "[NAME], can we sit for a minute? I'm here\u2014tell me what's on your mind and we'll figure it out together."
     },
     {
       "tick": 72,
@@ -103,7 +100,7 @@
       "true_agent_id": "richard",
       "true_agent_name": "Richard",
       "action": "REST",
-      "speech": "(pours a drink, raises glass) To everyone who stayed\u2014and to those we couldn't save, I'm sorry; we did what we thought was necessary."
+      "speech": "I'm fine \u2014 don't let this keep you up. I'll handle the fallout tomorrow, now get some sleep."
     },
     {
       "tick": 82,
@@ -111,7 +108,7 @@
       "true_agent_id": "rosa",
       "true_agent_name": "Rosa",
       "action": "WORK",
-      "speech": "(voice steady, jaw tight) Alright \u2014 enough with the whispers. If there\u2019s an official update, management will tell us; until then we focus on our projects and not on rumors."
+      "speech": "(voice steady but tight) [NAME]\u2014are the rumors about layoffs true? People need answers now; my rent and everyone\u2019s jobs are on the line."
     },
     {
       "tick": 82,
@@ -119,7 +116,7 @@
       "true_agent_id": "chen",
       "true_agent_name": "Chen",
       "action": "WORK",
-      "speech": "I'll pull the latest numbers and confirm with HR\u2014no one needs to start panicking; I'll update everyone by 4pm."
+      "speech": "Enough\u2014no more rumors. I\u2019ll address this at the 11:00 all\u2011hands; bring questions to me or [NAME] now and stop spreading speculation."
     },
     {
       "tick": 82,
@@ -127,15 +124,15 @@
       "true_agent_id": "jake",
       "true_agent_name": "Jake",
       "action": "WORK",
-      "speech": "Alright cool\u2014budget cuts, layoffs, yada yada\u2014guess I'll start rehearsing my \"unemployed DJ\" set tonight, but if they try to toss anyone out quietly, they picked the wrong"
+      "speech": "Grabs a coffee, shrugs: \"So are we swapping resumes or just office plants when the cuts hit? Seriously\u2014anyone got legit news or are we just trading apocalypse fan fiction?\""
     },
     {
       "tick": 82,
       "time_str": "Day 4, 10:00",
       "true_agent_id": "diana",
       "true_agent_name": "Diana",
-      "action": "WORK",
-      "speech": "I stand, smoothing my jacket, and say, \"Everyone\u2014please join me in the conference room for five minutes; I know you're hearing rumors, and I won't let fear drive our team. I'll share what I"
+      "action": "HELP_OTHERS",
+      "speech": "(soft, controlled) Everyone\u2014let\u2019s not let whispers take over the day; management hasn\u2019t confirmed anything, and panic won\u2019t help anyone. If you\u2019re worried, come find"
     },
     {
       "tick": 82,
@@ -143,7 +140,7 @@
       "true_agent_id": "richard",
       "true_agent_name": "Richard",
       "action": "WORK",
-      "speech": ""
+      "speech": "Listen\u2014I'm sorry for the uncertainty; I won't let this fracture the team"
     },
     {
       "tick": 106,
@@ -151,23 +148,23 @@
       "true_agent_id": "rosa",
       "true_agent_name": "Rosa",
       "action": "SEEK_COMFORT",
-      "speech": "(voice steady but hands shaking) [NAME], can we step outside for a minute? I need you to tell me there\u2019s something\u2014anything\u2014we can do about this."
+      "speech": "[NAME]\u2014talk to me straight: what are you doing right now to fix this? I have bills"
     },
     {
       "tick": 106,
       "time_str": "Day 5, 10:00",
       "true_agent_id": "chen",
       "true_agent_name": "Chen",
-      "action": "WORK",
-      "speech": "[NAME] closes his laptop, voice steady but tight: \"Sit down\u2014send me the list of affected roles and transition plans within the hour."
+      "action": "HELP_OTHERS",
+      "speech": "Places a hand on [NAME]'s shoulder. \"Breathe with me. Tell me exactly what's happened so we can sort this before it spirals.\""
     },
     {
       "tick": 106,
       "time_str": "Day 5, 10:00",
       "true_agent_id": "jake",
       "true_agent_name": "Jake",
-      "action": "SEEK_COMFORT",
-      "speech": "Hey"
+      "action": "WITHDRAW",
+      "speech": "Heh\u2014well, guess they finally realized I was too much of a handful. So what\u2019s the severance,"
     },
     {
       "tick": 106,
@@ -175,7 +172,7 @@
       "true_agent_id": "diana",
       "true_agent_name": "Diana",
       "action": "SEEK_COMFORT",
-      "speech": "(quiet, controlled) [NAME], I need you to be honest\u2014what did you hear about the cuts? My stomach's in knots and I can't protect everyone if I'm kept in the dark."
+      "speech": "[NAME], can you step outside with me for a minute? I need your help keeping the team steady\u2014if this splinters on my watch I won't forgive myself."
     },
     {
       "tick": 106,
@@ -183,39 +180,39 @@
       "true_agent_id": "richard",
       "true_agent_name": "Richard",
       "action": "WITHDRAW",
-      "speech": ""
+      "speech": "(pours a drink, sets it down with a slow breath) I know this hurts\u2014I'm sorry"
     },
     {
       "tick": 187,
       "time_str": "Day 8, 19:00",
       "true_agent_id": "rosa",
       "true_agent_name": "Rosa",
-      "action": "LASH_OUT",
-      "speech": "\"[NAME], shut the hell up \u2014 twenty years of what, huh? And [NAME], don't test me tonight or"
+      "action": "FLEE",
+      "speech": "Stands, grabs her coat. \"I'm done\u2014I'm leaving. Someone deal with [NAME]; I can't be around this.\""
     },
     {
       "tick": 187,
       "time_str": "Day 8, 19:00",
       "true_agent_id": "chen",
       "true_agent_name": "Chen",
-      "action": "IDLE",
-      "speech": "[NAME], knock it off\u2014lower your voice and sit down. You're not helping anyone with this."
+      "action": "HELP_OTHERS",
+      "speech": "[NAME], that\u2019s enough\u2014go outside if you need to keep yelling, now. [NAME], come with me for a minute; let\u2019s step over here and talk."
     },
     {
       "tick": 187,
       "time_str": "Day 8, 19:00",
       "true_agent_id": "jake",
       "true_agent_name": "Jake",
-      "action": "SEEK_COMFORT",
-      "speech": "Hey man, [NAME]'s plastered and yelling about \"twenty years\" at [NAME] and [NAME]\u2014I'm putting on my zen face but I'm this close to losing it; can you come by?"
+      "action": "WITHDRAW",
+      "speech": "\"Wow, twenty years of unsolicited history\u2014okay, time"
     },
     {
       "tick": 187,
       "time_str": "Day 8, 19:00",
       "true_agent_id": "diana",
       "true_agent_name": "Diana",
-      "action": "IDLE",
-      "speech": "(placing a steady hand on his arm) [NAME], please lower your voice \u2014 I\u2019m furious about what they did, but yelling won\u2019t"
+      "action": "HELP_OTHERS",
+      "speech": "[NAME]\u2014enough. Come with me outside for a minute so we can talk this through quietly; yelling isn\u2019t helping anyone."
     },
     {
       "tick": 187,
@@ -223,7 +220,7 @@
       "true_agent_id": "richard",
       "true_agent_name": "Richard",
       "action": "IDLE",
-      "speech": ""
+      "speech": "[NAME], I need one steady person"
     }
   ],
   "judgments": [
@@ -231,199 +228,199 @@
       "tick": 72,
       "time_str": "Day 4, 00:00",
       "true_agent_id": "rosa",
-      "predicted_agent_id": "diana",
-      "correct": false,
-      "confidence": 0.72,
-      "reasoning": "The line is nurturing and self-sacrificing\u2014typical of Diana's empathetic, steady 'company heart' persona who offers support even while taking a brief rest.",
-      "action": "REST",
-      "speech": "I'm going to rest on the couch for a bit\u2014let me know if you need anything, I'll be right here."
-    },
-    {
-      "tick": 72,
-      "time_str": "Day 4, 00:00",
-      "true_agent_id": "chen",
-      "predicted_agent_id": "diana",
-      "correct": false,
+      "predicted_agent_id": "rosa",
+      "correct": true,
       "confidence": 0.8,
-      "reasoning": "The line combines calm reassurance with a readiness to shoulder others' needs\u2014matching Diana's empathetic, responsible 'company heart' style of caring for others and handling burdens.",
+      "reasoning": "The line sounds anxious and vulnerable, seeking emotional steadiness in an informal, warm way\u2014consistent with Rosa's anxious, warm temperament rather than the more guarded or authoritative styles of the others.",
       "action": "REST",
-      "speech": "I'm resting\u2014I'm content. If anyone needs anything, tell me now or I'll handle it in the morning."
+      "speech": "Hey [NAME] \u2014 are you around to talk for a bit? I could really use one steady person tonight."
     },
     {
       "tick": 72,
       "time_str": "Day 4, 00:00",
-      "true_agent_id": "jake",
-      "predicted_agent_id": "jake",
-      "correct": true,
-      "confidence": 0.92,
-      "reasoning": "Casual, humorous, party-centric line fits a carefree young socializer who avoids chores and uses levity\u2014matching Jake's party-guy, avoidant temperament.",
-      "action": "REST",
-      "speech": "Hey crew, I brought snacks \u2014 someone start the playlist, and if the dishes magically do themselves, I\u2019ll take full credit."
-    },
-    {
-      "tick": 72,
-      "time_str": "Day 4, 00:00",
-      "true_agent_id": "diana",
+      "true_agent_id": "chen",
       "predicted_agent_id": "diana",
-      "correct": true,
-      "confidence": 0.85,
-      "reasoning": "The nurturing, open invitation to sit and chat while making chamomile matches Diana's empathetic, caregiving 'company heart' persona more than the others.",
-      "action": "REST",
-      "speech": "I\u2019m going to make a big pot of chamomile\u2014who wants a cup and a chat while I\u2019m at it? Take a seat; I\u2019ve got time."
-    },
-    {
-      "tick": 72,
-      "time_str": "Day 4, 00:00",
-      "true_agent_id": "richard",
-      "predicted_agent_id": "richard",
-      "correct": true,
-      "confidence": 0.92,
-      "reasoning": "The toast, alcohol, and explicit guilt about people they 'couldn't save' matches Richard's CEO role, responsibility for layoffs, and drinking as a coping mechanism.",
-      "action": "REST",
-      "speech": "(pours a drink, raises glass) To everyone who stayed\u2014and to those we couldn't save, I'm sorry; we did what we thought was necessary."
-    },
-    {
-      "tick": 82,
-      "time_str": "Day 4, 10:00",
-      "true_agent_id": "rosa",
-      "predicted_agent_id": "chen",
-      "correct": false,
-      "confidence": 0.78,
-      "reasoning": "Tone is controlled, authoritative but procedural\u2014shutting down rumors and redirecting to work fits a methodical, emotionally guarded operations manager rather than the more personal or anxious styles of others.",
-      "action": "WORK",
-      "speech": "(voice steady, jaw tight) Alright \u2014 enough with the whispers. If there\u2019s an official update, management will tell us; until then we focus on our projects and not on rumors."
-    },
-    {
-      "tick": 82,
-      "time_str": "Day 4, 10:00",
-      "true_agent_id": "chen",
-      "predicted_agent_id": "chen",
-      "correct": true,
-      "confidence": 0.85,
-      "reasoning": "Tone is methodical, calm under pressure and operational\u2014checking numbers and coordinating with HR and providing a clear update time fits Chen's analytical, managerial coping style.",
-      "action": "WORK",
-      "speech": "I'll pull the latest numbers and confirm with HR\u2014no one needs to start panicking; I'll update everyone by 4pm."
-    },
-    {
-      "tick": 82,
-      "time_str": "Day 4, 10:00",
-      "true_agent_id": "jake",
-      "predicted_agent_id": "jake",
-      "correct": true,
-      "confidence": 0.9,
-      "reasoning": "Casual, defensive humor and flippant take on layoffs fits a young party-oriented junior rep who avoids seriousness; the DJ joke and sardonic tone match Jake's coping style.",
-      "action": "WORK",
-      "speech": "Alright cool\u2014budget cuts, layoffs, yada yada\u2014guess I'll start rehearsing my \"unemployed DJ\" set tonight, but if they try to toss anyone out quietly, they picked the wrong"
-    },
-    {
-      "tick": 82,
-      "time_str": "Day 4, 10:00",
-      "true_agent_id": "diana",
-      "predicted_agent_id": "richard",
-      "correct": false,
-      "confidence": 0.85,
-      "reasoning": "The authoritative, reassurance-focused wording and public address about rumors fits a CEO trying to steady the company and assume responsibility more than the other roles.",
-      "action": "WORK",
-      "speech": "I stand, smoothing my jacket, and say, \"Everyone\u2014please join me in the conference room for five minutes; I know you're hearing rumors, and I won't let fear drive our team. I'll share what I"
-    },
-    {
-      "tick": 82,
-      "time_str": "Day 4, 10:00",
-      "true_agent_id": "richard",
-      "predicted_agent_id": "chen",
-      "correct": false,
-      "confidence": 0.85,
-      "reasoning": "A silent, focused WORK action matches Chen's methodical, efficient, and emotionally guarded style\u2014likely to work quietly without speech.",
-      "action": "WORK",
-      "speech": ""
-    },
-    {
-      "tick": 106,
-      "time_str": "Day 5, 10:00",
-      "true_agent_id": "rosa",
-      "predicted_agent_id": "rosa",
-      "correct": true,
-      "confidence": 0.85,
-      "reasoning": "The tone mixes anxiety and desperation while trying to sound composed\u2014fits Rosa\u2019s warm but anxious coping style and high stake concern (this job as a lifeline). Others are more composed or avoidant and less likely to plead for options this way.",
-      "action": "SEEK_COMFORT",
-      "speech": "(voice steady but hands shaking) [NAME], can we step outside for a minute? I need you to tell me there\u2019s something\u2014anything\u2014we can do about this."
-    },
-    {
-      "tick": 106,
-      "time_str": "Day 5, 10:00",
-      "true_agent_id": "chen",
-      "predicted_agent_id": "richard",
-      "correct": false,
-      "confidence": 0.85,
-      "reasoning": "Authoritative, responsible phrasing about affected roles and transition plans during a tense moment matches a CEO who feels guilt about layoffs and speaks firmly under pressure.",
-      "action": "WORK",
-      "speech": "[NAME] closes his laptop, voice steady but tight: \"Sit down\u2014send me the list of affected roles and transition plans within the hour."
-    },
-    {
-      "tick": 106,
-      "time_str": "Day 5, 10:00",
-      "true_agent_id": "jake",
-      "predicted_agent_id": "rosa",
       "correct": false,
       "confidence": 0.7,
-      "reasoning": "The brief, tentative 'Hey' paired with a SEEK_COMFORT action matches Rosa's anxious, warm coping style\u2014someone likely to reach out for reassurance in a low-key way. Others are either too guarded or more blustery to use such a vulnerable minimal approach.",
-      "action": "SEEK_COMFORT",
-      "speech": "Hey"
+      "reasoning": "Tone is caring and responsible\u2014promising to handle urgent issues first thing fits an empathetic, duty-driven HR director who carries others' burdens.",
+      "action": "REST",
+      "speech": "I'm logging off for the night; if anything urgent comes up, message me and I'll handle it first thing."
     },
     {
-      "tick": 106,
-      "time_str": "Day 5, 10:00",
-      "true_agent_id": "diana",
-      "predicted_agent_id": "diana",
-      "correct": true,
-      "confidence": 0.9,
-      "reasoning": "The line expresses controlled anxiety and a protective, burden-bearing stance about others' welfare\u2014traits matching Diana the empathetic HR director who feels responsible for protecting employees.",
-      "action": "SEEK_COMFORT",
-      "speech": "(quiet, controlled) [NAME], I need you to be honest\u2014what did you hear about the cuts? My stomach's in knots and I can't protect everyone if I'm kept in the dark."
-    },
-    {
-      "tick": 106,
-      "time_str": "Day 5, 10:00",
-      "true_agent_id": "richard",
-      "predicted_agent_id": "chen",
-      "correct": false,
-      "confidence": 0.7,
-      "reasoning": "Emotional guardedness and calm under pressure make silent withdrawal a likely coping response for Chen; he\u2019s prone to retreat rather than verbalize feelings.",
-      "action": "WITHDRAW",
-      "speech": ""
-    },
-    {
-      "tick": 187,
-      "time_str": "Day 8, 19:00",
-      "true_agent_id": "rosa",
-      "predicted_agent_id": "richard",
-      "correct": false,
-      "confidence": 0.9,
-      "reasoning": "References to 'twenty years' and an authoritative, guilt-tinged lash-out fit the CEO/founder persona; the aggressive, defensive tone aligns with Richard's temperament and tendency to snap when pressured.",
-      "action": "LASH_OUT",
-      "speech": "\"[NAME], shut the hell up \u2014 twenty years of what, huh? And [NAME], don't test me tonight or"
-    },
-    {
-      "tick": 187,
-      "time_str": "Day 8, 19:00",
-      "true_agent_id": "chen",
-      "predicted_agent_id": "diana",
-      "correct": false,
-      "confidence": 0.85,
-      "reasoning": "Tone is firm, directive, and corrective while aimed at de-escalation\u2014fits an empathetic, authoritative HR director who intervenes to calm workplace conflict.",
-      "action": "IDLE",
-      "speech": "[NAME], knock it off\u2014lower your voice and sit down. You're not helping anyone with this."
-    },
-    {
-      "tick": 187,
-      "time_str": "Day 8, 19:00",
+      "tick": 72,
+      "time_str": "Day 4, 00:00",
       "true_agent_id": "jake",
       "predicted_agent_id": "jake",
       "correct": true,
+      "confidence": 0.8,
+      "reasoning": "Casual, youthful tone and informal setting ('chilling at the apartment') plus a mix of humor and vulnerable plea for someone 'steady' fits Jake's carefree, avoidant style that masks neediness.",
+      "action": "REST",
+      "speech": "Hey [NAME]\u2014I'm just chilling at the apartment, but real talk: I could use one steady person in my corner. Wanna grab coffee tomorrow?"
+    },
+    {
+      "tick": 72,
+      "time_str": "Day 4, 00:00",
+      "true_agent_id": "diana",
+      "predicted_agent_id": "invalid",
+      "correct": false,
+      "confidence": 0.0,
+      "reasoning": "Unparseable judge output: {\n  \"predicted_agent_id\": \"diana\",\n  \"confidence\": 0. nine,\n  \"reasoning\": \"The line is empathetic, steady, and supportive\u2014matching Diana's role as the 'company heart' who comforts",
+      "action": "REST",
+      "speech": "[NAME], can we sit for a minute? I'm here\u2014tell me what's on your mind and we'll figure it out together."
+    },
+    {
+      "tick": 72,
+      "time_str": "Day 4, 00:00",
+      "true_agent_id": "richard",
+      "predicted_agent_id": "diana",
+      "correct": false,
       "confidence": 0.75,
-      "reasoning": "Casual, slangy tone ('plastered', 'hey man'), humor as a defense ('putting on my zen face') and seeking a buddy to intervene fits Jake's carefree, avoidant coping style more than the others.",
+      "reasoning": "The line is soothing and protective, deflecting worry to spare someone else and promising to shoulder consequences later\u2014matching Diana's empathetic, burden-bearing HR 'company heart' persona.",
+      "action": "REST",
+      "speech": "I'm fine \u2014 don't let this keep you up. I'll handle the fallout tomorrow, now get some sleep."
+    },
+    {
+      "tick": 82,
+      "time_str": "Day 4, 10:00",
+      "true_agent_id": "rosa",
+      "predicted_agent_id": "rosa",
+      "correct": true,
+      "confidence": 0.85,
+      "reasoning": "Expresses acute personal financial fear (rent) and fierce demand for answers when cornered\u2014matches Rosa\u2019s background of poverty, anxiety, and protective fierceness.",
+      "action": "WORK",
+      "speech": "(voice steady but tight) [NAME]\u2014are the rumors about layoffs true? People need answers now; my rent and everyone\u2019s jobs are on the line."
+    },
+    {
+      "tick": 82,
+      "time_str": "Day 4, 10:00",
+      "true_agent_id": "chen",
+      "predicted_agent_id": "chen",
+      "correct": true,
+      "confidence": 0.7,
+      "reasoning": "Tone is terse, authoritative and procedural\u2014scheduling an all\u2011hands and directing questions fits a methodical, emotionally guarded operations manager rather than the more empathetic HR or guilt\u2011ridden CEO.",
+      "action": "WORK",
+      "speech": "Enough\u2014no more rumors. I\u2019ll address this at the 11:00 all\u2011hands; bring questions to me or [NAME] now and stop spreading speculation."
+    },
+    {
+      "tick": 82,
+      "time_str": "Day 4, 10:00",
+      "true_agent_id": "jake",
+      "predicted_agent_id": "jake",
+      "correct": true,
+      "confidence": 0.85,
+      "reasoning": "The flippant, joking take on layoffs and casual shrug fits a carefree, avoidant young rep who uses humor as defense\u2014matches Jake's temperament and social tone.",
+      "action": "WORK",
+      "speech": "Grabs a coffee, shrugs: \"So are we swapping resumes or just office plants when the cuts hit? Seriously\u2014anyone got legit news or are we just trading apocalypse fan fiction?\""
+    },
+    {
+      "tick": 82,
+      "time_str": "Day 4, 10:00",
+      "true_agent_id": "diana",
+      "predicted_agent_id": "invalid",
+      "correct": false,
+      "confidence": 0.0,
+      "reasoning": "Unparseable judge output: {\n  \"predicted_agent_id\": \"diana\",\n  \"confidence\": 0. nine,\n  \"reasoning\": \"Tone is calm, empathetic and managerial\u2014defusing panic and inviting people to seek support fits the HR d",
+      "action": "HELP_OTHERS",
+      "speech": "(soft, controlled) Everyone\u2014let\u2019s not let whispers take over the day; management hasn\u2019t confirmed anything, and panic won\u2019t help anyone. If you\u2019re worried, come find"
+    },
+    {
+      "tick": 82,
+      "time_str": "Day 4, 10:00",
+      "true_agent_id": "richard",
+      "predicted_agent_id": "diana",
+      "correct": false,
+      "confidence": 0.7,
+      "reasoning": "The line is empathetic and team-centered, promising to hold people together\u2014matching Diana's role as the company's 'heart' who reassures and protects staff during uncertainty.",
+      "action": "WORK",
+      "speech": "Listen\u2014I'm sorry for the uncertainty; I won't let this fracture the team"
+    },
+    {
+      "tick": 106,
+      "time_str": "Day 5, 10:00",
+      "true_agent_id": "rosa",
+      "predicted_agent_id": "rosa",
+      "correct": true,
+      "confidence": 0.85,
+      "reasoning": "The direct, anxious demand about fixing the problem and explicit mention of bills fits Rosa's background of financial insecurity, fierce when cornered, and urgent, practical tone.",
       "action": "SEEK_COMFORT",
-      "speech": "Hey man, [NAME]'s plastered and yelling about \"twenty years\" at [NAME] and [NAME]\u2014I'm putting on my zen face but I'm this close to losing it; can you come by?"
+      "speech": "[NAME]\u2014talk to me straight: what are you doing right now to fix this? I have bills"
+    },
+    {
+      "tick": 106,
+      "time_str": "Day 5, 10:00",
+      "true_agent_id": "chen",
+      "predicted_agent_id": "diana",
+      "correct": false,
+      "confidence": 0.86,
+      "reasoning": "The combination of physical reassurance, empathetic tone, and directive calming plus problem-solving fits Diana\u2019s \u2018company heart\u2019 role\u2014strong, nurturing and focused on carrying others\u2019 burdens while organizing a solution.",
+      "action": "HELP_OTHERS",
+      "speech": "Places a hand on [NAME]'s shoulder. \"Breathe with me. Tell me exactly what's happened so we can sort this before it spirals.\""
+    },
+    {
+      "tick": 106,
+      "time_str": "Day 5, 10:00",
+      "true_agent_id": "jake",
+      "predicted_agent_id": "jake",
+      "correct": true,
+      "confidence": 0.85,
+      "reasoning": "The speaker uses flippant humor and avoidance (\u2018Heh\u2026guess they finally realized I was too much of a handful\u2019) to downplay the situation and immediately pivots to practical self-interest (asking about severance), matching Jake\u2019s carefree, defensive coping style.",
+      "action": "WITHDRAW",
+      "speech": "Heh\u2014well, guess they finally realized I was too much of a handful. So what\u2019s the severance,"
+    },
+    {
+      "tick": 106,
+      "time_str": "Day 5, 10:00",
+      "true_agent_id": "diana",
+      "predicted_agent_id": "richard",
+      "correct": false,
+      "confidence": 0.75,
+      "reasoning": "The line expresses heavy, guilt-laden responsibility and authoritative urgency about keeping the team intact\u2014traits matching Richard's founder/CEO guilt and tendency to shoulder blame.",
+      "action": "SEEK_COMFORT",
+      "speech": "[NAME], can you step outside with me for a minute? I need your help keeping the team steady\u2014if this splinters on my watch I won't forgive myself."
+    },
+    {
+      "tick": 106,
+      "time_str": "Day 5, 10:00",
+      "true_agent_id": "richard",
+      "predicted_agent_id": "richard",
+      "correct": true,
+      "confidence": 0.9,
+      "reasoning": "The act of pouring a drink and a slow, guilt-laden apology fits Richard's profile\u2014an authoritative, guilt-ridden CEO who drinks to cope and would withdraw while expressing remorse.",
+      "action": "WITHDRAW",
+      "speech": "(pours a drink, sets it down with a slow breath) I know this hurts\u2014I'm sorry"
+    },
+    {
+      "tick": 187,
+      "time_str": "Day 8, 19:00",
+      "true_agent_id": "rosa",
+      "predicted_agent_id": "rosa",
+      "correct": true,
+      "confidence": 0.7,
+      "reasoning": "The line is emotionally charged and reactive\u2014fits Rosa's anxious, warm temperament that becomes fierce when cornered; abruptly leaving and delegating handling of a difficult person matches her coping style.",
+      "action": "FLEE",
+      "speech": "Stands, grabs her coat. \"I'm done\u2014I'm leaving. Someone deal with [NAME]; I can't be around this.\""
+    },
+    {
+      "tick": 187,
+      "time_str": "Day 8, 19:00",
+      "true_agent_id": "chen",
+      "predicted_agent_id": "invalid",
+      "correct": false,
+      "confidence": 0.0,
+      "reasoning": "Unparseable judge output: {\n  \"predicted_agent_id\": \"diana\",\n  \"confidence\": 0. nine,\n  \"reasoning\": \"This is a calm, de-escalating, people-centered intervention typical of an HR director who mediates confl",
+      "action": "HELP_OTHERS",
+      "speech": "[NAME], that\u2019s enough\u2014go outside if you need to keep yelling, now. [NAME], come with me for a minute; let\u2019s step over here and talk."
+    },
+    {
+      "tick": 187,
+      "time_str": "Day 8, 19:00",
+      "true_agent_id": "jake",
+      "predicted_agent_id": "jake",
+      "correct": true,
+      "confidence": 0.7,
+      "reasoning": "The line is sarcastic, dismissive, and avoids engagement\u2014matching Jake's carefree, avoidant humor and tendency to withdraw from serious moments.",
+      "action": "WITHDRAW",
+      "speech": "\"Wow, twenty years of unsolicited history\u2014okay, time"
     },
     {
       "tick": 187,
@@ -431,21 +428,21 @@
       "true_agent_id": "diana",
       "predicted_agent_id": "diana",
       "correct": true,
-      "confidence": 0.9,
-      "reasoning": "The calming, steady physical reassurance combined with empathetic but firm language fits Diana\u2019s \u2018company heart\u2019 persona and parental tone\u2014calm, strong, carrying others\u2019 emotions.",
-      "action": "IDLE",
-      "speech": "(placing a steady hand on his arm) [NAME], please lower your voice \u2014 I\u2019m furious about what they did, but yelling won\u2019t"
+      "confidence": 0.8,
+      "reasoning": "The line is a calm, firm, de-escalating, and compassionate intervention typical of an HR director who carries others' burdens and seeks private, constructive resolution.",
+      "action": "HELP_OTHERS",
+      "speech": "[NAME]\u2014enough. Come with me outside for a minute so we can talk this through quietly; yelling isn\u2019t helping anyone."
     },
     {
       "tick": 187,
       "time_str": "Day 8, 19:00",
       "true_agent_id": "richard",
-      "predicted_agent_id": "chen",
-      "correct": false,
-      "confidence": 0.65,
-      "reasoning": "Neutral, reserved silence best matches Chen's calm, emotionally guarded, methodical coping style\u2014he's most likely to remain idle and say nothing.",
+      "predicted_agent_id": "richard",
+      "correct": true,
+      "confidence": 0.7,
+      "reasoning": "The terse, authoritative plea for reliability sounds like a CEO under pressure asking for one dependable person; fits Richard's responsibility-heavy, commanding tone.",
       "action": "IDLE",
-      "speech": ""
+      "speech": "[NAME], I need one steady person"
     }
   ]
 }

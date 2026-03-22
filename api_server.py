@@ -451,6 +451,153 @@ async def health():
     }
 
 
+# ─── World Simulation Viewer API ────────────────────────────────────────────
+
+@app.get("/api/world/snapshot")
+async def get_world_snapshot():
+    """Serve the world simulation snapshot for the 3D viewer.
+
+    Prefer a generated simulation snapshot from artifacts/, but fall back to
+    the checked-in frontend mock so the UI stays wired to the backend even
+    before a fresh export has been produced.
+    """
+    from fastapi.responses import FileResponse
+
+    root = Path(__file__).parent
+    generated_snapshot = root / "artifacts" / "world_snapshot.json"
+    mock_snapshot = root / "frontend" / "public" / "mock_snapshot.json"
+
+    if generated_snapshot.exists():
+        snapshot_path = generated_snapshot
+        snapshot_source = "generated"
+    elif mock_snapshot.exists():
+        snapshot_path = mock_snapshot
+        snapshot_source = "mock"
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "No world snapshot found. Run: "
+                "python -m examples.learned_brain.world_sim.export_snapshot "
+                "or generate frontend/public/mock_snapshot.json"
+            ),
+        )
+    return FileResponse(
+        snapshot_path,
+        media_type="application/json",
+        headers={
+            "Cache-Control": "public, max-age=60",
+            "X-World-Snapshot-Source": snapshot_source,
+        },
+    )
+
+
+@app.get("/api/world/stream")
+async def stream_world_simulation(
+    scenario: str = "small_town",
+    ticks: int = 360,
+    speed: float = 1.0,
+):
+    """SSE stream — runs the simulation live and emits one tick at a time.
+
+    The 3D viewer connects here for expanding-world mode.
+    Each tick is emitted as an SSE `tick` event.
+
+    Query params:
+        scenario: "small_town" or "large_town"
+        ticks:    number of ticks to simulate
+        speed:    seconds between ticks (default 1.0)
+    """
+    async def generate():
+        try:
+            import sys
+            sys.path.insert(0, str(Path(__file__).parent / "examples" / "learned_brain"))
+            from world_sim.scenarios import build_small_town
+            from world_sim.world import World
+
+            world = build_small_town()
+            world.initialize()
+
+            # Emit locations + agents first
+            locations_data = {
+                lid: {"id": lid, "name": loc.name, "default_activity": loc.default_activity}
+                for lid, loc in world.locations.items()
+            }
+            agents_data = {
+                aid: {
+                    "id": aid, "name": a.personality.name,
+                    "background": a.personality.background,
+                    "temperament": a.personality.temperament,
+                    "identity_tags": list(a.identity_tags),
+                    "coalitions": list(a.coalitions),
+                    "rival_coalitions": list(a.rival_coalitions),
+                    "private_burden": a.private_burden,
+                }
+                for aid, a in world.agents.items()
+            }
+            yield f"event: locations\ndata: {json.dumps(locations_data)}\n\n"
+            yield f"event: agents\ndata: {json.dumps(agents_data)}\n\n"
+
+            for _ in range(ticks):
+                summary = world.tick()
+
+                agent_states = {}
+                for aid, agent in world.agents.items():
+                    agent_states[aid] = agent.get_dashboard_state()
+                    rels = []
+                    for other_id, rel in world.relationships.get_agent_relationships(aid)[:6]:
+                        other_name = world.agents[other_id].personality.name if other_id in world.agents else other_id
+                        rels.append({
+                            "other_id": other_id, "other_name": other_name,
+                            "trust": round(rel.trust, 2), "warmth": round(rel.warmth, 2),
+                            "resentment_toward": round(world.relationships.get_resentment(aid, other_id), 2),
+                            "resentment_from": round(world.relationships.get_resentment(other_id, aid), 2),
+                            "grievance_toward": round(world.relationships.get_grievance(aid, other_id), 2),
+                            "grievance_from": round(world.relationships.get_grievance(other_id, aid), 2),
+                            "debt_toward": round(world.relationships.get_debt(aid, other_id), 2),
+                            "debt_from": round(world.relationships.get_debt(other_id, aid), 2),
+                            "alliance_strength": round(rel.alliance_strength, 2),
+                            "rivalry": round(rel.rivalry, 2),
+                            "support_events": rel.support_events,
+                            "conflict_events": rel.conflict_events,
+                            "betrayal_events": rel.betrayal_events,
+                        })
+                    agent_states[aid]["relationships"] = rels
+                    agent_states[aid]["recent_memories"] = [
+                        {"tick": m.tick, "description": m.description,
+                         "valence": round(m.valence_at_time, 2), "other": m.other_agent_id}
+                        for m in agent.get_recent_memories(8)
+                    ]
+
+                tick_data = {
+                    "tick": summary["tick"],
+                    "time": summary["time"],
+                    "events": summary["events"],
+                    "interactions": summary["interactions"],
+                    "agent_states": agent_states,
+                }
+                yield f"event: tick\ndata: {json.dumps(tick_data)}\n\n"
+                await asyncio.sleep(speed)
+
+            yield "event: done\ndata: {}\n\n"
+
+        except ImportError as e:
+            yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
+        except Exception as e:
+            traceback.print_exc()
+            yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            "Connection": "keep-alive",
+        },
+    )
+
+
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":

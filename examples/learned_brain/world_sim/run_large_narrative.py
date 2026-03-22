@@ -23,8 +23,9 @@ from collections import defaultdict
 
 import openai
 
+from .dynamic_events import DISTRICT_MAP, DynamicEventEngine, compute_district_stats
 from .scenarios_large import build_large_town
-from .world import World, ScheduledEvent
+from .world import World
 from .world_agent import WorldAgent
 from .action_table import Action, get_action_description
 
@@ -69,37 +70,6 @@ class NarratorLLM:
                 self.total_output_tokens * 0.60 / 1e6)
 
 
-# ─── District mapping ─────────────────────────────────────────────────────────
-
-DISTRICT_MAP = {
-    "factory_floor": "Industrial Quarter",
-    "warehouse": "Industrial Quarter",
-    "workers_canteen": "Industrial Quarter",
-    "office_tower": "Downtown",
-    "trading_floor": "Downtown",
-    "downtown_cafe": "Downtown",
-    "lecture_hall": "University District",
-    "library": "University District",
-    "student_union": "University District",
-    "main_market": "Market District",
-    "food_court": "Market District",
-    "artisan_alley": "Market District",
-    "docks": "Waterfront",
-    "fish_market": "Waterfront",
-    "harbor_bar": "Waterfront",
-    "city_hall": "Government Hill",
-    "courthouse": "Government Hill",
-    "gov_offices": "Government Hill",
-    "hospital": "Suburbs North",
-    "north_school": "Suburbs North",
-    "north_homes": "Suburbs North",
-    "community_center": "Suburbs South",
-    "south_homes": "Suburbs South",
-    "central_park": "Central",
-    "central_bar": "Central",
-}
-
-
 # ─── Prompt Builders ─────────────────────────────────────────────────────────
 
 SYSTEM_PROMPT = """You are the narrative voice of a city-wide crisis simulation with 300 characters across 8 districts. Write vivid, concise prose. Use dialogue in quotes. Show don't tell. Match emotional intensity to character state. Keep it grounded and human. Reference the specific district/location."""
@@ -108,6 +78,10 @@ SYSTEM_PROMPT = """You are the narrative voice of a city-wide crisis simulation 
 def _agent_card(agent: WorldAgent) -> str:
     s = agent.heart
     wounds = f", carrying {len(s.wounds)} emotional wound(s)" if s.wounds else ""
+    futures = "\n".join(
+        f"- {branch['label']}: {branch['summary']}"
+        for branch in agent.get_future_branches()
+    )
     return (
         f"{agent.personality.name}: {agent.personality.background}\n"
         f"Temperament: {agent.personality.temperament}\n"
@@ -115,7 +89,9 @@ def _agent_card(agent: WorldAgent) -> str:
         f"divergence: {s.divergence:.1f})\n"
         f"Arousal: {s.arousal:.2f} | Valence: {s.valence:.2f} | "
         f"Tension: {s.tension:.2f} | Energy: {s.energy:.2f} | "
-        f"Vulnerability: {s.vulnerability:.2f}{wounds}"
+        f"Vulnerability: {s.vulnerability:.2f}{wounds}\n"
+        f"{agent.render_subjective_brief()}\n"
+        f"Near futures:\n{futures}"
     )
 
 
@@ -291,84 +267,10 @@ Capture the day's arc. What shifted? What's building?"""
     return SYSTEM_PROMPT, user
 
 
-# ─── Ripple detection ─────────────────────────────────────────────────────────
+# ─── Dynamic event hooks ──────────────────────────────────────────────────────
 
 SOLO_NARRATE_ACTIONS = {"COLLAPSE", "LASH_OUT", "FLEE", "WITHDRAW", "RUMINATE",
                         "SEEK_COMFORT", "CONFRONT"}
-
-
-def detect_ripple_events(world: World, summary: dict, agent_meta: dict) -> list[ScheduledEvent]:
-    """Detect conditions that should generate new events for the next tick."""
-    ripples = []
-    next_tick = world.tick_count + 1
-
-    # Group agents by location
-    by_location: dict[str, list[WorldAgent]] = defaultdict(list)
-    for agent in world.agents.values():
-        by_location[agent.location].append(agent)
-
-    for loc, agents in by_location.items():
-        if len(agents) < 5:
-            continue
-
-        avg_valence = sum(a.heart.valence for a in agents) / len(agents)
-        avg_vulnerability = sum(a.heart.vulnerability for a in agents) / len(agents)
-
-        # Crowd distress → tension event
-        if avg_valence < 0.25 and len(agents) >= 8:
-            ripples.append(ScheduledEvent(
-                tick=next_tick,
-                location=loc,
-                description=f"Tension boils over at {loc}. The crowd's collective anxiety becomes palpable.",
-                emotional_text="Everyone around me is falling apart. The tension is unbearable. I can feel the group's despair pulling me under.",
-            ))
-
-    # Agent extreme actions → witness events
-    for agent in world.agents.values():
-        if agent.last_action == "LASH_OUT":
-            ripples.append(ScheduledEvent(
-                tick=next_tick,
-                location=agent.location,
-                description=f"{agent.personality.name} erupted in an angry outburst, shocking everyone nearby.",
-                emotional_text="Someone just lost control and started screaming. I feel scared and unsettled.",
-            ))
-        elif agent.last_action == "COLLAPSE":
-            ripples.append(ScheduledEvent(
-                tick=next_tick,
-                location=agent.location,
-                description=f"{agent.personality.name} collapsed, overwhelmed by exhaustion and despair.",
-                emotional_text="Someone just broke down completely. It's heartbreaking and frightening to witness.",
-            ))
-
-    # Limit ripples to avoid event explosion
-    return ripples[:5]
-
-
-def compute_district_stats(world: World) -> dict[str, dict]:
-    """Compute per-district aggregate statistics."""
-    district_agents: dict[str, list[WorldAgent]] = defaultdict(list)
-    for agent in world.agents.values():
-        district = DISTRICT_MAP.get(agent.location, "Other")
-        district_agents[district].append(agent)
-
-    stats = {}
-    for district, agents in district_agents.items():
-        if not agents:
-            continue
-        n = len(agents)
-        emotions = defaultdict(int)
-        for a in agents:
-            emotions[a.heart.internal_emotion] += 1
-        top_emotion = max(emotions, key=emotions.get)
-
-        stats[district] = {
-            "count": n,
-            "avg_valence": sum(a.heart.valence for a in agents) / n,
-            "avg_energy": sum(a.heart.energy for a in agents) / n,
-            "avg_vulnerability": sum(a.heart.vulnerability for a in agents) / n,
-            "top_emotion": top_emotion,
-        }
-    return stats
 
 
 # ─── Main narrative runner ────────────────────────────────────────────────────
@@ -395,6 +297,7 @@ async def run_large_narrative(
 
     world, agent_meta = build_large_town()
     world.initialize()
+    event_engine = DynamicEventEngine()
 
     total_ticks = days * 24
     md: list[str] = []
@@ -434,7 +337,7 @@ async def run_large_narrative(
         interactions = summary.get("interactions", [])
 
         # Detect ripple events and inject for next tick
-        ripples = detect_ripple_events(world, summary, agent_meta)
+        ripples = event_engine.generate(world, summary, agent_meta)
         for ripple in ripples:
             world.schedule_event(ripple)
 

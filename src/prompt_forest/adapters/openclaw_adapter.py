@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from ..core.engine import PromptForestEngine
+from ..modes.orchestrator import ModeOrchestrator
 
 
 @dataclass
@@ -22,13 +23,13 @@ class OpenClawTrajectory:
 class OpenClawAdapter:
     """Adapter that lets an OpenClaw-style runtime call into prompt-forest adaptation."""
 
-    def __init__(self, engine: PromptForestEngine) -> None:
+    def __init__(self, engine: PromptForestEngine | ModeOrchestrator) -> None:
         self.engine = engine
 
     def process_trajectory(self, trajectory: OpenClawTrajectory) -> dict[str, Any]:
         event = asdict(trajectory)
         result = self.engine.openclaw_ingest(event)
-        return {
+        payload = {
             "episode_id": trajectory.episode_id,
             "selected_branch": result["evaluation_signal"]["selected_branch"],
             "reward": result["evaluation_signal"]["reward_score"],
@@ -36,3 +37,12 @@ class OpenClawAdapter:
             "routing": result["routing"],
             "optimization": result["optimization"],
         }
+        brain_output = result.get("brain_output")
+        if brain_output:
+            payload["brain_output"] = brain_output
+        if hasattr(self.engine, "get_brain_state"):
+            try:
+                payload["brain_state"] = self.engine.get_brain_state().to_dict()
+            except RuntimeError:
+                pass
+        return payload

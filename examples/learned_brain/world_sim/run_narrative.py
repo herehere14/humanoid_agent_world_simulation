@@ -75,13 +75,19 @@ SYSTEM_PROMPT = """You are the narrative voice of a small-town drama simulation.
 def _agent_card(agent: WorldAgent) -> str:
     s = agent.heart
     wounds_str = f", carrying {len(s.wounds)} emotional wound(s)" if s.wounds else ""
+    futures = "\n".join(
+        f"- {branch['label']}: {branch['summary']}"
+        for branch in agent.get_future_branches()
+    )
     return (
         f"{agent.personality.name}: {agent.personality.background}\n"
         f"Temperament: {agent.personality.temperament}\n"
         f"Feeling: {s.internal_emotion} (showing: {s.surface_emotion}, divergence: {s.divergence:.1f})\n"
         f"Arousal: {s.arousal:.2f} | Valence: {s.valence:.2f} | Tension: {s.tension:.2f} | "
         f"Energy: {s.energy:.2f} | Vulnerability: {s.vulnerability:.2f} | "
-        f"Impulse control: {s.impulse_control:.2f}{wounds_str}"
+        f"Impulse control: {s.impulse_control:.2f}{wounds_str}\n"
+        f"{agent.render_subjective_brief()}\n"
+        f"Near futures:\n{futures}"
     )
 
 

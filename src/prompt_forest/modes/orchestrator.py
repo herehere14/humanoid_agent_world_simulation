@@ -28,11 +28,13 @@ from uuid import uuid4
 
 from ..backend.base import LLMBackend
 from ..backend.mock import MockLLMBackend
+from ..agents.optimizer_agent import OptimizationEvent
+from ..brain import BrainController, BrainOutput, BrainState
 from ..branches.base import PromptBranch
 from ..config import EngineConfig, load_config
 from ..core.engine import PromptForestEngine
 from ..state.human_state import DriveConflict, HumanState
-from ..types import RoutingDecision, TaskInput
+from ..types import MemoryRecord, RoutingDecision, TaskInput
 from .human_mode.branches import create_human_mode_forest
 from .human_mode.evaluator import HumanModeEvaluator
 from .human_mode.memory import HumanModeMemory
@@ -90,6 +92,8 @@ class ModeOrchestrator:
         self.human_router: HumanModeRouter | None = None
         self.human_evaluator: HumanModeEvaluator | None = None
         self.human_memory: HumanModeMemory | None = None
+        self.brain_controller: BrainController | None = None
+        self._last_brain_output: BrainOutput | None = None
 
     def _init_human_mode(
         self,
@@ -131,6 +135,8 @@ class ModeOrchestrator:
             trauma_amplification=hmc.trauma_amplification,
             experience_bias_strength=hmc.experience_bias_strength,
         )
+        self.brain_controller = BrainController()
+        self._last_brain_output: BrainOutput | None = None
 
     # ── Public API ────────────────────────────────────────────────────────
 
@@ -140,15 +146,34 @@ class ModeOrchestrator:
         task_type: str = "auto",
         metadata: dict[str, Any] | None = None,
         event_callback: Callable[[dict[str, Any]], None] | None = None,
+        *,
+        adapt: bool = False,
+        update_memory: bool = True,
+        acceptance_runner: Callable[..., bool] | None = None,
     ) -> dict[str, Any]:
         """Run a task through the appropriate mode pipeline.
 
         This is the main entry point for both modes.
         """
         if self.mode == OperatingMode.AGENT_IMPROVEMENT:
-            return self._run_agent_mode(text, task_type, metadata, event_callback)
+            return self._run_agent_mode(
+                text,
+                task_type,
+                metadata,
+                event_callback,
+                adapt=adapt,
+                update_memory=update_memory,
+            )
         else:
-            return self._run_human_mode(text, task_type, metadata, event_callback)
+            return self._run_human_mode(
+                text,
+                task_type,
+                metadata,
+                event_callback,
+                adapt=adapt,
+                update_memory=update_memory,
+                acceptance_runner=acceptance_runner,
+            )
 
     def inject_event(self, event_type: str, intensity: float = 0.5) -> dict[str, Any]:
         """Inject an external event into the human state (Human Mode only)."""
@@ -184,7 +209,37 @@ class ModeOrchestrator:
             ]
         if self.human_memory is not None:
             result["experiential_memory_count"] = self.human_memory.memory_count
+        if self.brain_controller is not None and self.human_state is not None:
+            result["brain_state"] = self.get_brain_state().to_dict()
+            if self._last_brain_output is not None:
+                result["last_brain_output"] = self._last_brain_output.to_dict()
         return result
+
+    def get_brain_state(self) -> BrainState:
+        """Return the current portable latent-state summary for external agents."""
+        if self.brain_controller is None or self.human_state is None:
+            raise RuntimeError("Brain state is only available in human_mode")
+        return self.brain_controller.build_state(self.human_state)
+
+    def get_last_brain_output(self) -> BrainOutput | None:
+        """Return the most recent brain control surface, if any."""
+        return self._last_brain_output
+
+    def openclaw_ingest(self, trajectory_event: dict[str, Any]) -> dict[str, Any]:
+        """Compatibility hook for external runtimes that want the brain layer."""
+        metadata = {
+            "expected_keywords": trajectory_event.get("expected_keywords", []),
+            "required_substrings": trajectory_event.get("required_checks", []),
+            "trajectory": trajectory_event,
+            "user_id": trajectory_event.get("user_id", "global"),
+        }
+        return self.run_task(
+            text=str(trajectory_event.get("task", "") or ""),
+            task_type=str(trajectory_event.get("task_type", "auto") or "auto"),
+            metadata=metadata,
+            adapt=bool(trajectory_event.get("adapt", False)),
+            update_memory=bool(trajectory_event.get("update_memory", True)),
+        )
 
     # ── Agent Improvement Mode pipeline ───────────────────────────────────
 
@@ -194,13 +249,18 @@ class ModeOrchestrator:
         task_type: str,
         metadata: dict[str, Any] | None,
         event_callback: Callable[[dict[str, Any]], None] | None,
+        *,
+        adapt: bool,
+        update_memory: bool,
     ) -> dict[str, Any]:
         """Passthrough to standard engine. No behaviour change."""
-        result = self.engine.run_task(
+        result = self.engine.run_task_controlled(
             text=text,
             task_type=task_type,
             metadata=metadata,
             event_callback=event_callback,
+            adapt=adapt,
+            update_memory=update_memory,
         )
         result["mode"] = "agent_improvement"
         return result
@@ -213,6 +273,10 @@ class ModeOrchestrator:
         task_type: str,
         metadata: dict[str, Any] | None,
         event_callback: Callable[[dict[str, Any]], None] | None,
+        *,
+        adapt: bool,
+        update_memory: bool,
+        acceptance_runner: Callable[..., bool] | None,
     ) -> dict[str, Any]:
         """Full human-mode pipeline with state, conflicts, and experiential memory."""
         assert self.human_state is not None
@@ -344,7 +408,32 @@ class ModeOrchestrator:
             "emotional_valence": exp_mem.emotional_valence,
         })
 
-        # Step 10: Also update the core engine's memory for weight adaptation
+        selected_path = self.engine._selected_path(route, signal.selected_branch)
+        routing_context_key = ""
+        if len(selected_path) >= 2:
+            routing_context_key = self.engine.memory.routing_context_key_for_task(
+                task,
+                parent_id=selected_path[-2],
+            )
+        reward_components = self.engine._compute_reward_components(
+            task,
+            signal.selected_output,
+            signal.reward_score,
+        )
+        brain_output = self.brain_controller.build_output(
+            state=self.human_state,
+            route=route,
+            conflicts=resolved_conflicts,
+            human_memory=self.human_memory,
+            branch_weights={
+                name: b.state.weight
+                for name, b in self.engine.branches.items()
+                if not b.state.metadata.get("category_node")
+            },
+        )
+        self._last_brain_output = brain_output
+
+        # Step 10: Also update the core engine for weight adaptation
         optimize_started = perf_counter()
         self.engine._propagate_rewards_along_path(route, signal, gamma=0.9, local_mix=0.55)
         # Apply branch rewards
@@ -352,7 +441,59 @@ class ModeOrchestrator:
             branch = self.engine.branches.get(branch_name)
             if branch:
                 branch.apply_reward(fb.reward)
+        if adapt:
+            optimize_event: OptimizationEvent = self.engine.optimizer_agent.optimize(
+                task=task,
+                route=route,
+                signal=signal,
+                branches=self.engine.branches,
+                memory=self.engine.memory,
+                acceptance_runner=acceptance_runner or self.engine._mini_holdout_acceptance,
+            )
+            self.engine._attach_created_candidates(
+                route,
+                optimize_event,
+                selected_branch=signal.selected_branch,
+            )
+        else:
+            optimize_event = OptimizationEvent(
+                updated_weights={},
+                update_details={},
+                rewritten_prompts=[],
+                promoted_candidates=[],
+                archived_candidates=[],
+                created_candidates=[],
+                advisor_used=False,
+                advisor_error="",
+            )
         timings["optimize_ms"] = round((perf_counter() - optimize_started) * 1000, 3)
+
+        # Step 11: Mirror the core engine memory path so acceptance gates and
+        # routing preferences can use human-mode episodes too.
+        memory_started_core = perf_counter()
+        record = MemoryRecord(
+            task_id=task.task_id,
+            task_type=route.task_type,
+            input_text=task.text,
+            activated_branches=route.activated_branches,
+            branch_outputs={name: out.output for name, out in outputs.items()},
+            selected_branch=signal.selected_branch,
+            selected_output=signal.selected_output,
+            reward_score=signal.reward_score,
+            failure_reason=signal.failure_reason,
+            confidence=signal.confidence,
+            useful_patterns=self.engine.memory.useful_patterns(route.task_type),
+            branch_rewards={name: fb.reward for name, fb in signal.branch_feedback.items()},
+            selected_path=selected_path,
+            routing_context_key=routing_context_key,
+            user_id=str(task.metadata.get("user_id", "global")).strip() or "global",
+            task_metadata=task.metadata,
+            reward_components=reward_components,
+        )
+        if update_memory:
+            self.engine.memory.add(record)
+            self.engine._record_route_preferences(task, route, signal)
+        timings["core_memory_ms"] = round((perf_counter() - memory_started_core) * 1000, 3)
 
         timings["total_ms"] = round((perf_counter() - started_at) * 1000, 3)
 
@@ -379,11 +520,19 @@ class ModeOrchestrator:
                 "count": self.human_memory.memory_count,
                 "latest_tags": exp_mem.tags,
             },
+            "brain_output": brain_output.to_dict(),
             "timings": timings,
             "branch_weights": {
                 name: round(b.state.weight, 4)
                 for name, b in self.engine.branches.items()
                 if not b.state.metadata.get("category_node")
+            },
+            "optimization": {
+                "updated_weights": dict(optimize_event.updated_weights),
+                "rewritten_prompts": list(optimize_event.rewritten_prompts),
+                "created_candidates": list(optimize_event.created_candidates),
+                "promoted_candidates": list(optimize_event.promoted_candidates),
+                "archived_candidates": list(optimize_event.archived_candidates),
             },
         }
 

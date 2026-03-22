@@ -99,6 +99,22 @@ def print_agent_detail(world: World, agent_id: str):
     print(f"\n  Emotion: internal={dashboard['internal']}  surface={dashboard['surface']}  "
           f"divergence={dashboard['divergence']:.2f}")
 
+    print(f"\n  Private model:")
+    print(f"    Concern: {dashboard['primary_concern']}")
+    print(f"    Interpretation: {dashboard['interpretation']}")
+    print(f"    Blame focus: {dashboard['blame_target']}")
+    print(f"    Support target: {dashboard['support_target']}")
+    print(f"    Priority motive: {dashboard['priority_motive']}")
+    print(f"    Mask: {dashboard['mask_style']}")
+    print(f"    Action style: {dashboard['action_style']}")
+    print(f"    Inner voice: {dashboard['inner_voice']}")
+
+    branches = dashboard.get("future_branches", [])
+    if branches:
+        print(f"\n  Likely futures:")
+        for branch in branches:
+            print(f"    {branch['label']}: {branch['summary']}")
+
     # Relationships
     rels = dashboard.get("relationships", [])
     if rels:

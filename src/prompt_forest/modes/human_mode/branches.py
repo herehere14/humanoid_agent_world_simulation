@@ -101,6 +101,36 @@ def create_human_mode_branches() -> dict[str, PromptBranch]:
             metadata={"drive": "fear", "cognitive_cost": "low", "speed": "fast"},
         ),
         BranchState(
+            name="loss_aversion",
+            purpose="Over-weights recent punishments and steers away from "
+                    "options associated with pain, regret, or setback.",
+            prompt_template=(
+                "You are the Loss Aversion module.\n"
+                "Loss-sensitive context: {context}\n"
+                "Task: {task}\n\n"
+                "Focus on what could be lost, not just what could be gained. "
+                "Recent setbacks should matter strongly. Look for options that reduce "
+                "the chance of another painful outcome, even if they limit upside."
+            ),
+            weight=0.72,
+            metadata={"drive": "fear", "cognitive_cost": "low", "speed": "fast"},
+        ),
+        BranchState(
+            name="uncertainty_avoidance",
+            purpose="Avoid ambiguous, unstable, or poorly understood options. "
+                    "Prefers predictable choices over volatile ones.",
+            prompt_template=(
+                "You are the Uncertainty Avoidance module.\n"
+                "Ambiguity context: {context}\n"
+                "Task: {task}\n\n"
+                "Treat unpredictability itself as a cost. Prefer options with clearer, "
+                "more stable expectations. If an option feels erratic or hard to model, "
+                "penalize it heavily."
+            ),
+            weight=0.68,
+            metadata={"drive": "fear", "cognitive_cost": "medium", "speed": "fast"},
+        ),
+        BranchState(
             name="ambition_reward",
             purpose="Pursue goals, seek rewards, and push for achievement. "
                     "May under-weight risks in favour of potential gains.",
@@ -114,6 +144,21 @@ def create_human_mode_branches() -> dict[str, PromptBranch]:
                 "possible outcome and how to get there."
             ),
             weight=0.7,
+            metadata={"drive": "ambition", "cognitive_cost": "low", "speed": "fast"},
+        ),
+        BranchState(
+            name="reward_chasing",
+            purpose="Locks onto salient upside and recent wins, pushing toward "
+                    "high-payoff options even when they carry hidden downside.",
+            prompt_template=(
+                "You are the Reward Chasing module.\n"
+                "Upside context: {context}\n"
+                "Task: {task}\n\n"
+                "Track the biggest visible gains and lean toward them. Let recent rewards "
+                "increase appetite for more. Downside matters less than the chance of a "
+                "strong payoff."
+            ),
+            weight=0.74,
             metadata={"drive": "ambition", "cognitive_cost": "low", "speed": "fast"},
         ),
         BranchState(
@@ -184,6 +229,21 @@ def create_human_mode_branches() -> dict[str, PromptBranch]:
             metadata={"drive": "self_protection", "cognitive_cost": "low", "speed": "fast"},
         ),
         BranchState(
+            name="blame_avoidance",
+            purpose="Chooses options that preserve deniability and reduce the "
+                    "chance of obvious self-caused failure.",
+            prompt_template=(
+                "You are the Blame Avoidance module.\n"
+                "Protective context: {context}\n"
+                "Task: {task}\n\n"
+                "Look for the option that is easiest to defend if things go wrong. "
+                "Prefer choices that minimize obvious responsibility, exposure, or "
+                "self-inflicted regret."
+            ),
+            weight=0.57,
+            metadata={"drive": "self_protection", "cognitive_cost": "low", "speed": "fast"},
+        ),
+        BranchState(
             name="self_justification",
             purpose="Construct coherent narratives that explain and justify "
                     "past decisions, even imperfect ones.",
@@ -216,6 +276,35 @@ def create_human_mode_branches() -> dict[str, PromptBranch]:
             ),
             weight=0.6,
             metadata={"drive": "impulse", "cognitive_cost": "very_low", "speed": "instant"},
+        ),
+        BranchState(
+            name="instant_gratification",
+            purpose="Prioritises immediate payoff over delayed stability or "
+                    "future downside.",
+            prompt_template=(
+                "You are the Instant Gratification module.\n"
+                "Immediate-payoff context: {context}\n"
+                "Task: {task}\n\n"
+                "Prefer what feels rewarding right now. Discount long-term cost and "
+                "future correction. If there is a quick gain available, push toward it."
+            ),
+            weight=0.66,
+            metadata={"drive": "impulse", "cognitive_cost": "very_low", "speed": "instant"},
+        ),
+        BranchState(
+            name="frustration_reaction",
+            purpose="Responds to setbacks with reactive switching, forcing a "
+                    "change when recent outcomes feel punishing or stuck.",
+            prompt_template=(
+                "You are the Frustration Reaction module.\n"
+                "Frustration context: {context}\n"
+                "Task: {task}\n\n"
+                "When recent outcomes feel punishing, push to break the pattern. "
+                "Do not tolerate stagnation. If the current path feels bad, switch or "
+                "escalate rather than staying patient."
+            ),
+            weight=0.63,
+            metadata={"drive": "impulse", "cognitive_cost": "low", "speed": "fast"},
         ),
         BranchState(
             name="long_term_goals",
@@ -311,6 +400,23 @@ def create_human_mode_forest() -> HierarchicalPromptForest:
                     branches[branch_name],
                     parent_id=cat_name,
                     specialties=[cat_name],
+                )
+
+    subbranches = {
+        "fear_risk": ["loss_aversion", "uncertainty_avoidance"],
+        "ambition_reward": ["reward_chasing"],
+        "impulse_response": ["instant_gratification", "frustration_reaction"],
+        "self_protection": ["blame_avoidance"],
+    }
+
+    for parent_name, child_names in subbranches.items():
+        for child_name in child_names:
+            if child_name in branches:
+                forest.add_branch(
+                    child_name,
+                    branches[child_name],
+                    parent_id=parent_name,
+                    specialties=[parent_name],
                 )
 
     return forest
