@@ -1,0 +1,6 @@
+{
+  "seed": 11,
+  "full_holdout": 0.6783,
+  "frozen_holdout": 0.6825,
+  "gain": -0.0042
+}

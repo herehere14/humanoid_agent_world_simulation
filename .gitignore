@@ -2,6 +2,8 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .venv/
+.DS_Store
+*.egg-info/
 
 # Large data files
 *.pkl

@@ -1,0 +1,84 @@
+{
+  "config_path": "/Users/justin/Documents/New project/openclaw_closedsourcemodel_RL/artifacts/runtime_openai_fast_evalopt_round1.json",
+  "seeds": [
+    11,
+    17,
+    19
+  ],
+  "episodes": {
+    "train": 6,
+    "holdout": 8
+  },
+  "aggregate": {
+    "full_mean_holdout": 0.6229,
+    "frozen_mean_holdout": 0.6286,
+    "full_minus_frozen_holdout": -0.0057,
+    "full_over_frozen_win_rate": 0.3333,
+    "full_minus_frozen_ci95": [
+      -0.024,
+      0.01
+    ]
+  },
+  "per_seed": [
+    {
+      "seed": 11,
+      "full_holdout": 0.6277,
+      "frozen_holdout": 0.6308,
+      "gain": -0.0031,
+      "runtime": {
+        "full": {
+          "events": 14,
+          "evaluator_errors": 0,
+          "optimizer_errors": 0,
+          "evaluator_llm_events": 14
+        },
+        "frozen": {
+          "events": 14,
+          "evaluator_errors": 0,
+          "optimizer_errors": 0,
+          "evaluator_llm_events": 14
+        }
+      }
+    },
+    {
+      "seed": 17,
+      "full_holdout": 0.654,
+      "frozen_holdout": 0.644,
+      "gain": 0.01,
+      "runtime": {
+        "full": {
+          "events": 14,
+          "evaluator_errors": 0,
+          "optimizer_errors": 0,
+          "evaluator_llm_events": 14
+        },
+        "frozen": {
+          "events": 14,
+          "evaluator_errors": 0,
+          "optimizer_errors": 0,
+          "evaluator_llm_events": 14
+        }
+      }
+    },
+    {
+      "seed": 19,
+      "full_holdout": 0.5871,
+      "frozen_holdout": 0.611,
+      "gain": -0.024,
+      "runtime": {
+        "full": {
+          "events": 14,
+          "evaluator_errors": 0,
+          "optimizer_errors": 0,
+          "evaluator_llm_events": 14
+        },
+        "frozen": {
+          "events": 14,
+          "evaluator_errors": 0,
+          "optimizer_errors": 0,
+          "evaluator_llm_events": 14
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "seeds": [
+    11,
+    17
+  ],
+  "episodes": {
+    "train": 20,
+    "holdout": 12
+  },
+  "aggregate": {
+    "full_mean_holdout": 0.6625,
+    "frozen_mean_holdout": 0.6375,
+    "full_minus_frozen_holdout": 0.025,
+    "full_over_frozen_win_rate": 1.0
+  },
+  "per_seed": [
+    {
+      "seed": 11,
+      "full_holdout": 0.6469,
+      "frozen_holdout": 0.6219,
+      "gain": 0.025
+    },
+    {
+      "seed": 17,
+      "full_holdout": 0.6781,
+      "frozen_holdout": 0.6531,
+      "gain": 0.025
+    }
+  ]
+}

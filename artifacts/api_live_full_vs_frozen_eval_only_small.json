@@ -1,0 +1,42 @@
+{
+  "config_path": "/Users/justin/Documents/New project/openclaw_closedsourcemodel_RL/artifacts/runtime_openai_eval_only_fast.json",
+  "seeds": [
+    11,
+    17,
+    19
+  ],
+  "episodes": {
+    "train": 6,
+    "holdout": 8
+  },
+  "aggregate": {
+    "full_mean_holdout": 0.618,
+    "frozen_mean_holdout": 0.6287,
+    "full_minus_frozen_holdout": -0.0108,
+    "full_over_frozen_win_rate": 0.3333,
+    "full_minus_frozen_ci95": [
+      -0.0246,
+      0.0102
+    ]
+  },
+  "per_seed": [
+    {
+      "seed": 11,
+      "full_holdout": 0.6129,
+      "frozen_holdout": 0.6308,
+      "gain": -0.0179
+    },
+    {
+      "seed": 17,
+      "full_holdout": 0.6537,
+      "frozen_holdout": 0.6435,
+      "gain": 0.0102
+    },
+    {
+      "seed": 19,
+      "full_holdout": 0.5873,
+      "frozen_holdout": 0.6119,
+      "gain": -0.0246
+    }
+  ]
+}

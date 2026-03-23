@@ -1,0 +1,146 @@
+{
+  "baseline_local_agents": {
+    "label": "baseline_local_agents",
+    "config_path": "configs/default.json",
+    "seeds": [
+      11,
+      17
+    ],
+    "train_episodes": 12,
+    "holdout_episodes": 12,
+    "aggregate_policy_metrics": {
+      "full": {
+        "mean_train_reward": 0.6283333333333334,
+        "mean_holdout_reward": 0.6311805555555555,
+        "mean_train_reward_trend": 0.07444444444444448,
+        "mean_train_hit_rate": 0.041666666666666664,
+        "mean_holdout_hit_rate": 0.125,
+        "mean_selected_branch_hhi": 0.7222222222222221
+      },
+      "frozen": {
+        "mean_train_reward": 0.6354861111111112,
+        "mean_holdout_reward": 0.6270138888888889,
+        "mean_train_reward_trend": 0.06611111111111118,
+        "mean_train_hit_rate": 0.08333333333333333,
+        "mean_holdout_hit_rate": 0.125,
+        "mean_selected_branch_hhi": 0.8611111111111112
+      },
+      "memory_only": {
+        "mean_train_reward": 0.6283333333333334,
+        "mean_holdout_reward": 0.6311805555555555,
+        "mean_train_reward_trend": 0.07444444444444448,
+        "mean_train_hit_rate": 0.041666666666666664,
+        "mean_holdout_hit_rate": 0.125,
+        "mean_selected_branch_hhi": 0.7222222222222221
+      },
+      "weight_only": {
+        "mean_train_reward": 0.6283333333333334,
+        "mean_holdout_reward": 0.6313888888888889,
+        "mean_train_reward_trend": 0.07444444444444448,
+        "mean_train_hit_rate": 0.041666666666666664,
+        "mean_holdout_hit_rate": 0.16666666666666666,
+        "mean_selected_branch_hhi": 0.7777777777777777
+      },
+      "exploration_only": {
+        "mean_train_reward": 0.6463194444444444,
+        "mean_holdout_reward": 0.588125,
+        "mean_train_reward_trend": 0.0352777777777778,
+        "mean_train_hit_rate": 0.16666666666666666,
+        "mean_holdout_hit_rate": 0.08333333333333333,
+        "mean_selected_branch_hhi": 0.3194444444444444
+      }
+    },
+    "summary": {
+      "full_minus_frozen_holdout": 0.004166666666666652,
+      "full_minus_memory_only_holdout": 0.0,
+      "full_over_frozen_win_rate": 1.0,
+      "full_over_memory_only_win_rate": 0.0,
+      "full_holdout_fairness_gap": 0.21958333333333335
+    },
+    "runtime_reliability": {
+      "events": 240,
+      "eval_runtime_llm_events": 0,
+      "eval_runtime_error_events": 0,
+      "optimizer_advisor_used_events": 0,
+      "optimizer_advisor_error_events": 0,
+      "local_scope_violations": 0
+    }
+  },
+  "api_agents_openai": {
+    "label": "api_agents_openai",
+    "config_path": "configs/runtime_openai_example.json",
+    "seeds": [
+      11,
+      17
+    ],
+    "train_episodes": 12,
+    "holdout_episodes": 12,
+    "aggregate_policy_metrics": {
+      "full": {
+        "mean_train_reward": 0.631736111111111,
+        "mean_holdout_reward": 0.6145833333333333,
+        "mean_train_reward_trend": 0.0625,
+        "mean_train_hit_rate": 0.041666666666666664,
+        "mean_holdout_hit_rate": 0.041666666666666664,
+        "mean_selected_branch_hhi": 0.42361111111111116
+      },
+      "frozen": {
+        "mean_train_reward": 0.6363888888888889,
+        "mean_holdout_reward": 0.6277083333333333,
+        "mean_train_reward_trend": 0.06250000000000006,
+        "mean_train_hit_rate": 0.08333333333333333,
+        "mean_holdout_hit_rate": 0.125,
+        "mean_selected_branch_hhi": 0.7986111111111112
+      },
+      "memory_only": {
+        "mean_train_reward": 0.6292361111111111,
+        "mean_holdout_reward": 0.6290972222222222,
+        "mean_train_reward_trend": 0.07083333333333336,
+        "mean_train_hit_rate": 0.041666666666666664,
+        "mean_holdout_hit_rate": 0.125,
+        "mean_selected_branch_hhi": 0.6527777777777778
+      },
+      "weight_only": {
+        "mean_train_reward": 0.6213888888888889,
+        "mean_holdout_reward": 0.6268055555555556,
+        "mean_train_reward_trend": 0.08749999999999997,
+        "mean_train_hit_rate": 0.041666666666666664,
+        "mean_holdout_hit_rate": 0.16666666666666666,
+        "mean_selected_branch_hhi": 0.7777777777777777
+      },
+      "exploration_only": {
+        "mean_train_reward": 0.6472222222222221,
+        "mean_holdout_reward": 0.588125,
+        "mean_train_reward_trend": 0.031666666666666676,
+        "mean_train_hit_rate": 0.16666666666666666,
+        "mean_holdout_hit_rate": 0.08333333333333333,
+        "mean_selected_branch_hhi": 0.3055555555555556
+      }
+    },
+    "summary": {
+      "full_minus_frozen_holdout": -0.013124999999999998,
+      "full_minus_memory_only_holdout": -0.014513888888888882,
+      "full_over_frozen_win_rate": 0.5,
+      "full_over_memory_only_win_rate": 0.5,
+      "full_holdout_fairness_gap": 0.1562499999999999
+    },
+    "runtime_reliability": {
+      "events": 240,
+      "eval_runtime_llm_events": 240,
+      "eval_runtime_error_events": 0,
+      "optimizer_advisor_used_events": 48,
+      "optimizer_advisor_error_events": 0,
+      "local_scope_violations": 0
+    }
+  },
+  "delta_api_minus_baseline": {
+    "full_mean_train_reward": 0.0034027777777776436,
+    "full_mean_holdout_reward": -0.016597222222222263,
+    "full_mean_train_hit_rate": 0.0,
+    "full_mean_holdout_hit_rate": -0.08333333333333334,
+    "full_minus_frozen_holdout": -0.01729166666666665,
+    "full_minus_memory_only_holdout": -0.014513888888888882,
+    "full_fairness_gap": -0.06333333333333346,
+    "full_branch_hhi": -0.29861111111111094
+  }
+}

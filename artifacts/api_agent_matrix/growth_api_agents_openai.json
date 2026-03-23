@@ -1,0 +1,41 @@
+{
+  "label": "api_agents_openai",
+  "config": "configs/runtime_openai_example.json",
+  "episodes": 24,
+  "per_seed": [
+    {
+      "seed": 11,
+      "before_count": 18,
+      "after_count": 26,
+      "created_count": 8,
+      "before_depth": 2,
+      "after_depth": 3,
+      "depth_gain": 1,
+      "avg_reward": 0.37447916666666664,
+      "reward_trend": 0.0048958333333333215,
+      "eval_runtime_errors": 0,
+      "optimizer_runtime_errors": 0
+    },
+    {
+      "seed": 17,
+      "before_count": 18,
+      "after_count": 26,
+      "created_count": 8,
+      "before_depth": 2,
+      "after_depth": 3,
+      "depth_gain": 1,
+      "avg_reward": 0.3637152777777778,
+      "reward_trend": 0.00833333333333336,
+      "eval_runtime_errors": 0,
+      "optimizer_runtime_errors": 0
+    }
+  ],
+  "aggregate": {
+    "mean_created_count": 8,
+    "mean_depth_gain": 1,
+    "mean_avg_reward": 0.3690972222222222,
+    "mean_reward_trend": 0.00661458333333334,
+    "total_eval_runtime_errors": 0,
+    "total_optimizer_runtime_errors": 0
+  }
+}

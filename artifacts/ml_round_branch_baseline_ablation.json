@@ -1,0 +1,44 @@
+{
+  "seeds": [
+    11,
+    17,
+    19,
+    23,
+    29,
+    31,
+    37,
+    41
+  ],
+  "episodes_per_seed": 220,
+  "method": "branch_specific_advantage_baseline + llm_variance_adaptive_step",
+  "enabled_patch": {
+    "optimizer.branch_advantage_mix": 0.1,
+    "optimizer.branch_baseline_beta": 0.05
+  },
+  "enabled_metrics": {
+    "full_minus_frozen_holdout": 0.0199,
+    "full_minus_memory_only_holdout": 0.0233,
+    "full_over_frozen_holdout_win_rate": 0.875,
+    "full_ci95_vs_frozen": [
+      0.0125,
+      0.0268
+    ],
+    "full_holdout_reward": 0.6435,
+    "frozen_holdout_reward": 0.6236
+  },
+  "ablation_patch": {
+    "optimizer.branch_advantage_mix": 0.0,
+    "optimizer.branch_baseline_beta": 0.05
+  },
+  "ablation_metrics": {
+    "full_minus_frozen_holdout": 0.0162,
+    "full_minus_memory_only_holdout": 0.0197,
+    "full_over_frozen_holdout_win_rate": 0.75,
+    "full_ci95_vs_frozen": [
+      0.0063,
+      0.0254
+    ],
+    "full_holdout_reward": 0.6399,
+    "frozen_holdout_reward": 0.6236
+  }
+}

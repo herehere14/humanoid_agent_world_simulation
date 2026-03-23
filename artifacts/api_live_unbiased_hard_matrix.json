@@ -1,0 +1,324 @@
+{
+  "model": "gpt-4.1-mini",
+  "seeds": [
+    11,
+    17,
+    23
+  ],
+  "train_tasks_per_seed": 8,
+  "holdout_tasks_per_seed": 8,
+  "policies": [
+    "full",
+    "frozen",
+    "memory_only",
+    "weight_only",
+    "exploration_only"
+  ],
+  "external_metric": "strict multi-aspect programmatic checks",
+  "per_seed": {
+    "11": {
+      "full": {
+        "holdout_mean_external": 0.9196,
+        "holdout_strict_pass_rate": 0.625,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 1.0,
+          "context_json": 0.75,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.0
+        }
+      },
+      "frozen": {
+        "holdout_mean_external": 0.9196,
+        "holdout_strict_pass_rate": 0.625,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 1.0,
+          "context_json": 0.75,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.0
+        }
+      },
+      "memory_only": {
+        "holdout_mean_external": 0.9196,
+        "holdout_strict_pass_rate": 0.625,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 1.0,
+          "context_json": 0.75,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.0
+        }
+      },
+      "weight_only": {
+        "holdout_mean_external": 0.8988,
+        "holdout_strict_pass_rate": 0.5,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 0.8333,
+          "context_json": 0.75,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.0
+        }
+      },
+      "exploration_only": {
+        "holdout_mean_external": 0.8676,
+        "holdout_strict_pass_rate": 0.5,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 0.8333,
+          "context_json": 0.625,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.0
+        }
+      },
+      "raw_base": {
+        "holdout_mean_external": 0.9018,
+        "holdout_strict_pass_rate": 0.625,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 1.0,
+          "context_json": 0.75,
+          "csv_class": 1.0,
+          "math_json": 0.8572,
+          "plan_table": 1.0
+        }
+      }
+    },
+    "17": {
+      "full": {
+        "holdout_mean_external": 0.8393,
+        "holdout_strict_pass_rate": 0.625,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 1.0,
+          "context_json": 0.5,
+          "csv_class": 1.0,
+          "math_json": 0.8572,
+          "plan_table": 1.0
+        }
+      },
+      "frozen": {
+        "holdout_mean_external": 0.8415,
+        "holdout_strict_pass_rate": 0.5,
+        "by_eval_type": {
+          "bullets": 0.375,
+          "code_fix": 1.0,
+          "context_json": 0.75,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.0
+        }
+      },
+      "memory_only": {
+        "holdout_mean_external": 0.6362,
+        "holdout_strict_pass_rate": 0.375,
+        "by_eval_type": {
+          "bullets": 0.375,
+          "code_fix": 0.0,
+          "context_json": 0.5,
+          "csv_class": 1.0,
+          "math_json": 0.8572,
+          "plan_table": 1.0
+        }
+      },
+      "weight_only": {
+        "holdout_mean_external": 0.8363,
+        "holdout_strict_pass_rate": 0.5,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 0.8333,
+          "context_json": 0.5,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.0
+        }
+      },
+      "exploration_only": {
+        "holdout_mean_external": 0.8884,
+        "holdout_strict_pass_rate": 0.5,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 1.0,
+          "context_json": 0.625,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.0
+        }
+      },
+      "raw_base": {
+        "holdout_mean_external": 0.9018,
+        "holdout_strict_pass_rate": 0.625,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 1.0,
+          "context_json": 0.75,
+          "csv_class": 1.0,
+          "math_json": 0.8572,
+          "plan_table": 1.0
+        }
+      }
+    },
+    "23": {
+      "full": {
+        "holdout_mean_external": 0.8207,
+        "holdout_strict_pass_rate": 0.375,
+        "by_eval_type": {
+          "bullets": 0.375,
+          "code_fix": 0.8333,
+          "context_json": 0.75,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.0
+        }
+      },
+      "frozen": {
+        "holdout_mean_external": 0.8905,
+        "holdout_strict_pass_rate": 0.25,
+        "by_eval_type": {
+          "bullets": 0.8,
+          "code_fix": 0.8333,
+          "context_json": 0.75,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.1333
+        }
+      },
+      "memory_only": {
+        "holdout_mean_external": 0.9196,
+        "holdout_strict_pass_rate": 0.625,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 1.0,
+          "context_json": 0.75,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.0
+        }
+      },
+      "weight_only": {
+        "holdout_mean_external": 0.8415,
+        "holdout_strict_pass_rate": 0.5,
+        "by_eval_type": {
+          "bullets": 0.375,
+          "code_fix": 1.0,
+          "context_json": 0.75,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.0
+        }
+      },
+      "exploration_only": {
+        "holdout_mean_external": 0.8259,
+        "holdout_strict_pass_rate": 0.625,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 1.0,
+          "context_json": 0.375,
+          "csv_class": 1.0,
+          "math_json": 0.9285,
+          "plan_table": 1.0
+        }
+      },
+      "raw_base": {
+        "holdout_mean_external": 0.933,
+        "holdout_strict_pass_rate": 0.75,
+        "by_eval_type": {
+          "bullets": 1.0,
+          "code_fix": 1.0,
+          "context_json": 0.875,
+          "csv_class": 1.0,
+          "math_json": 0.8572,
+          "plan_table": 1.0
+        }
+      }
+    }
+  },
+  "aggregate": {
+    "full": {
+      "mean_holdout_external": 0.8599,
+      "mean_holdout_strict_pass_rate": 0.5417,
+      "by_eval_type": {
+        "bullets": 0.7917,
+        "code_fix": 0.9444,
+        "context_json": 0.6667,
+        "csv_class": 1.0,
+        "math_json": 0.9047,
+        "plan_table": 1.0
+      }
+    },
+    "frozen": {
+      "mean_holdout_external": 0.8839,
+      "mean_holdout_strict_pass_rate": 0.4583,
+      "by_eval_type": {
+        "bullets": 0.725,
+        "code_fix": 0.9444,
+        "context_json": 0.75,
+        "csv_class": 1.0,
+        "math_json": 0.9285,
+        "plan_table": 1.0444
+      }
+    },
+    "memory_only": {
+      "mean_holdout_external": 0.8251,
+      "mean_holdout_strict_pass_rate": 0.5417,
+      "by_eval_type": {
+        "bullets": 0.7917,
+        "code_fix": 0.6667,
+        "context_json": 0.6667,
+        "csv_class": 1.0,
+        "math_json": 0.9047,
+        "plan_table": 1.0
+      }
+    },
+    "weight_only": {
+      "mean_holdout_external": 0.8589,
+      "mean_holdout_strict_pass_rate": 0.5,
+      "by_eval_type": {
+        "bullets": 0.7917,
+        "code_fix": 0.8889,
+        "context_json": 0.6667,
+        "csv_class": 1.0,
+        "math_json": 0.9285,
+        "plan_table": 1.0
+      }
+    },
+    "exploration_only": {
+      "mean_holdout_external": 0.8606,
+      "mean_holdout_strict_pass_rate": 0.5417,
+      "by_eval_type": {
+        "bullets": 1.0,
+        "code_fix": 0.9444,
+        "context_json": 0.5417,
+        "csv_class": 1.0,
+        "math_json": 0.9285,
+        "plan_table": 1.0
+      }
+    },
+    "raw_base": {
+      "mean_holdout_external": 0.9122,
+      "mean_holdout_strict_pass_rate": 0.6667,
+      "by_eval_type": {
+        "bullets": 1.0,
+        "code_fix": 1.0,
+        "context_json": 0.7917,
+        "csv_class": 1.0,
+        "math_json": 0.8572,
+        "plan_table": 1.0
+      }
+    }
+  },
+  "summary": {
+    "full_minus_frozen": -0.024,
+    "full_over_frozen_relative": -0.0272,
+    "full_minus_memory_only": 0.0348,
+    "full_over_memory_only_relative": 0.0422,
+    "full_minus_raw_base": -0.0523,
+    "full_over_raw_base_relative": -0.0573
+  }
+}

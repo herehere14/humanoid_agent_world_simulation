@@ -1,0 +1,106 @@
+{
+  "model": "gpt-4.1-mini",
+  "seeds": [
+    11,
+    17
+  ],
+  "train_tasks_per_seed": 6,
+  "holdout_tasks_per_seed": 6,
+  "external_metric": "holdout check coverage",
+  "per_seed": {
+    "11": {
+      "full": {
+        "train_mean_external": 1.0,
+        "holdout_mean_external": 1.0,
+        "holdout_pass_rate_0_8": 1.0
+      },
+      "frozen": {
+        "train_mean_external": 1.0,
+        "holdout_mean_external": 1.0,
+        "holdout_pass_rate_0_8": 1.0
+      },
+      "memory_only": {
+        "train_mean_external": 1.0,
+        "holdout_mean_external": 1.0,
+        "holdout_pass_rate_0_8": 1.0
+      },
+      "weight_only": {
+        "train_mean_external": 1.0,
+        "holdout_mean_external": 1.0,
+        "holdout_pass_rate_0_8": 1.0
+      },
+      "exploration_only": {
+        "train_mean_external": 1.0,
+        "holdout_mean_external": 1.0,
+        "holdout_pass_rate_0_8": 1.0
+      },
+      "raw_base": {
+        "holdout_mean_external": 1.0,
+        "holdout_pass_rate_0_8": 1.0
+      }
+    },
+    "17": {
+      "full": {
+        "train_mean_external": 1.0,
+        "holdout_mean_external": 1.0,
+        "holdout_pass_rate_0_8": 1.0
+      },
+      "frozen": {
+        "train_mean_external": 1.0,
+        "holdout_mean_external": 1.0,
+        "holdout_pass_rate_0_8": 1.0
+      },
+      "memory_only": {
+        "train_mean_external": 1.0,
+        "holdout_mean_external": 1.0,
+        "holdout_pass_rate_0_8": 1.0
+      },
+      "weight_only": {
+        "train_mean_external": 1.0,
+        "holdout_mean_external": 1.0,
+        "holdout_pass_rate_0_8": 1.0
+      },
+      "exploration_only": {
+        "train_mean_external": 1.0,
+        "holdout_mean_external": 1.0,
+        "holdout_pass_rate_0_8": 1.0
+      },
+      "raw_base": {
+        "holdout_mean_external": 1.0,
+        "holdout_pass_rate_0_8": 1.0
+      }
+    }
+  },
+  "aggregate": {
+    "full": {
+      "mean_holdout_external": 1.0,
+      "mean_holdout_pass_rate_0_8": 1.0
+    },
+    "frozen": {
+      "mean_holdout_external": 1.0,
+      "mean_holdout_pass_rate_0_8": 1.0
+    },
+    "memory_only": {
+      "mean_holdout_external": 1.0,
+      "mean_holdout_pass_rate_0_8": 1.0
+    },
+    "weight_only": {
+      "mean_holdout_external": 1.0,
+      "mean_holdout_pass_rate_0_8": 1.0
+    },
+    "exploration_only": {
+      "mean_holdout_external": 1.0,
+      "mean_holdout_pass_rate_0_8": 1.0
+    },
+    "raw_base": {
+      "mean_holdout_external": 1.0,
+      "mean_holdout_pass_rate_0_8": 1.0
+    }
+  },
+  "summary": {
+    "full_minus_frozen": 0.0,
+    "full_over_frozen_relative": 0.0,
+    "full_minus_raw_base": 0.0,
+    "full_over_raw_base_relative": 0.0
+  }
+}

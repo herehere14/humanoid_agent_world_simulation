@@ -1,0 +1,24 @@
+{
+  "baseline": {
+    "mean_created_count": 8,
+    "mean_depth_gain": 1,
+    "mean_avg_reward": 0.3605208333333333,
+    "mean_reward_trend": -0.014166666666666689,
+    "total_eval_runtime_errors": 0,
+    "total_optimizer_runtime_errors": 0
+  },
+  "api": {
+    "mean_created_count": 8,
+    "mean_depth_gain": 1,
+    "mean_avg_reward": 0.3690972222222222,
+    "mean_reward_trend": 0.00661458333333334,
+    "total_eval_runtime_errors": 0,
+    "total_optimizer_runtime_errors": 0
+  },
+  "delta_api_minus_baseline": {
+    "mean_created_count": 0,
+    "mean_depth_gain": 0,
+    "mean_avg_reward": 0.008576388888888897,
+    "mean_reward_trend": 0.02078125000000003
+  }
+}
