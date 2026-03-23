@@ -13,6 +13,7 @@
 This project implements a **population-scale agent simulation engine** capable of running hundreds of autonomous agents with continuous emotional state, persistent memory, wound psychology, relationship dynamics, and emergent behavioral cascades — all at sub-second tick speeds with near-zero inference cost for state computation.
 
 Each agent is driven by **HeartState**, a real-time emotional cognition engine that maintains six continuous psychological variables, processes events through learned semantic embeddings, and produces deterministic behavioral decisions. When combined with selective LLM narration, the system generates rich multi-day narratives where factory workers organize protests, relationships fracture under stress, and community resilience emerges organically from individual agent states.
+<img width="1349" height="891" alt="Screenshot 2026-03-21 at 10 27 19 pm" src="https://github.com/user-attachments/assets/4fbc9742-4dd2-46db-8fbb-f0055db26d07" />
 
 ### Key Results
 
