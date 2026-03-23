@@ -31,6 +31,9 @@ from .world_information import apply_external_information, interpret_external_in
 from .macro_aggregator import MacroAggregator
 from .info_propagation import InfoPropagationEngine
 from .economic_actions import resolve_economic_actions, update_expectations
+from .institutional_actions import resolve_institutional_decisions
+from .persistent_conditions import apply_persistent_conditions, register_persistent_condition
+from .ripple_engine import RippleEngine, build_organizational_fabric
 
 
 @dataclass
@@ -73,6 +76,9 @@ class World:
         self.macro_aggregator = MacroAggregator()
         self.info_propagation = InfoPropagationEngine()
         self._info_awareness: dict[str, set[str]] = {}
+        self._persistent_conditions: list = []
+        self.ripple_engine: RippleEngine | None = None  # built after agents are added
+        self._org_fabric_built = False
 
     def initialize(self):
         """Load the shared brain (SBERT + anchors). Call once before simulation."""
@@ -94,6 +100,8 @@ class World:
         """Translate external information into town-level effects."""
         plan = interpret_external_information(text, self, start_tick=start_tick)
         result = apply_external_information(self, plan)
+        # Register persistent condition so it stays active every tick
+        register_persistent_condition(self, plan.kind, plan.severity)
         # Register with info propagation engine so it spreads through social network
         self.info_propagation.register_info(
             label=plan.label,
@@ -310,16 +318,34 @@ class World:
         interactions = self._resolve_interactions(actions, by_location)
         summary["interactions"] = interactions
 
-        # Phase 7: Economic actions — agents make economic decisions that
-        # affect other agents (raise prices, cut shifts, reduce spending, etc.)
-        # This creates the cascading feedback loops that sustain macro shocks.
+        # Phase 7: Persistent conditions — ongoing external states apply
+        # pressure every tick (oil stays high, pandemic continues, etc.)
+        persist_result = apply_persistent_conditions(self)
+        summary["persistent_conditions"] = persist_result
+
+        # Phase 7b: Economic actions — agents make economic decisions
         econ_resolution = resolve_economic_actions(
             self.agents, by_location, self.relationships, self.tick_count,
         )
         summary["economic_actions"] = econ_resolution.as_dict()
 
-        # Phase 7b: Update forward-looking expectations
-        # Agents form beliefs about whether things will get better or worse
+        # Phase 7c: Institutional decisions — government and corporate agents
+        # make policy/business decisions (stimulus, layoffs, regulations)
+        inst_resolution = resolve_institutional_decisions(self, self.tick_count)
+        summary["institutional_decisions"] = inst_resolution.as_dict()
+
+        # Phase 7d: Ripple engine — concrete agent-to-agent economic consequences
+        # Manager cuts worker's hours, vendor raises prices for customers, etc.
+        if not self._org_fabric_built and len(self.agents) > 10:
+            fabric = build_organizational_fabric(self)
+            self.ripple_engine = RippleEngine(fabric)
+            self._org_fabric_built = True
+
+        if self.ripple_engine:
+            ripple_result = self.ripple_engine.tick(self)
+            summary["ripple_events"] = ripple_result.as_dict()
+
+        # Phase 7e: Update forward-looking expectations
         update_expectations(self.agents, self.tick_count)
 
         # Phase 8: Emotional contagion

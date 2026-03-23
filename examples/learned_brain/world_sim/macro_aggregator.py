@@ -322,18 +322,18 @@ class MacroAggregator:
             getattr(a, "expectation_pessimism", 0.0) for a in agents
         )
 
-        # Consumer confidence: current state + forward-looking expectations
-        # Expectations component only kicks in when pessimism > 0 (i.e. after a shock)
-        # At baseline (pessimism=0), confidence is purely state-based
-        expectation_drag = avg_pessimism * 0.25  # 0 at baseline, grows after shocks
-        consumer_confidence = max(0.0, min(1.0,
-            avg_valence * 0.3 +
-            avg_energy * 0.15 +
-            (1.0 - avg_debt) * 0.2 +
-            (1.0 - avg_dread) * 0.2 +
-            (1.0 - avg_tension) * 0.15 -
-            expectation_drag  # drags confidence down when agents expect worse
-        ))
+        # Consumer confidence on 0-100 scale matching real CCI
+        # Healthy baseline ~85-90, crisis trough ~40-60
+        expectation_drag = avg_pessimism * 20  # up to -20 points in deep crisis
+        raw_cc = (
+            avg_valence * 30 +         # 0-30 from mood
+            avg_energy * 15 +           # 0-15 from energy
+            (1.0 - avg_debt) * 20 +     # 0-20 from low debt
+            (1.0 - avg_dread) * 15 +    # 0-15 from low dread
+            (1.0 - avg_tension) * 15 +  # 0-15 from low tension
+            5                           # floor
+        )
+        consumer_confidence = max(10.0, min(100.0, raw_cc - expectation_drag))
 
         # Social cohesion: warm relationships + low rivalry + faction cooperation
         all_trust = []
