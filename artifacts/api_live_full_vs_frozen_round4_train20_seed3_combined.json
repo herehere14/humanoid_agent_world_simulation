@@ -1,0 +1,70 @@
+{
+  "seeds": [
+    11,
+    17,
+    19
+  ],
+  "episodes": {
+    "train": 20,
+    "holdout": 12
+  },
+  "aggregate": {
+    "full_mean_holdout": 0.6487,
+    "frozen_mean_holdout": 0.632,
+    "full_minus_frozen_holdout": 0.0167,
+    "full_over_frozen_win_rate": 0.6667,
+    "full_minus_frozen_ci95": [
+      0.0,
+      0.025
+    ]
+  },
+  "per_seed": [
+    {
+      "seed": 11,
+      "full_holdout": 0.6469,
+      "frozen_holdout": 0.6219,
+      "gain": 0.025,
+      "runtime": {
+        "full": {
+          "events": 32,
+          "evaluator_errors": 0,
+          "optimizer_errors": 0
+        },
+        "frozen": {
+          "events": 32,
+          "evaluator_errors": 0,
+          "optimizer_errors": 0
+        }
+      }
+    },
+    {
+      "seed": 17,
+      "full_holdout": 0.6781,
+      "frozen_holdout": 0.6531,
+      "gain": 0.025,
+      "runtime": {
+        "full": {
+          "events": 32,
+          "evaluator_errors": 0,
+          "optimizer_errors": 0
+        },
+        "frozen": {
+          "events": 32,
+          "evaluator_errors": 0,
+          "optimizer_errors": 0
+        }
+      }
+    },
+    {
+      "seed": 19,
+      "full_holdout": 0.621,
+      "frozen_holdout": 0.621,
+      "gain": 0.0,
+      "runtime": {}
+    }
+  ],
+  "source_files": [
+    "artifacts/api_live_full_vs_frozen_round4_train20_seed2.json",
+    "artifacts/api_live_full_vs_frozen_round4_seed19.json"
+  ]
+}

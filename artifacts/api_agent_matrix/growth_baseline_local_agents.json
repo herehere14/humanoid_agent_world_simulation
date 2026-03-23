@@ -1,0 +1,41 @@
+{
+  "label": "baseline_local_agents",
+  "config": "configs/default.json",
+  "episodes": 24,
+  "per_seed": [
+    {
+      "seed": 11,
+      "before_count": 18,
+      "after_count": 26,
+      "created_count": 8,
+      "before_depth": 2,
+      "after_depth": 3,
+      "depth_gain": 1,
+      "avg_reward": 0.35659722222222223,
+      "reward_trend": -0.01958333333333334,
+      "eval_runtime_errors": 0,
+      "optimizer_runtime_errors": 0
+    },
+    {
+      "seed": 17,
+      "before_count": 18,
+      "after_count": 26,
+      "created_count": 8,
+      "before_depth": 2,
+      "after_depth": 3,
+      "depth_gain": 1,
+      "avg_reward": 0.3644444444444444,
+      "reward_trend": -0.008750000000000036,
+      "eval_runtime_errors": 0,
+      "optimizer_runtime_errors": 0
+    }
+  ],
+  "aggregate": {
+    "mean_created_count": 8,
+    "mean_depth_gain": 1,
+    "mean_avg_reward": 0.3605208333333333,
+    "mean_reward_trend": -0.014166666666666689,
+    "total_eval_runtime_errors": 0,
+    "total_optimizer_runtime_errors": 0
+  }
+}

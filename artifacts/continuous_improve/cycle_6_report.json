@@ -1,0 +1,167 @@
+{
+  "cycle": 6,
+  "accepted": false,
+  "metrics": {
+    "objective": 0.837911,
+    "full_minus_frozen": 0.0237,
+    "full_minus_memory_only": 0.0288,
+    "full_win_rate_vs_frozen": 0.875,
+    "fairness_gap": 0.1723,
+    "tests_passed": true
+  },
+  "auto_report": {
+    "rounds": 2,
+    "candidates_per_round": 6,
+    "search_seeds": [
+      11,
+      17,
+      19,
+      23,
+      29,
+      31,
+      37,
+      41
+    ],
+    "search_episodes_per_seed": 160,
+    "final_eval_seeds": [
+      11,
+      17,
+      19,
+      23,
+      29,
+      31,
+      37,
+      41
+    ],
+    "final_eval_episodes": 220,
+    "best_candidate": {
+      "patch": {
+        "router.memory_coef": 0.221801,
+        "router.exploration": 0.141407,
+        "router.exploration_decay": 0.994593,
+        "memory.bias_scale": 0.526598,
+        "memory.recency_decay": 0.982064,
+        "memory.shrinkage_k": 40.0,
+        "optimizer.learning_rate": 0.131926,
+        "optimizer.weight_decay": 0.040298,
+        "optimizer.advantage_baseline_beta": 0.141565
+      },
+      "objective": 0.837911,
+      "full_holdout": 0.6412,
+      "full_minus_frozen": 0.0237,
+      "full_minus_memory_only": 0.0288,
+      "full_win_rate_vs_frozen": 0.875,
+      "full_ci95_low": 0.0141,
+      "fairness_gap": 0.1723,
+      "gain_std": 0.012895,
+      "branch_concentration_gap": -0.3142,
+      "report_path": "/Users/justin/Documents/New project/openclaw_closedsourcemodel_RL/artifacts/auto_improve/baseline_report.json"
+    },
+    "round_summaries": [
+      {
+        "round": 1,
+        "improved": false,
+        "best_objective": 0.837911,
+        "round_best": {
+          "patch": {
+            "router.memory_coef": 0.221801,
+            "router.exploration": 0.141407,
+            "router.exploration_decay": 0.994593,
+            "memory.bias_scale": 0.526598,
+            "memory.recency_decay": 0.982064,
+            "memory.shrinkage_k": 40.0,
+            "optimizer.learning_rate": 0.131926,
+            "optimizer.weight_decay": 0.040298,
+            "optimizer.advantage_baseline_beta": 0.141565
+          },
+          "objective": 0.837911,
+          "full_holdout": 0.6412,
+          "full_minus_frozen": 0.0237,
+          "full_minus_memory_only": 0.0288,
+          "full_win_rate_vs_frozen": 0.875,
+          "full_ci95_low": 0.0141,
+          "fairness_gap": 0.1723,
+          "gain_std": 0.012895,
+          "branch_concentration_gap": -0.3142,
+          "report_path": "/Users/justin/Documents/New project/openclaw_closedsourcemodel_RL/artifacts/auto_improve/round_1_candidate_0.json"
+        },
+        "incumbent": {
+          "patch": {
+            "router.memory_coef": 0.221801,
+            "router.exploration": 0.141407,
+            "router.exploration_decay": 0.994593,
+            "memory.bias_scale": 0.526598,
+            "memory.recency_decay": 0.982064,
+            "memory.shrinkage_k": 40.0,
+            "optimizer.learning_rate": 0.131926,
+            "optimizer.weight_decay": 0.040298,
+            "optimizer.advantage_baseline_beta": 0.141565
+          },
+          "objective": 0.837911,
+          "full_holdout": 0.6412,
+          "full_minus_frozen": 0.0237,
+          "full_minus_memory_only": 0.0288,
+          "full_win_rate_vs_frozen": 0.875,
+          "full_ci95_low": 0.0141,
+          "fairness_gap": 0.1723,
+          "gain_std": 0.012895,
+          "branch_concentration_gap": -0.3142,
+          "report_path": "/Users/justin/Documents/New project/openclaw_closedsourcemodel_RL/artifacts/auto_improve/baseline_report.json"
+        }
+      },
+      {
+        "round": 2,
+        "improved": false,
+        "best_objective": 0.837911,
+        "round_best": {
+          "patch": {
+            "router.memory_coef": 0.221801,
+            "router.exploration": 0.141407,
+            "router.exploration_decay": 0.994593,
+            "memory.bias_scale": 0.526598,
+            "memory.recency_decay": 0.982064,
+            "memory.shrinkage_k": 40.0,
+            "optimizer.learning_rate": 0.131926,
+            "optimizer.weight_decay": 0.040298,
+            "optimizer.advantage_baseline_beta": 0.141565
+          },
+          "objective": 0.837911,
+          "full_holdout": 0.6412,
+          "full_minus_frozen": 0.0237,
+          "full_minus_memory_only": 0.0288,
+          "full_win_rate_vs_frozen": 0.875,
+          "full_ci95_low": 0.0141,
+          "fairness_gap": 0.1723,
+          "gain_std": 0.012895,
+          "branch_concentration_gap": -0.3142,
+          "report_path": "/Users/justin/Documents/New project/openclaw_closedsourcemodel_RL/artifacts/auto_improve/round_2_candidate_0.json"
+        },
+        "incumbent": {
+          "patch": {
+            "router.memory_coef": 0.221801,
+            "router.exploration": 0.141407,
+            "router.exploration_decay": 0.994593,
+            "memory.bias_scale": 0.526598,
+            "memory.recency_decay": 0.982064,
+            "memory.shrinkage_k": 40.0,
+            "optimizer.learning_rate": 0.131926,
+            "optimizer.weight_decay": 0.040298,
+            "optimizer.advantage_baseline_beta": 0.141565
+          },
+          "objective": 0.837911,
+          "full_holdout": 0.6412,
+          "full_minus_frozen": 0.0237,
+          "full_minus_memory_only": 0.0288,
+          "full_win_rate_vs_frozen": 0.875,
+          "full_ci95_low": 0.0141,
+          "fairness_gap": 0.1723,
+          "gain_std": 0.012895,
+          "branch_concentration_gap": -0.3142,
+          "report_path": "/Users/justin/Documents/New project/openclaw_closedsourcemodel_RL/artifacts/auto_improve/baseline_report.json"
+        }
+      }
+    ],
+    "final_validation_path": "/Users/justin/Documents/New project/openclaw_closedsourcemodel_RL/artifacts/auto_improve/final_validation_report.json",
+    "applied_to_default_config": true
+  }
+}

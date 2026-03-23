@@ -1,0 +1,67 @@
+{
+  "label": "baseline_local_agents",
+  "config_path": "configs/default.json",
+  "seeds": [
+    11,
+    17
+  ],
+  "train_episodes": 12,
+  "holdout_episodes": 12,
+  "aggregate_policy_metrics": {
+    "full": {
+      "mean_train_reward": 0.6283333333333334,
+      "mean_holdout_reward": 0.6311805555555555,
+      "mean_train_reward_trend": 0.07444444444444448,
+      "mean_train_hit_rate": 0.041666666666666664,
+      "mean_holdout_hit_rate": 0.125,
+      "mean_selected_branch_hhi": 0.7222222222222221
+    },
+    "frozen": {
+      "mean_train_reward": 0.6354861111111112,
+      "mean_holdout_reward": 0.6270138888888889,
+      "mean_train_reward_trend": 0.06611111111111118,
+      "mean_train_hit_rate": 0.08333333333333333,
+      "mean_holdout_hit_rate": 0.125,
+      "mean_selected_branch_hhi": 0.8611111111111112
+    },
+    "memory_only": {
+      "mean_train_reward": 0.6283333333333334,
+      "mean_holdout_reward": 0.6311805555555555,
+      "mean_train_reward_trend": 0.07444444444444448,
+      "mean_train_hit_rate": 0.041666666666666664,
+      "mean_holdout_hit_rate": 0.125,
+      "mean_selected_branch_hhi": 0.7222222222222221
+    },
+    "weight_only": {
+      "mean_train_reward": 0.6283333333333334,
+      "mean_holdout_reward": 0.6313888888888889,
+      "mean_train_reward_trend": 0.07444444444444448,
+      "mean_train_hit_rate": 0.041666666666666664,
+      "mean_holdout_hit_rate": 0.16666666666666666,
+      "mean_selected_branch_hhi": 0.7777777777777777
+    },
+    "exploration_only": {
+      "mean_train_reward": 0.6463194444444444,
+      "mean_holdout_reward": 0.588125,
+      "mean_train_reward_trend": 0.0352777777777778,
+      "mean_train_hit_rate": 0.16666666666666666,
+      "mean_holdout_hit_rate": 0.08333333333333333,
+      "mean_selected_branch_hhi": 0.3194444444444444
+    }
+  },
+  "summary": {
+    "full_minus_frozen_holdout": 0.004166666666666652,
+    "full_minus_memory_only_holdout": 0.0,
+    "full_over_frozen_win_rate": 1.0,
+    "full_over_memory_only_win_rate": 0.0,
+    "full_holdout_fairness_gap": 0.21958333333333335
+  },
+  "runtime_reliability": {
+    "events": 240,
+    "eval_runtime_llm_events": 0,
+    "eval_runtime_error_events": 0,
+    "optimizer_advisor_used_events": 0,
+    "optimizer_advisor_error_events": 0,
+    "local_scope_violations": 0
+  }
+}

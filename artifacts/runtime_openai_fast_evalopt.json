@@ -1,0 +1,30 @@
+{
+  "agent_runtimes": {
+    "evaluator": {
+      "enabled": true,
+      "provider": "openai_compatible",
+      "model": "gpt-4.1-mini",
+      "api_key_env": "OPENAI_API_KEY",
+      "base_url": "https://api.openai.com/v1",
+      "temperature": 0.1,
+      "max_output_tokens": 600,
+      "timeout_seconds": 15
+    },
+    "optimizer": {
+      "enabled": true,
+      "provider": "openai_compatible",
+      "model": "gpt-4.1-mini",
+      "api_key_env": "OPENAI_API_KEY",
+      "base_url": "https://api.openai.com/v1",
+      "temperature": 0.1,
+      "max_output_tokens": 700,
+      "timeout_seconds": 15
+    }
+  },
+  "optimizer": {
+    "advisor_weight_delta_cap": 0.02,
+    "advisor_rewrite_confidence_threshold": 0.8,
+    "rewrite_cooldown_episodes": 8,
+    "rewrite_failure_streak_trigger": 3
+  }
+}

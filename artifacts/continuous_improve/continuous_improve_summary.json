@@ -1,19 +1,19 @@
 {
   "cycles_run": 1,
   "best_cycle": 1,
-  "best_objective": 1.067995,
+  "best_objective": 1.11037,
   "early_stopped": false,
   "cycle_results": [
     {
       "cycle": 1,
       "accepted": true,
       "metrics": {
-        "objective": 1.067995,
-        "full_minus_frozen": 0.0922,
-        "full_minus_memory_only": 0.0922,
+        "objective": 1.11037,
+        "full_minus_frozen": 0.128,
+        "full_minus_memory_only": 0.1296,
         "full_win_rate_vs_frozen": 1.0,
-        "full_ci95_low": 0.0922,
-        "fairness_gap": 0.0995,
+        "full_ci95_low": 0.128,
+        "fairness_gap": 0.123,
         "tests_passed": true
       },
       "auto_report": {
@@ -43,23 +43,23 @@
             "optimizer.branch_advantage_mix": 0.1,
             "optimizer.branch_baseline_beta": 0.05
           },
-          "objective": 1.067995,
-          "full_holdout": 0.7053,
-          "full_minus_frozen": 0.0922,
-          "full_minus_memory_only": 0.0922,
+          "objective": 1.11037,
+          "full_holdout": 0.6975,
+          "full_minus_frozen": 0.128,
+          "full_minus_memory_only": 0.1296,
           "full_win_rate_vs_frozen": 1.0,
-          "full_ci95_low": 0.0922,
-          "fairness_gap": 0.0995,
+          "full_ci95_low": 0.128,
+          "fairness_gap": 0.123,
           "gain_std": 0.0,
-          "branch_concentration_gap": 0.0037,
-          "report_path": "/Users/justin/openclaw_projects/openclaw_closedsourcemodel_RL/artifacts/auto_improve/baseline_report.json",
+          "branch_concentration_gap": -0.2062,
+          "report_path": "/Users/justin/Documents/New project/openclaw_closedsourcemodel_RL/artifacts/auto_improve/baseline_report.json",
           "ci_gate_passed": true
         },
         "round_summaries": [
           {
             "round": 1,
             "improved": false,
-            "best_objective": 1.067995,
+            "best_objective": 1.11037,
             "round_best": {
               "patch": {
                 "router.memory_coef": 0.221801,
@@ -76,16 +76,16 @@
                 "optimizer.branch_advantage_mix": 0.1,
                 "optimizer.branch_baseline_beta": 0.05
               },
-              "objective": 1.067995,
-              "full_holdout": 0.7053,
-              "full_minus_frozen": 0.0922,
-              "full_minus_memory_only": 0.0922,
+              "objective": 1.11037,
+              "full_holdout": 0.6975,
+              "full_minus_frozen": 0.128,
+              "full_minus_memory_only": 0.1296,
               "full_win_rate_vs_frozen": 1.0,
-              "full_ci95_low": 0.0922,
-              "fairness_gap": 0.0995,
+              "full_ci95_low": 0.128,
+              "fairness_gap": 0.123,
               "gain_std": 0.0,
-              "branch_concentration_gap": 0.0037,
-              "report_path": "/Users/justin/openclaw_projects/openclaw_closedsourcemodel_RL/artifacts/auto_improve/round_1_candidate_0.json",
+              "branch_concentration_gap": -0.2062,
+              "report_path": "/Users/justin/Documents/New project/openclaw_closedsourcemodel_RL/artifacts/auto_improve/round_1_candidate_0.json",
               "ci_gate_passed": true
             },
             "incumbent": {
@@ -104,21 +104,21 @@
                 "optimizer.branch_advantage_mix": 0.1,
                 "optimizer.branch_baseline_beta": 0.05
               },
-              "objective": 1.067995,
-              "full_holdout": 0.7053,
-              "full_minus_frozen": 0.0922,
-              "full_minus_memory_only": 0.0922,
+              "objective": 1.11037,
+              "full_holdout": 0.6975,
+              "full_minus_frozen": 0.128,
+              "full_minus_memory_only": 0.1296,
               "full_win_rate_vs_frozen": 1.0,
-              "full_ci95_low": 0.0922,
-              "fairness_gap": 0.0995,
+              "full_ci95_low": 0.128,
+              "fairness_gap": 0.123,
               "gain_std": 0.0,
-              "branch_concentration_gap": 0.0037,
-              "report_path": "/Users/justin/openclaw_projects/openclaw_closedsourcemodel_RL/artifacts/auto_improve/baseline_report.json",
+              "branch_concentration_gap": -0.2062,
+              "report_path": "/Users/justin/Documents/New project/openclaw_closedsourcemodel_RL/artifacts/auto_improve/baseline_report.json",
               "ci_gate_passed": true
             }
           }
         ],
-        "final_validation_path": "/Users/justin/openclaw_projects/openclaw_closedsourcemodel_RL/artifacts/auto_improve/final_validation_report.json",
+        "final_validation_path": "/Users/justin/Documents/New project/openclaw_closedsourcemodel_RL/artifacts/auto_improve/final_validation_report.json",
         "applied_to_default_config": false
       }
     }

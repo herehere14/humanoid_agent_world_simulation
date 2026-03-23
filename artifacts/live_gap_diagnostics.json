@@ -1,0 +1,103 @@
+{
+  "source_matrix": "artifacts/api_live_unbiased_hard_matrix_v2.json",
+  "matrix_summary": {
+    "full_minus_frozen": -0.0223,
+    "full_over_frozen_relative": -0.0277,
+    "full_minus_memory_only": -0.0365,
+    "full_over_memory_only_relative": -0.0446,
+    "full_minus_raw_base": -0.1201,
+    "full_over_raw_base_relative": -0.1332
+  },
+  "aggregate_scores": {
+    "full": {
+      "mean_holdout_external": 0.7817,
+      "mean_holdout_strict_pass_rate": 0.4583
+    },
+    "frozen": {
+      "mean_holdout_external": 0.804,
+      "mean_holdout_strict_pass_rate": 0.2917
+    },
+    "memory_only": {
+      "mean_holdout_external": 0.8182,
+      "mean_holdout_strict_pass_rate": 0.5
+    },
+    "weight_only": {
+      "mean_holdout_external": 0.8338,
+      "mean_holdout_strict_pass_rate": 0.5
+    },
+    "exploration_only": {
+      "mean_holdout_external": 0.8026,
+      "mean_holdout_strict_pass_rate": 0.5
+    },
+    "raw_base": {
+      "mean_holdout_external": 0.9018,
+      "mean_holdout_strict_pass_rate": 0.625
+    }
+  },
+  "route_concentration_full_policy": {
+    "11": {
+      "total_episodes": 16,
+      "unique_routes": 4,
+      "top_route": [
+        "verification",
+        "verification_constraint_checker"
+      ],
+      "top_route_share": 0.75,
+      "top_selected_branch": "verification_constraint_checker",
+      "top_selected_branch_share": 0.75
+    },
+    "17": {
+      "total_episodes": 16,
+      "unique_routes": 4,
+      "top_route": [
+        "verification",
+        "verification_constraint_checker"
+      ],
+      "top_route_share": 0.75,
+      "top_selected_branch": "verification_constraint_checker",
+      "top_selected_branch_share": 0.75
+    },
+    "23": {
+      "total_episodes": 16,
+      "unique_routes": 4,
+      "top_route": [
+        "verification",
+        "verification_constraint_checker"
+      ],
+      "top_route_share": 0.6875,
+      "top_selected_branch": "verification_constraint_checker",
+      "top_selected_branch_share": 0.6875
+    }
+  },
+  "optimizer_activity_full_policy": {
+    "11": {
+      "rewrites": 0,
+      "created_candidates": 0,
+      "promoted_candidates": 0,
+      "archived_candidates": 0,
+      "mean_abs_weight_delta": 0.006581
+    },
+    "17": {
+      "rewrites": 0,
+      "created_candidates": 0,
+      "promoted_candidates": 0,
+      "archived_candidates": 0,
+      "mean_abs_weight_delta": 0.006719
+    },
+    "23": {
+      "rewrites": 0,
+      "created_candidates": 0,
+      "promoted_candidates": 0,
+      "archived_candidates": 0,
+      "mean_abs_weight_delta": 0.006581
+    }
+  },
+  "eval_type_gap_full_minus_raw": {
+    "bullets": -0.4167,
+    "code_fix": -0.3889,
+    "context_json": -0.125,
+    "csv_class": 0.0,
+    "math_json": 0.0475,
+    "plan_table": 0.0
+  }
+}

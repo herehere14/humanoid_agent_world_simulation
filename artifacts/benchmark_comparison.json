@@ -1,0 +1,204 @@
+{
+  "train": {
+    "adaptive": {
+      "episodes": 48,
+      "average_reward": 0.6952,
+      "reward_by_round": [
+        0.6952
+      ],
+      "branch_weight_trajectory": {
+        "analytical": [
+          1.0371
+        ],
+        "planner": [
+          1.0189
+        ],
+        "retrieval": [
+          1.0039
+        ],
+        "critique": [
+          0.95
+        ],
+        "verification": [
+          1.0958
+        ],
+        "creative": [
+          0.9
+        ],
+        "analytical_symbolic_solver": [
+          0.9756
+        ],
+        "analytical_causal_decomposer": [
+          0.92
+        ],
+        "planner_timeline_optimizer": [
+          0.9826
+        ],
+        "planner_risk_allocator": [
+          0.93
+        ],
+        "retrieval_evidence_tracer": [
+          0.9559
+        ],
+        "retrieval_source_triage": [
+          0.92
+        ],
+        "critique_failure_hunter": [
+          0.9
+        ],
+        "critique_adversarial_probe": [
+          0.9
+        ],
+        "verification_constraint_checker": [
+          1.0303
+        ],
+        "verification_consistency_auditor": [
+          0.9928
+        ],
+        "json_lock": [
+          1.0761
+        ],
+        "csv_lock": [
+          1.0097
+        ],
+        "code_patch_lock": [
+          1.0567
+        ],
+        "bullet_lock": [
+          1.0649
+        ],
+        "creative_divergent_generator": [
+          0.9391
+        ],
+        "creative_constraint_innovator": [
+          0.9484
+        ]
+      },
+      "route_counts": {
+        "verification": 48,
+        "csv_lock": 14,
+        "bullet_lock": 22,
+        "planner": 10,
+        "planner_timeline_optimizer": 10,
+        "verification_constraint_checker": 25,
+        "json_lock": 30,
+        "verification_consistency_auditor": 13,
+        "retrieval": 1,
+        "retrieval_evidence_tracer": 1,
+        "code_patch_lock": 11,
+        "analytical": 6,
+        "analytical_symbolic_solver": 6,
+        "creative": 6,
+        "creative_constraint_innovator": 6,
+        "creative_divergent_generator": 6
+      }
+    },
+    "frozen": {
+      "episodes": 48,
+      "average_reward": 0.679,
+      "reward_by_round": [
+        0.679
+      ],
+      "branch_weight_trajectory": {
+        "analytical": [
+          1.05
+        ],
+        "planner": [
+          1.0
+        ],
+        "retrieval": [
+          1.0
+        ],
+        "critique": [
+          0.95
+        ],
+        "verification": [
+          1.15
+        ],
+        "creative": [
+          0.9
+        ],
+        "analytical_symbolic_solver": [
+          0.95
+        ],
+        "analytical_causal_decomposer": [
+          0.92
+        ],
+        "planner_timeline_optimizer": [
+          0.94
+        ],
+        "planner_risk_allocator": [
+          0.93
+        ],
+        "retrieval_evidence_tracer": [
+          0.95
+        ],
+        "retrieval_source_triage": [
+          0.92
+        ],
+        "critique_failure_hunter": [
+          0.9
+        ],
+        "critique_adversarial_probe": [
+          0.9
+        ],
+        "verification_constraint_checker": [
+          0.97
+        ],
+        "verification_consistency_auditor": [
+          0.95
+        ],
+        "json_lock": [
+          0.98
+        ],
+        "csv_lock": [
+          0.98
+        ],
+        "code_patch_lock": [
+          0.99
+        ],
+        "bullet_lock": [
+          0.97
+        ],
+        "creative_divergent_generator": [
+          0.9
+        ],
+        "creative_constraint_innovator": [
+          0.91
+        ]
+      },
+      "route_counts": {
+        "verification": 48,
+        "csv_lock": 18,
+        "bullet_lock": 18,
+        "verification_consistency_auditor": 20,
+        "planner": 3,
+        "planner_timeline_optimizer": 3,
+        "json_lock": 30,
+        "verification_constraint_checker": 23,
+        "retrieval": 1,
+        "retrieval_evidence_tracer": 1,
+        "code_patch_lock": 12,
+        "analytical": 7,
+        "analytical_symbolic_solver": 7,
+        "creative": 6,
+        "creative_constraint_innovator": 6,
+        "creative_divergent_generator": 6
+      }
+    },
+    "average_reward_gain": 0.0162,
+    "relative_gain": 0.0239
+  },
+  "holdout": {
+    "adaptive_average_reward": 0.6561,
+    "frozen_average_reward": 0.6786,
+    "average_reward_gain": -0.0225,
+    "relative_gain": -0.0332,
+    "target_relative_gain": 0.2,
+    "passes_target_relative_gain": false
+  },
+  "evaluation_design": {
+    "train": "non-stationary stream with task-type drift by phase",
+    "holdout": "unseen prompt variants and keyword sets; no adaptation during scoring"
+  }
+}

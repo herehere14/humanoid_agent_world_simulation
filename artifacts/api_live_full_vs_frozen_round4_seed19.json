@@ -1,0 +1,8 @@
+{
+  "seed": 19,
+  "train_eps": 20,
+  "holdout_eps": 12,
+  "full_holdout": 0.621,
+  "frozen_holdout": 0.621,
+  "gain": 0.0
+}

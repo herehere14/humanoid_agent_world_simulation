@@ -1,0 +1,12 @@
+{
+  "alice": {
+    "style": "bullet",
+    "verbosity": "concise",
+    "hard_constraints": [
+      "owner",
+      "go/no-go",
+      "rollback",
+      "confidence"
+    ]
+  }
+}

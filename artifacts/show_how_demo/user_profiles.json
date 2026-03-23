@@ -1,0 +1,16 @@
+{
+  "alice": {
+    "style": "bullet",
+    "verbosity": "concise",
+    "domain_preferences": [
+      "planning",
+      "ops"
+    ],
+    "hard_constraints": [
+      "owner",
+      "go/no-go",
+      "rollback",
+      "confidence"
+    ]
+  }
+}

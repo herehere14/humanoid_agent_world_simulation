@@ -1,0 +1,77 @@
+{
+  "episodes": 32,
+  "average_reward": 0.68,
+  "reward_by_round": [
+    0.68
+  ],
+  "branch_weight_trajectory": {
+    "analytical": [
+      1.0456
+    ],
+    "planner": [
+      1.0393
+    ],
+    "retrieval": [
+      1.0039
+    ],
+    "critique": [
+      0.9524
+    ],
+    "verification": [
+      1.1769
+    ],
+    "creative": [
+      0.9
+    ],
+    "analytical_symbolic_solver": [
+      0.95
+    ],
+    "analytical_causal_decomposer": [
+      0.9274
+    ],
+    "planner_timeline_optimizer": [
+      0.984
+    ],
+    "planner_risk_allocator": [
+      0.955
+    ],
+    "retrieval_evidence_tracer": [
+      0.9652
+    ],
+    "retrieval_source_triage": [
+      0.92
+    ],
+    "critique_failure_hunter": [
+      0.9
+    ],
+    "critique_adversarial_probe": [
+      0.9049
+    ],
+    "verification_constraint_checker": [
+      1.0956
+    ],
+    "verification_consistency_auditor": [
+      0.9554
+    ],
+    "creative_divergent_generator": [
+      0.9
+    ],
+    "creative_constraint_innovator": [
+      0.91
+    ]
+  },
+  "route_counts": {
+    "planner": 7,
+    "planner_timeline_optimizer": 5,
+    "verification": 20,
+    "verification_constraint_checker": 19,
+    "critique": 1,
+    "critique_adversarial_probe": 1,
+    "retrieval": 2,
+    "retrieval_evidence_tracer": 2,
+    "analytical": 2,
+    "analytical_causal_decomposer": 2,
+    "planner_risk_allocator": 2,
+    "verification_consistency_auditor": 1
+  }
+}

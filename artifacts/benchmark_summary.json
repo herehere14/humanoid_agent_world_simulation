@@ -1,49 +1,93 @@
 {
-  "episodes": 24,
-  "average_reward": 0.8222,
+  "episodes": 48,
+  "average_reward": 0.6952,
   "reward_by_round": [
-    0.8292,
-    0.8292,
-    0.8083
+    0.6952
   ],
   "branch_weight_trajectory": {
     "analytical": [
-      1.228,
-      1.378,
-      1.55
+      1.0371
     ],
     "planner": [
-      1.106,
-      1.256,
-      1.428
+      1.0189
     ],
     "retrieval": [
-      1.108,
-      1.214,
-      1.32
+      1.0039
     ],
     "critique": [
-      0.964,
-      0.964,
-      0.964
+      0.95
     ],
     "verification": [
-      1.456,
-      1.692,
-      1.908
+      1.0958
     ],
     "creative": [
-      0.866,
-      0.932,
-      0.954
+      0.9
+    ],
+    "analytical_symbolic_solver": [
+      0.9756
+    ],
+    "analytical_causal_decomposer": [
+      0.92
+    ],
+    "planner_timeline_optimizer": [
+      0.9826
+    ],
+    "planner_risk_allocator": [
+      0.93
+    ],
+    "retrieval_evidence_tracer": [
+      0.9559
+    ],
+    "retrieval_source_triage": [
+      0.92
+    ],
+    "critique_failure_hunter": [
+      0.9
+    ],
+    "critique_adversarial_probe": [
+      0.9
+    ],
+    "verification_constraint_checker": [
+      1.0303
+    ],
+    "verification_consistency_auditor": [
+      0.9928
+    ],
+    "json_lock": [
+      1.0761
+    ],
+    "csv_lock": [
+      1.0097
+    ],
+    "code_patch_lock": [
+      1.0567
+    ],
+    "bullet_lock": [
+      1.0649
+    ],
+    "creative_divergent_generator": [
+      0.9391
+    ],
+    "creative_constraint_innovator": [
+      0.9484
     ]
   },
   "route_counts": {
-    "analytical": 15,
-    "verification": 24,
-    "planner": 14,
-    "creative": 7,
-    "retrieval": 10,
-    "critique": 2
+    "verification": 48,
+    "csv_lock": 14,
+    "bullet_lock": 22,
+    "planner": 10,
+    "planner_timeline_optimizer": 10,
+    "verification_constraint_checker": 25,
+    "json_lock": 30,
+    "verification_consistency_auditor": 13,
+    "retrieval": 1,
+    "retrieval_evidence_tracer": 1,
+    "code_patch_lock": 11,
+    "analytical": 6,
+    "analytical_symbolic_solver": 6,
+    "creative": 6,
+    "creative_constraint_innovator": 6,
+    "creative_divergent_generator": 6
   }
 }
