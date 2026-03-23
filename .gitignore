@@ -13,3 +13,4 @@ artifacts/**/*.jsonl
 artifacts/*.log
 artifacts/empathetic_dialogues/
 artifacts/ethics_dataset/
+*.Rhistory

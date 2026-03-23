@@ -1,0 +1,2128 @@
+{
+  "event": "2008 Financial Crisis",
+  "baseline": {
+    "cci": 79.8,
+    "unemployment_rate": 0.0,
+    "underemployment_rate": 6.2,
+    "gdp_index": 84.4,
+    "spending_index": 87.5,
+    "vix_proxy": 4.4,
+    "credit_stress": 6.3,
+    "housing_stress": 23.9,
+    "biz_confidence": 98.3,
+    "labor_anxiety": 0.0,
+    "institutional_trust": 57.3,
+    "social_cohesion": 73.7,
+    "inequality_index": 7.9,
+    "bankruptcy_risk": 0.0,
+    "exhaustion_rate": 0.0,
+    "civil_unrest": 1.6,
+    "price_pressure": 18.7,
+    "sector_stress": {
+      "manager": {
+        "count": 21,
+        "avg_debt": 0.058,
+        "avg_tension": 0.022,
+        "avg_valence": 0.5,
+        "unemployment_pct": 0.0
+      },
+      "office_worker": {
+        "count": 385,
+        "avg_debt": 0.129,
+        "avg_tension": 0.059,
+        "avg_valence": 0.497,
+        "unemployment_pct": 0.0
+      },
+      "retail_worker": {
+        "count": 140,
+        "avg_debt": 0.187,
+        "avg_tension": 0.075,
+        "avg_valence": 0.495,
+        "unemployment_pct": 0.0
+      },
+      "office_professional": {
+        "count": 3,
+        "avg_debt": 0.063,
+        "avg_tension": 0.022,
+        "avg_valence": 0.5,
+        "unemployment_pct": 0.0
+      },
+      "government_worker": {
+        "count": 7,
+        "avg_debt": 0.047,
+        "avg_tension": 0.022,
+        "avg_valence": 0.5,
+        "unemployment_pct": 0.0
+      },
+      "healthcare": {
+        "count": 1,
+        "avg_debt": 0.084,
+        "avg_tension": 0.022,
+        "avg_valence": 0.5,
+        "unemployment_pct": 0.0
+      },
+      "tech_worker": {
+        "count": 60,
+        "avg_debt": 0.127,
+        "avg_tension": 0.026,
+        "avg_valence": 0.497,
+        "unemployment_pct": 0.0
+      },
+      "factory_worker": {
+        "count": 50,
+        "avg_debt": 0.186,
+        "avg_tension": 0.024,
+        "avg_valence": 0.495,
+        "unemployment_pct": 0.0
+      },
+      "healthcare_worker": {
+        "count": 30,
+        "avg_debt": 0.152,
+        "avg_tension": 0.024,
+        "avg_valence": 0.496,
+        "unemployment_pct": 0.0
+      },
+      "gig_worker": {
+        "count": 40,
+        "avg_debt": 0.31,
+        "avg_tension": 0.095,
+        "avg_valence": 0.489,
+        "unemployment_pct": 0.0
+      },
+      "student": {
+        "count": 30,
+        "avg_debt": 0.225,
+        "avg_tension": 0.093,
+        "avg_valence": 0.492,
+        "unemployment_pct": 0.0
+      },
+      "retiree": {
+        "count": 25,
+        "avg_debt": 0.114,
+        "avg_tension": 0.023,
+        "avg_valence": 0.498,
+        "unemployment_pct": 0.0
+      },
+      "small_business_owner": {
+        "count": 25,
+        "avg_debt": 0.251,
+        "avg_tension": 0.025,
+        "avg_valence": 0.492,
+        "unemployment_pct": 0.0
+      }
+    }
+  },
+  "daily": [
+    {
+      "day": 3,
+      "cci": 64.9,
+      "unemployment_rate": 84.9,
+      "underemployment_rate": 14.1,
+      "gdp_index": 39.7,
+      "spending_index": 51.7,
+      "vix_proxy": 7.3,
+      "credit_stress": 51.5,
+      "housing_stress": 68.6,
+      "biz_confidence": 72.0,
+      "labor_anxiety": 12.3,
+      "institutional_trust": 55.2,
+      "social_cohesion": 73.0,
+      "inequality_index": 11.1,
+      "bankruptcy_risk": 17.5,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 2.5,
+      "price_pressure": 61.8,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.437,
+          "avg_tension": 0.038,
+          "avg_valence": 0.484,
+          "unemployment_pct": 0.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 0.583,
+          "avg_tension": 0.091,
+          "avg_valence": 0.479,
+          "unemployment_pct": 83.1
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 0.618,
+          "avg_tension": 0.113,
+          "avg_valence": 0.478,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 0.515,
+          "avg_tension": 0.046,
+          "avg_valence": 0.481,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 0.245,
+          "avg_tension": 0.029,
+          "avg_valence": 0.491,
+          "unemployment_pct": 0.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 0.274,
+          "avg_tension": 0.029,
+          "avg_valence": 0.49,
+          "unemployment_pct": 0.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 0.529,
+          "avg_tension": 0.087,
+          "avg_valence": 0.481,
+          "unemployment_pct": 63.3
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 0.811,
+          "avg_tension": 0.084,
+          "avg_valence": 0.47,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 0.561,
+          "avg_tension": 0.054,
+          "avg_valence": 0.48,
+          "unemployment_pct": 80.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 0.694,
+          "avg_tension": 0.116,
+          "avg_valence": 0.475,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 0.615,
+          "avg_tension": 0.114,
+          "avg_valence": 0.478,
+          "unemployment_pct": 96.7
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 0.724,
+          "avg_tension": 0.085,
+          "avg_valence": 0.473,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 0.634,
+          "avg_tension": 0.053,
+          "avg_valence": 0.478,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 4,
+      "cci": 55.8,
+      "unemployment_rate": 99.0,
+      "underemployment_rate": 1.0,
+      "gdp_index": 14.7,
+      "spending_index": 31.7,
+      "vix_proxy": 8.5,
+      "credit_stress": 83.0,
+      "housing_stress": 91.2,
+      "biz_confidence": 36.5,
+      "labor_anxiety": 18.0,
+      "institutional_trust": 54.5,
+      "social_cohesion": 73.1,
+      "inequality_index": 11.0,
+      "bankruptcy_risk": 92.3,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 2.9,
+      "price_pressure": 86.7,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.684,
+          "avg_tension": 0.05,
+          "avg_valence": 0.473,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 0.855,
+          "avg_tension": 0.106,
+          "avg_valence": 0.467,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 0.867,
+          "avg_tension": 0.125,
+          "avg_valence": 0.468,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 0.83,
+          "avg_tension": 0.067,
+          "avg_valence": 0.468,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 0.381,
+          "avg_tension": 0.032,
+          "avg_valence": 0.485,
+          "unemployment_pct": 0.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 0.383,
+          "avg_tension": 0.031,
+          "avg_valence": 0.486,
+          "unemployment_pct": 0.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 0.776,
+          "avg_tension": 0.103,
+          "avg_valence": 0.471,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.105,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 0.775,
+          "avg_tension": 0.066,
+          "avg_valence": 0.471,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 0.9,
+          "avg_tension": 0.124,
+          "avg_valence": 0.466,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 0.828,
+          "avg_tension": 0.12,
+          "avg_valence": 0.469,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.114,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 0.843,
+          "avg_tension": 0.066,
+          "avg_valence": 0.468,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 5,
+      "cci": 51.0,
+      "unemployment_rate": 99.4,
+      "underemployment_rate": 0.6,
+      "gdp_index": 2.0,
+      "spending_index": 21.6,
+      "vix_proxy": 9.3,
+      "credit_stress": 100.0,
+      "housing_stress": 99.4,
+      "biz_confidence": 12.8,
+      "labor_anxiety": 23.1,
+      "institutional_trust": 54.1,
+      "social_cohesion": 73.1,
+      "inequality_index": 6.0,
+      "bankruptcy_risk": 99.0,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 3.2,
+      "price_pressure": 99.8,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.908,
+          "avg_tension": 0.065,
+          "avg_valence": 0.464,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 0.985,
+          "avg_tension": 0.118,
+          "avg_valence": 0.461,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 0.998,
+          "avg_tension": 0.135,
+          "avg_valence": 0.462,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 1.0,
+          "avg_tension": 0.085,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 0.506,
+          "avg_tension": 0.036,
+          "avg_valence": 0.481,
+          "unemployment_pct": 42.9
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 0.482,
+          "avg_tension": 0.035,
+          "avg_valence": 0.483,
+          "unemployment_pct": 0.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 0.972,
+          "avg_tension": 0.121,
+          "avg_valence": 0.463,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.106,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 0.958,
+          "avg_tension": 0.08,
+          "avg_valence": 0.463,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 0.999,
+          "avg_tension": 0.129,
+          "avg_valence": 0.461,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 0.979,
+          "avg_tension": 0.126,
+          "avg_valence": 0.462,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.116,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 0.98,
+          "avg_tension": 0.078,
+          "avg_valence": 0.462,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 6,
+      "cci": 49.9,
+      "unemployment_rate": 100.0,
+      "underemployment_rate": 0.0,
+      "gdp_index": 0.4,
+      "spending_index": 20.3,
+      "vix_proxy": 9.4,
+      "credit_stress": 100.0,
+      "housing_stress": 100.0,
+      "biz_confidence": 8.5,
+      "labor_anxiety": 27.7,
+      "institutional_trust": 53.9,
+      "social_cohesion": 73.2,
+      "inequality_index": 3.8,
+      "bankruptcy_risk": 99.0,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 3.2,
+      "price_pressure": 100.0,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.996,
+          "avg_tension": 0.075,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 1.0,
+          "avg_tension": 0.118,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 1.0,
+          "avg_tension": 0.135,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 1.0,
+          "avg_tension": 0.087,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 0.62,
+          "avg_tension": 0.042,
+          "avg_valence": 0.475,
+          "unemployment_pct": 100.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 0.573,
+          "avg_tension": 0.039,
+          "avg_valence": 0.479,
+          "unemployment_pct": 100.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 0.999,
+          "avg_tension": 0.124,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.106,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.085,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 1.0,
+          "avg_tension": 0.129,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.128,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.117,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.08,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 7,
+      "cci": 49.2,
+      "unemployment_rate": 100.0,
+      "underemployment_rate": 0.0,
+      "gdp_index": 0.3,
+      "spending_index": 20.2,
+      "vix_proxy": 9.4,
+      "credit_stress": 100.0,
+      "housing_stress": 100.0,
+      "biz_confidence": 10.6,
+      "labor_anxiety": 31.7,
+      "institutional_trust": 53.8,
+      "social_cohesion": 73.2,
+      "inequality_index": 2.8,
+      "bankruptcy_risk": 99.9,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 3.3,
+      "price_pressure": 100.0,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.999,
+          "avg_tension": 0.076,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 1.0,
+          "avg_tension": 0.119,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 1.0,
+          "avg_tension": 0.135,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 1.0,
+          "avg_tension": 0.089,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 0.724,
+          "avg_tension": 0.047,
+          "avg_valence": 0.471,
+          "unemployment_pct": 100.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 0.656,
+          "avg_tension": 0.044,
+          "avg_valence": 0.474,
+          "unemployment_pct": 100.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 1.0,
+          "avg_tension": 0.124,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.108,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.085,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 1.0,
+          "avg_tension": 0.129,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.127,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.12,
+          "avg_valence": 0.454,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.081,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 8,
+      "cci": 48.6,
+      "unemployment_rate": 100.0,
+      "underemployment_rate": 0.0,
+      "gdp_index": 0.2,
+      "spending_index": 20.2,
+      "vix_proxy": 9.4,
+      "credit_stress": 100.0,
+      "housing_stress": 100.0,
+      "biz_confidence": 11.6,
+      "labor_anxiety": 35.3,
+      "institutional_trust": 53.7,
+      "social_cohesion": 73.3,
+      "inequality_index": 1.9,
+      "bankruptcy_risk": 100.0,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 3.2,
+      "price_pressure": 100.0,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.999,
+          "avg_tension": 0.077,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 1.0,
+          "avg_tension": 0.116,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 1.0,
+          "avg_tension": 0.135,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 1.0,
+          "avg_tension": 0.091,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 0.819,
+          "avg_tension": 0.051,
+          "avg_valence": 0.467,
+          "unemployment_pct": 100.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 0.732,
+          "avg_tension": 0.047,
+          "avg_valence": 0.471,
+          "unemployment_pct": 100.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 1.0,
+          "avg_tension": 0.124,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.11,
+          "avg_valence": 0.454,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.086,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 1.0,
+          "avg_tension": 0.129,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.127,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.123,
+          "avg_valence": 0.453,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.081,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 9,
+      "cci": 48.0,
+      "unemployment_rate": 100.0,
+      "underemployment_rate": 0.0,
+      "gdp_index": 0.1,
+      "spending_index": 20.1,
+      "vix_proxy": 9.4,
+      "credit_stress": 100.0,
+      "housing_stress": 100.0,
+      "biz_confidence": 12.3,
+      "labor_anxiety": 38.5,
+      "institutional_trust": 53.6,
+      "social_cohesion": 73.3,
+      "inequality_index": 1.1,
+      "bankruptcy_risk": 100.0,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 3.3,
+      "price_pressure": 100.0,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.999,
+          "avg_tension": 0.079,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 1.0,
+          "avg_tension": 0.117,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 1.0,
+          "avg_tension": 0.135,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 1.0,
+          "avg_tension": 0.093,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 0.906,
+          "avg_tension": 0.056,
+          "avg_valence": 0.464,
+          "unemployment_pct": 100.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 0.8,
+          "avg_tension": 0.051,
+          "avg_valence": 0.469,
+          "unemployment_pct": 100.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 1.0,
+          "avg_tension": 0.124,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.113,
+          "avg_valence": 0.453,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.087,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 1.0,
+          "avg_tension": 0.128,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.127,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.126,
+          "avg_valence": 0.451,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.082,
+          "avg_valence": 0.458,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 10,
+      "cci": 47.4,
+      "unemployment_rate": 100.0,
+      "underemployment_rate": 0.0,
+      "gdp_index": 0.0,
+      "spending_index": 20.0,
+      "vix_proxy": 9.5,
+      "credit_stress": 100.0,
+      "housing_stress": 100.0,
+      "biz_confidence": 12.8,
+      "labor_anxiety": 41.3,
+      "institutional_trust": 53.5,
+      "social_cohesion": 73.4,
+      "inequality_index": 0.5,
+      "bankruptcy_risk": 100.0,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 3.3,
+      "price_pressure": 100.0,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.999,
+          "avg_tension": 0.08,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 1.0,
+          "avg_tension": 0.119,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 1.0,
+          "avg_tension": 0.135,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 1.0,
+          "avg_tension": 0.095,
+          "avg_valence": 0.454,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 0.983,
+          "avg_tension": 0.063,
+          "avg_valence": 0.461,
+          "unemployment_pct": 100.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 0.863,
+          "avg_tension": 0.054,
+          "avg_valence": 0.466,
+          "unemployment_pct": 100.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 1.0,
+          "avg_tension": 0.124,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.115,
+          "avg_valence": 0.452,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.088,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 1.0,
+          "avg_tension": 0.129,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.128,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.129,
+          "avg_valence": 0.45,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.083,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 11,
+      "cci": 47.0,
+      "unemployment_rate": 100.0,
+      "underemployment_rate": 0.0,
+      "gdp_index": 0.0,
+      "spending_index": 20.0,
+      "vix_proxy": 9.4,
+      "credit_stress": 100.0,
+      "housing_stress": 100.0,
+      "biz_confidence": 13.3,
+      "labor_anxiety": 43.8,
+      "institutional_trust": 53.6,
+      "social_cohesion": 73.4,
+      "inequality_index": 0.3,
+      "bankruptcy_risk": 100.0,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 3.3,
+      "price_pressure": 100.0,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.999,
+          "avg_tension": 0.081,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 1.0,
+          "avg_tension": 0.116,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 1.0,
+          "avg_tension": 0.135,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 1.0,
+          "avg_tension": 0.096,
+          "avg_valence": 0.454,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 1.0,
+          "avg_tension": 0.065,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 0.92,
+          "avg_tension": 0.059,
+          "avg_valence": 0.464,
+          "unemployment_pct": 100.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 1.0,
+          "avg_tension": 0.124,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.116,
+          "avg_valence": 0.451,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.088,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 1.0,
+          "avg_tension": 0.129,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.128,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.131,
+          "avg_valence": 0.449,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.084,
+          "avg_valence": 0.457,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 12,
+      "cci": 46.6,
+      "unemployment_rate": 100.0,
+      "underemployment_rate": 0.0,
+      "gdp_index": 0.0,
+      "spending_index": 20.0,
+      "vix_proxy": 9.5,
+      "credit_stress": 100.0,
+      "housing_stress": 100.0,
+      "biz_confidence": 13.6,
+      "labor_anxiety": 46.0,
+      "institutional_trust": 53.6,
+      "social_cohesion": 73.5,
+      "inequality_index": 0.1,
+      "bankruptcy_risk": 100.0,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 3.3,
+      "price_pressure": 100.0,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.999,
+          "avg_tension": 0.082,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 1.0,
+          "avg_tension": 0.118,
+          "avg_valence": 0.454,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 1.0,
+          "avg_tension": 0.135,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 1.0,
+          "avg_tension": 0.098,
+          "avg_valence": 0.453,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 1.0,
+          "avg_tension": 0.065,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 0.971,
+          "avg_tension": 0.063,
+          "avg_valence": 0.462,
+          "unemployment_pct": 100.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 1.0,
+          "avg_tension": 0.124,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.118,
+          "avg_valence": 0.451,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.089,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 1.0,
+          "avg_tension": 0.129,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.128,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.133,
+          "avg_valence": 0.448,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.085,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 13,
+      "cci": 46.3,
+      "unemployment_rate": 100.0,
+      "underemployment_rate": 0.0,
+      "gdp_index": 0.0,
+      "spending_index": 20.0,
+      "vix_proxy": 9.5,
+      "credit_stress": 100.0,
+      "housing_stress": 100.0,
+      "biz_confidence": 13.8,
+      "labor_anxiety": 47.8,
+      "institutional_trust": 53.7,
+      "social_cohesion": 73.5,
+      "inequality_index": 0.0,
+      "bankruptcy_risk": 100.0,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 3.3,
+      "price_pressure": 100.0,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.999,
+          "avg_tension": 0.083,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 1.0,
+          "avg_tension": 0.117,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 1.0,
+          "avg_tension": 0.136,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 1.0,
+          "avg_tension": 0.099,
+          "avg_valence": 0.452,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 1.0,
+          "avg_tension": 0.065,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 1.0,
+          "avg_tension": 0.066,
+          "avg_valence": 0.461,
+          "unemployment_pct": 100.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 1.0,
+          "avg_tension": 0.124,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.119,
+          "avg_valence": 0.45,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.09,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 1.0,
+          "avg_tension": 0.129,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.129,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.134,
+          "avg_valence": 0.447,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.086,
+          "avg_valence": 0.456,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 14,
+      "cci": 46.1,
+      "unemployment_rate": 100.0,
+      "underemployment_rate": 0.0,
+      "gdp_index": 0.0,
+      "spending_index": 20.0,
+      "vix_proxy": 9.6,
+      "credit_stress": 100.0,
+      "housing_stress": 100.0,
+      "biz_confidence": 13.9,
+      "labor_anxiety": 49.5,
+      "institutional_trust": 53.7,
+      "social_cohesion": 73.6,
+      "inequality_index": 0.1,
+      "bankruptcy_risk": 100.0,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 3.3,
+      "price_pressure": 100.0,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.999,
+          "avg_tension": 0.083,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 1.0,
+          "avg_tension": 0.119,
+          "avg_valence": 0.454,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 1.0,
+          "avg_tension": 0.136,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 1.0,
+          "avg_tension": 0.1,
+          "avg_valence": 0.452,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 1.0,
+          "avg_tension": 0.065,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 1.0,
+          "avg_tension": 0.066,
+          "avg_valence": 0.461,
+          "unemployment_pct": 100.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 1.0,
+          "avg_tension": 0.124,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.12,
+          "avg_valence": 0.449,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.091,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 1.0,
+          "avg_tension": 0.13,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.129,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.136,
+          "avg_valence": 0.447,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.087,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 15,
+      "cci": 45.8,
+      "unemployment_rate": 100.0,
+      "underemployment_rate": 0.0,
+      "gdp_index": 0.0,
+      "spending_index": 20.0,
+      "vix_proxy": 9.6,
+      "credit_stress": 100.0,
+      "housing_stress": 100.0,
+      "biz_confidence": 14.0,
+      "labor_anxiety": 50.9,
+      "institutional_trust": 53.7,
+      "social_cohesion": 73.6,
+      "inequality_index": 0.0,
+      "bankruptcy_risk": 100.0,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 3.3,
+      "price_pressure": 100.0,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.999,
+          "avg_tension": 0.084,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 1.0,
+          "avg_tension": 0.118,
+          "avg_valence": 0.454,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 1.0,
+          "avg_tension": 0.136,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 1.0,
+          "avg_tension": 0.1,
+          "avg_valence": 0.451,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 1.0,
+          "avg_tension": 0.066,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 1.0,
+          "avg_tension": 0.066,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 1.0,
+          "avg_tension": 0.124,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.121,
+          "avg_valence": 0.449,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.091,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 1.0,
+          "avg_tension": 0.13,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.129,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.137,
+          "avg_valence": 0.446,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.087,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        }
+      }
+    },
+    {
+      "day": 16,
+      "cci": 45.6,
+      "unemployment_rate": 100.0,
+      "underemployment_rate": 0.0,
+      "gdp_index": 0.0,
+      "spending_index": 20.0,
+      "vix_proxy": 9.7,
+      "credit_stress": 100.0,
+      "housing_stress": 100.0,
+      "biz_confidence": 14.1,
+      "labor_anxiety": 52.0,
+      "institutional_trust": 53.7,
+      "social_cohesion": 73.7,
+      "inequality_index": 0.1,
+      "bankruptcy_risk": 100.0,
+      "exhaustion_rate": 0.0,
+      "civil_unrest": 3.4,
+      "price_pressure": 100.0,
+      "sector_stress": {
+        "manager": {
+          "count": 21,
+          "avg_debt": 0.998,
+          "avg_tension": 0.084,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "office_worker": {
+          "count": 385,
+          "avg_debt": 1.0,
+          "avg_tension": 0.121,
+          "avg_valence": 0.453,
+          "unemployment_pct": 100.0
+        },
+        "retail_worker": {
+          "count": 140,
+          "avg_debt": 1.0,
+          "avg_tension": 0.136,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "office_professional": {
+          "count": 3,
+          "avg_debt": 1.0,
+          "avg_tension": 0.101,
+          "avg_valence": 0.451,
+          "unemployment_pct": 100.0
+        },
+        "government_worker": {
+          "count": 7,
+          "avg_debt": 1.0,
+          "avg_tension": 0.066,
+          "avg_valence": 0.459,
+          "unemployment_pct": 100.0
+        },
+        "healthcare": {
+          "count": 1,
+          "avg_debt": 1.0,
+          "avg_tension": 0.066,
+          "avg_valence": 0.46,
+          "unemployment_pct": 100.0
+        },
+        "tech_worker": {
+          "count": 60,
+          "avg_debt": 1.0,
+          "avg_tension": 0.123,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "factory_worker": {
+          "count": 50,
+          "avg_debt": 1.0,
+          "avg_tension": 0.121,
+          "avg_valence": 0.449,
+          "unemployment_pct": 100.0
+        },
+        "healthcare_worker": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.092,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "gig_worker": {
+          "count": 40,
+          "avg_debt": 1.0,
+          "avg_tension": 0.13,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "student": {
+          "count": 30,
+          "avg_debt": 1.0,
+          "avg_tension": 0.129,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        },
+        "retiree": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.138,
+          "avg_valence": 0.445,
+          "unemployment_pct": 100.0
+        },
+        "small_business_owner": {
+          "count": 25,
+          "avg_debt": 1.0,
+          "avg_tension": 0.088,
+          "avg_valence": 0.455,
+          "unemployment_pct": 100.0
+        }
+      }
+    }
+  ],
+  "final": {
+    "day": 16,
+    "cci": 45.6,
+    "unemployment_rate": 100.0,
+    "underemployment_rate": 0.0,
+    "gdp_index": 0.0,
+    "spending_index": 20.0,
+    "vix_proxy": 9.7,
+    "credit_stress": 100.0,
+    "housing_stress": 100.0,
+    "biz_confidence": 14.1,
+    "labor_anxiety": 52.0,
+    "institutional_trust": 53.7,
+    "social_cohesion": 73.7,
+    "inequality_index": 0.1,
+    "bankruptcy_risk": 100.0,
+    "exhaustion_rate": 0.0,
+    "civil_unrest": 3.4,
+    "price_pressure": 100.0,
+    "sector_stress": {
+      "manager": {
+        "count": 21,
+        "avg_debt": 0.998,
+        "avg_tension": 0.084,
+        "avg_valence": 0.455,
+        "unemployment_pct": 100.0
+      },
+      "office_worker": {
+        "count": 385,
+        "avg_debt": 1.0,
+        "avg_tension": 0.121,
+        "avg_valence": 0.453,
+        "unemployment_pct": 100.0
+      },
+      "retail_worker": {
+        "count": 140,
+        "avg_debt": 1.0,
+        "avg_tension": 0.136,
+        "avg_valence": 0.455,
+        "unemployment_pct": 100.0
+      },
+      "office_professional": {
+        "count": 3,
+        "avg_debt": 1.0,
+        "avg_tension": 0.101,
+        "avg_valence": 0.451,
+        "unemployment_pct": 100.0
+      },
+      "government_worker": {
+        "count": 7,
+        "avg_debt": 1.0,
+        "avg_tension": 0.066,
+        "avg_valence": 0.459,
+        "unemployment_pct": 100.0
+      },
+      "healthcare": {
+        "count": 1,
+        "avg_debt": 1.0,
+        "avg_tension": 0.066,
+        "avg_valence": 0.46,
+        "unemployment_pct": 100.0
+      },
+      "tech_worker": {
+        "count": 60,
+        "avg_debt": 1.0,
+        "avg_tension": 0.123,
+        "avg_valence": 0.455,
+        "unemployment_pct": 100.0
+      },
+      "factory_worker": {
+        "count": 50,
+        "avg_debt": 1.0,
+        "avg_tension": 0.121,
+        "avg_valence": 0.449,
+        "unemployment_pct": 100.0
+      },
+      "healthcare_worker": {
+        "count": 30,
+        "avg_debt": 1.0,
+        "avg_tension": 0.092,
+        "avg_valence": 0.455,
+        "unemployment_pct": 100.0
+      },
+      "gig_worker": {
+        "count": 40,
+        "avg_debt": 1.0,
+        "avg_tension": 0.13,
+        "avg_valence": 0.455,
+        "unemployment_pct": 100.0
+      },
+      "student": {
+        "count": 30,
+        "avg_debt": 1.0,
+        "avg_tension": 0.129,
+        "avg_valence": 0.455,
+        "unemployment_pct": 100.0
+      },
+      "retiree": {
+        "count": 25,
+        "avg_debt": 1.0,
+        "avg_tension": 0.138,
+        "avg_valence": 0.445,
+        "unemployment_pct": 100.0
+      },
+      "small_business_owner": {
+        "count": 25,
+        "avg_debt": 1.0,
+        "avg_tension": 0.088,
+        "avg_valence": 0.455,
+        "unemployment_pct": 100.0
+      }
+    }
+  },
+  "decisions": {
+    "ABSORB_LOSSES": 118,
+    "CUT_HOURS": 179,
+    "ORGANIZE_UNION": 42,
+    "CONFRONT_MANAGEMENT": 14,
+    "LOBBY_GOVERNMENT": 14,
+    "HOLD_STEADY": 24,
+    "EMERGENCY_FUND": 81,
+    "ORGANIZE_MUTUAL_AID": 14,
+    "APPROVE_STIMULUS": 12,
+    "RAISE_PRICES": 1
+  },
+  "llm_calls": 502,
+  "llm_decisions": 499,
+  "sample_decisions": [
+    {
+      "tick": 368,
+      "time": "Day 16, 08:00",
+      "agent": "Ron Vachris",
+      "role": "manager",
+      "decision": "RAISE_PRICES",
+      "magnitude": 0.6,
+      "reasoning": "I won't break trust with my crew by cutting pay or jobs; raising prices preserves payroll and dignit",
+      "who_helps": "Riley_Cos_0",
+      "who_hurts": "myself",
+      "speech": "Team \u2014 I know times are tight and I won't let anyone here lose their paycheck on my watch. We're imp",
+      "thought": "This stings \u2014 customers will push back and I'll take the blame \u2014 but it's better than cutting hours ",
+      "ripple_count": 113,
+      "latency_ms": 7810
+    },
+    {
+      "tick": 368,
+      "time": "Day 16, 08:00",
+      "agent": "Marianne Lake",
+      "role": "office_professional",
+      "decision": "CUT_HOURS",
+      "magnitude": 0.75,
+      "reasoning": "With cash burn at a critical level I must extend runway while preserving as many jobs and core capab",
+      "who_helps": "Alex_Fir_0",
+      "who_hurts": "Drew_Fir_1",
+      "speech": "We've made a very difficult but necessary decision to reduce hours across the organization on a temp",
+      "thought": "This is the least-bad option to avoid layoffs, but I'm anxious about fallout for individuals' financ",
+      "ripple_count": 64,
+      "latency_ms": 9411
+    },
+    {
+      "tick": 368,
+      "time": "Day 16, 08:00",
+      "agent": "Albert Bourla",
+      "role": "manager",
+      "decision": "CUT_HOURS",
+      "magnitude": 0.9,
+      "reasoning": "Debt pressure is critical and my duty as guardian is to preserve jobs and team cohesion; spreading r",
+      "who_helps": "Sam_Pha_0",
+      "who_hurts": "Alex_Pha_6",
+      "speech": "Team, to protect every job and keep our unit intact through this critical period, we will implement ",
+      "thought": "I worry this will strain people and some will suffer financially, but layoffs would be abandonment \u2014",
+      "ripple_count": 60,
+      "latency_ms": 8020
+    },
+    {
+      "tick": 368,
+      "time": "Day 16, 08:00",
+      "agent": "Senator Chen",
+      "role": "government_worker",
+      "decision": "EMERGENCY_FUND",
+      "magnitude": 0.95,
+      "reasoning": "Payroll and constituents' insured deposits are immediately at risk and I need decisive action that I",
+      "who_helps": "Taylor_US__0",
+      "who_hurts": "nobody",
+      "speech": "We're authorizing an emergency liquidity fund now \u2014 full payroll protection and deposit guarantees. ",
+      "thought": "If this doesn't work I'll be exposed as the one who let the office fail; I need to control every ste",
+      "ripple_count": 0,
+      "latency_ms": 7158
+    },
+    {
+      "tick": 368,
+      "time": "Day 16, 08:00",
+      "agent": "Colette Kress",
+      "role": "manager",
+      "decision": "CUT_HOURS",
+      "magnitude": 0.8,
+      "reasoning": "Debt is at a critical threshold and preserving runway is paramount to avoid permanent layoffs; a tem",
+      "who_helps": "Sam_Nov_0",
+      "who_hurts": "Riley_Nov_1",
+      "speech": "I've made a difficult but necessary decision to implement a temporary, proportional reduction in hou",
+      "thought": "I hope this staves off insolvency \u2014 I can't gamble with the balance sheet. I hate that anyone will l",
+      "ripple_count": 46,
+      "latency_ms": 7479
+    },
+    {
+      "tick": 369,
+      "time": "Day 16, 09:00",
+      "agent": "Andy Burke",
+      "role": "manager",
+      "decision": "HOLD_STEADY",
+      "magnitude": 0.85,
+      "reasoning": "With debt at a critical level my priority is to minimize chaos and preserve payroll while I buy time",
+      "who_helps": "Sam_Meg_0",
+      "who_hurts": "creditors",
+      "speech": "We are pausing nonessential projects, hiring and discretionary spend effective immediately. This is ",
+      "thought": "I need to keep the machine running and avoid panic while I hustle the balance sheet and negotiate wi",
+      "ripple_count": 0,
+      "latency_ms": 7202
+    },
+    {
+      "tick": 369,
+      "time": "Day 16, 09:00",
+      "agent": "Dave Cho",
+      "role": "manager",
+      "decision": "CUT_HOURS",
+      "magnitude": 0.9,
+      "reasoning": "Debt is critical and layoffs would permanently betray the team and cripple our delivery backbone; ac",
+      "who_helps": "Sam_Meg_0",
+      "who_hurts": "Avery_Meg_5",
+      "speech": "We've hit a liquidity emergency and I won't betray this team with layoffs. We're instituting a tempo",
+      "thought": "This stings, but cutting hours is the only way to keep the core intact; I can't let us sacrifice peo",
+      "ripple_count": 60,
+      "latency_ms": 7594
+    },
+    {
+      "tick": 370,
+      "time": "Day 16, 10:00",
+      "agent": "Doug Whitfield",
+      "role": "manager",
+      "decision": "CUT_HOURS",
+      "magnitude": 0.9,
+      "reasoning": "Debt is critical and my priority as a third\u2011generation leader is to protect jobs and the trust we've",
+      "who_helps": "Jordan_Ret_0",
+      "who_hurts": "Taylor_Ret_1",
+      "speech": "I know this is hard. To avoid layoffs and keep everyone on the team, we're implementing a temporary ",
+      "thought": "I hate doing this but firing people would destroy the trust I've spent my life building; if the cuts",
+      "ripple_count": 101,
+      "latency_ms": 6374
+    },
+    {
+      "tick": 370,
+      "time": "Day 16, 10:00",
+      "agent": "Judith McKenna",
+      "role": "manager",
+      "decision": "CUT_HOURS",
+      "magnitude": 0.8,
+      "reasoning": "With debt and banking liquidity at critical levels, a proportionate reduction in hours is the most c",
+      "who_helps": "Jordan_Ret_0",
+      "who_hurts": "Alex_Ret_2",
+      "speech": "We are instituting a temporary, measured reduction in hours across the business to preserve payroll ",
+      "thought": "Cutting hours is ugly but necessary \u2014 it keeps the operation intact and gives me something I can con",
+      "ripple_count": 80,
+      "latency_ms": 6031
+    },
+    {
+      "tick": 370,
+      "time": "Day 16, 10:00",
+      "agent": "Tim Park",
+      "role": "manager",
+      "decision": "CUT_HOURS",
+      "magnitude": 0.9,
+      "reasoning": "With debt at a critical level and liquidity fragile, spreading reduced hours preserves cash immediat",
+      "who_helps": "Morgan_Ape_7",
+      "who_hurts": "Drew_Ape_0",
+      "speech": "To protect the company and as many paychecks as possible, we\u2019re instituting a temporary, across-the-",
+      "thought": "This is the necessary control move to prevent total collapse \u2014 I can\u2019t afford exposure or rash cuts.",
+      "ripple_count": 60,
+      "latency_ms": 6294
+    },
+    {
+      "tick": 370,
+      "time": "Day 16, 10:00",
+      "agent": "Kathy Mikells",
+      "role": "manager",
+      "decision": "ABSORB_LOSSES",
+      "magnitude": 0.9,
+      "reasoning": "Debt is critical but layoffs would destroy operational capability and morale; I will continue to abs",
+      "who_helps": "Drew_Pet_0",
+      "who_hurts": "myself",
+      "speech": "I've made the decision to protect our people and operations: we will cut all non\u2011payroll spend, defe",
+      "thought": "This is getting tight \u2014 lenders could balk and my personal finances are taking a hit, but laying peo",
+      "ripple_count": 0,
+      "latency_ms": 5233
+    },
+    {
+      "tick": 370,
+      "time": "Day 16, 10:00",
+      "agent": "Jensen Huang",
+      "role": "manager",
+      "decision": "ABSORB_LOSSES",
+      "magnitude": 0.8,
+      "reasoning": "I will take deep margin hits now to preserve payroll and core talent because cutting people would de",
+      "who_helps": "Sam_Nov_0",
+      "who_hurts": "myself",
+      "speech": "We're taking a deliberate hit to margins so every one of you can keep your job and we can protect th",
+      "thought": "Debt is crushing and this gambit might not be enough \u2014 if we fail I'll be exposed and humiliated. Bu",
+      "ripple_count": 0,
+      "latency_ms": 6572
+    },
+    {
+      "tick": 371,
+      "time": "Day 16, 11:00",
+      "agent": "Luca Torres",
+      "role": "manager",
+      "decision": "CUT_HOURS",
+      "magnitude": 0.85,
+      "reasoning": "With liquidity exhausted and debt critical, a broad, temporary reduction in hours is the most contro",
+      "who_helps": "Morgan_Ape_7",
+      "who_hurts": "Drew_Ape_0",
+      "speech": "Team \u2014 we're taking an urgent, temporary reduction in hours across the board to preserve everyone's ",
+      "thought": "We need to maintain control and buy time; layoffs would create chaos and strip our ability to recove",
+      "ripple_count": 60,
+      "latency_ms": 4454
+    },
+    {
+      "tick": 371,
+      "time": "Day 16, 11:00",
+      "agent": "Kevin Turner",
+      "role": "manager",
+      "decision": "ABSORB_LOSSES",
+      "magnitude": 0.8,
+      "reasoning": "As an operator I will take a deep margin hit now to preserve payroll and customer trust while we sur",
+      "who_helps": "Casey_Clo_0",
+      "who_hurts": "myself",
+      "speech": "Listen up \u2014 we are absorbing the margin impact now so nobody on this team loses a paycheck. I\u2019ll tak",
+      "thought": "Debt is critical and this will squeeze me personally, but layoffs would destroy our ops and morale \u2014",
+      "ripple_count": 0,
+      "latency_ms": 5083
+    },
+    {
+      "tick": 371,
+      "time": "Day 16, 11:00",
+      "agent": "Casey_CDC_0",
+      "role": "office_worker",
+      "decision": "ORGANIZE_UNION",
+      "magnitude": 0.8,
+      "reasoning": "With household debt at critical levels I need collective, legally grounded leverage to stabilize pay",
+      "who_helps": "myself",
+      "who_hurts": "Albert Bourla",
+      "speech": "I've been talking with colleagues and researching options \u2014 we're going to begin a coordinated, lega",
+      "thought": "I can't afford reckless risks, but I also can't keep taking cuts; organizing is the safest way to fo",
+      "ripple_count": 8,
+      "latency_ms": 5980
+    },
+    {
+      "tick": 373,
+      "time": "Day 16, 13:00",
+      "agent": "Darren Foster",
+      "role": "manager",
+      "decision": "CUT_HOURS",
+      "magnitude": 0.85,
+      "reasoning": "Debt pressure is critical but my loyalty and duty are to keep our skilled team intact and PetroMax o",
+      "who_helps": "Drew_Pet_0",
+      "who_hurts": "nobody",
+      "speech": "Team \u2014 I know this is hard. To avoid permanent layoffs I\u2019m instituting a temporary, across\u2011the\u2011board",
+      "thought": "I hate this, but cutting hours protects loyalty and keeps our talent ready; I\u2019m shouldering more to ",
+      "ripple_count": 53,
+      "latency_ms": 7671
+    },
+    {
+      "tick": 374,
+      "time": "Day 16, 14:00",
+      "agent": "Craig Rivera",
+      "role": "manager",
+      "decision": "CUT_HOURS",
+      "magnitude": 0.9,
+      "reasoning": "Runway is critically short and payroll is our largest ongoing burn; a meaningful temporary reduction",
+      "who_helps": "Jordan_Ape_4",
+      "who_hurts": "Drew_Ape_0",
+      "speech": "Team\u2014this is one of the hardest messages I've had to deliver. To avoid permanent layoffs, we need to",
+      "thought": "Cutting hours is the least bad option \u2014 it hurts people's immediate cash flow but keeps them employe",
+      "ripple_count": 40,
+      "latency_ms": 8647
+    },
+    {
+      "tick": 376,
+      "time": "Day 16, 16:00",
+      "agent": "Janet Morrison",
+      "role": "government_worker",
+      "decision": "EMERGENCY_FUND",
+      "magnitude": 0.9,
+      "reasoning": "Immediate targeted liquidity support is the fastest way to stop runs, preserve depositor access, and",
+      "who_helps": "Morgan_Tre_0",
+      "who_hurts": "Daniel_Pinto",
+      "speech": "We will stand ready with a targeted emergency liquidity fund to stop runs and ensure depositors can ",
+      "thought": "I hate that this increases near-term fiscal strain, but doing nothing risks a collapse that would ru",
+      "ripple_count": 0,
+      "latency_ms": 6321
+    },
+    {
+      "tick": 379,
+      "time": "Day 16, 19:00",
+      "agent": "Rep. Williams",
+      "role": "government_worker",
+      "decision": "EMERGENCY_FUND",
+      "magnitude": 0.9,
+      "reasoning": "Payrolls for my staff and constituents are at immediate risk and I cannot stand by while workers los",
+      "who_helps": "Taylor_US__0",
+      "who_hurts": "future taxpayers",
+      "speech": "We will act swiftly to protect payrolls and prevent mass layoffs, but this aid will be narrowly targ",
+      "thought": "This staves off immediate collapse for my team and constituents, but I'm terrified of creating a pre",
+      "ripple_count": 0,
+      "latency_ms": 5635
+    },
+    {
+      "tick": 380,
+      "time": "Day 16, 20:00",
+      "agent": "Dr. Mandy Cohen",
+      "role": "healthcare",
+      "decision": "ORGANIZE_MUTUAL_AID",
+      "magnitude": 1.0,
+      "reasoning": "Immediate financial distress among staff is the greatest operational and moral risk; as a guardian I",
+      "who_helps": "Casey_CDC_0",
+      "who_hurts": "nobody",
+      "speech": "We are standing up an immediate mutual-aid and payroll-advance program to get everyone emergency sup",
+      "thought": "If I don't move fast, people will panic and operations will destabilize \u2014 I can't let that happen. T",
+      "ripple_count": 6,
+      "latency_ms": 4581
+    }
+  ]
+}
