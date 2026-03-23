@@ -1,6 +1,6 @@
 /** Playback controls — timeline, play/pause, speed, event markers */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useWorldStore } from '../store';
 
 export function PlaybackControls() {
@@ -8,13 +8,33 @@ export function PlaybackControls() {
   const maxTick = useWorldStore(s => s.maxTick);
   const playing = useWorldStore(s => s.playing);
   const speed = useWorldStore(s => s.speed);
+  const snapshot = useWorldStore(s => s.snapshot);
   const setTick = useWorldStore(s => s.setTick);
   const togglePlay = useWorldStore(s => s.togglePlay);
   const setSpeed = useWorldStore(s => s.setSpeed);
   const advanceTick = useWorldStore(s => s.advanceTick);
-  const getCurrentTickData = useWorldStore(s => s.getCurrentTickData);
 
-  const tickData = getCurrentTickData();
+  const tickData = snapshot?.ticks[currentTick] ?? null;
+
+  // Pre-scan all ticks for event markers + conflict hotspots
+  const markers = useMemo(() => {
+    if (!snapshot) return [];
+    const m: Array<{ tick: number; type: 'event' | 'conflict' | 'collapse'; label: string }> = [];
+    for (const t of snapshot.ticks) {
+      if (t.events.length > 0) {
+        m.push({ tick: t.tick - 1, type: 'event', label: t.events[0].description.slice(0, 40) });
+      }
+      const conflicts = t.interactions.filter(i => i.type === 'conflict').length;
+      if (conflicts >= 3) {
+        m.push({ tick: t.tick - 1, type: 'conflict', label: `${conflicts} conflicts` });
+      }
+      const collapses = Object.values(t.agent_states).filter((a: any) => a.action === 'COLLAPSE').length;
+      if (collapses > 0) {
+        m.push({ tick: t.tick - 1, type: 'collapse', label: `${collapses} collapsed` });
+      }
+    }
+    return m;
+  }, [snapshot]);
   const intervalRef = useRef<number | null>(null);
 
   // Playback timer
@@ -148,6 +168,18 @@ export function PlaybackControls() {
             >
               D{i + 1}
             </div>
+          ))}
+        </div>
+        {/* Event/conflict/collapse markers on the timeline */}
+        <div className="timeline-events">
+          {markers.map((m, i) => (
+            <div
+              key={`em-${i}`}
+              className={`timeline-event-dot timeline-event-${m.type}`}
+              style={{ left: `${(m.tick / (maxTick + 1)) * 100}%` }}
+              title={m.label}
+              onClick={(e) => { e.stopPropagation(); setTick(m.tick); }}
+            />
           ))}
         </div>
       </div>

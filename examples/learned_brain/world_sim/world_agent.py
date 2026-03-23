@@ -7,6 +7,7 @@ function operating on (HeartState, embedding, anchors) — no per-agent model.
 
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
@@ -144,6 +145,16 @@ class Personality:
     name: str
     background: str
     temperament: str
+    attachment_style: str = ""
+    coping_style: str = ""
+    threat_lens: str = ""
+    core_need: str = ""
+    shame_trigger: str = ""
+    care_style: str = ""
+    conflict_style: str = ""
+    mask_tendency: str = ""
+    self_story: str = ""
+    longing: str = ""
 
     # Heart dynamics modifiers (defaults = baseline personality)
     arousal_rise_rate: float = 0.7      # how fast arousal rises (0.5-0.9)
@@ -168,6 +179,8 @@ class MemoryEntry:
     valence_at_time: float
     arousal_at_time: float
     other_agent_id: str | None = None  # who was involved
+    interpretation: str = ""
+    story_beat: str = ""
 
 
 @dataclass
@@ -186,6 +199,7 @@ class AppraisalState:
     opportunity_pressure: float = 0.0
     primary_concern: str = "keep things steady"
     interpretation: str = "Nothing feels urgent right now."
+    ongoing_story: str = "trying to stay steady without giving away too much"
     blame_target: str = "circumstances"
     support_target: str = "nobody"
 
@@ -486,6 +500,7 @@ class WorldAgent:
     memory: list[MemoryEntry] = field(default_factory=list)
     last_action: str = "idle"
     last_speech: str = ""
+    social_role: str = "unknown"
     appraisal: AppraisalState = field(default_factory=AppraisalState)
     motives: MotiveState = field(default_factory=MotiveState)
     identity_tags: tuple[str, ...] = ()
@@ -494,19 +509,33 @@ class WorldAgent:
     private_burden: str = ""
     debt_pressure: float = 0.0
     secret_pressure: float = 0.0
+    dread_pressure: float = 0.0  # non-economic persistent stress: health fear, existential threat, moral injury
+    expectation_pessimism: float = 0.0  # forward-looking: 0 = optimistic, 1 = expects disaster
+    _prev_total_pressure: float = 0.0  # used by expectations update
     ambition: float = 0.0
+    llm_salience: float = 0.0
+    llm_salience_level: str = "low"
+    llm_active: bool = False
+    llm_candidate_rank: int | None = None
+    llm_salience_reasons: list[str] = field(default_factory=list)
+    llm_salience_factors: dict[str, float] = field(default_factory=dict)
+    llm_packet_preview: dict | None = None
+    _human_profile_cache: dict[str, str] | None = field(default=None, init=False, repr=False)
 
     # Ring buffer max
     _max_memory: int = 50
 
     def add_memory(self, tick: int, description: str, other_id: str | None = None):
         """Add a compressed memory entry."""
+        interpretation, story_beat = self._interpret_memory(description, other_id)
         self.memory.append(MemoryEntry(
             tick=tick,
             description=description,
             valence_at_time=self.heart.valence,
             arousal_at_time=self.heart.arousal,
             other_agent_id=other_id,
+            interpretation=interpretation,
+            story_beat=story_beat,
         ))
         if len(self.memory) > self._max_memory:
             self.memory = self.memory[-self._max_memory:]
@@ -514,18 +543,256 @@ class WorldAgent:
     def get_recent_memories(self, n: int = 10) -> list[MemoryEntry]:
         return self.memory[-n:]
 
+    def _interpret_memory(self, description: str, other_id: str | None) -> tuple[str, str]:
+        """Store what the event meant to this person, not only what happened."""
+        text = description.lower()
+        profile = self.get_human_profile()
+        attachment = profile["attachment_style"]
+        threat_lens = profile["threat_lens"]
+        core_need = profile["core_need"]
+        self_story = profile["self_story"]
+
+        if "conflict interaction" in text:
+            if threat_lens == "betrayal" or self_story == "loyalist":
+                return (
+                    "I am logging this as proof that loyalty collapses faster than people admit.",
+                    "loyalty breaks the moment pressure rises",
+                )
+            if threat_lens == "humiliation" or core_need == "dignity":
+                return (
+                    "What sticks is not only the conflict, but how exposed and smaller it made me feel.",
+                    "if I look weak, I become movable",
+                )
+            if threat_lens == "scarcity" or self_story in {"provider", "survivor"}:
+                return (
+                    "Conflict like this always feels one step away from taking something concrete from me.",
+                    "security is one bad week from collapse",
+                )
+            return (
+                "I remember the moment the room tilted and nobody really held it.",
+                "if I stop holding the room, it tilts",
+            )
+
+        if "support interaction" in text or "positive interaction" in text:
+            if "guarded" in attachment or "self-protective" in attachment:
+                return (
+                    "Part of me is relieved, and part of me is already wondering what this help will cost later.",
+                    "help always comes with a price",
+                )
+            if "anxious" in attachment or core_need == "belonging":
+                return (
+                    "This changes who feels safe to reach for when things start slipping.",
+                    "who showed up is now part of the map",
+                )
+            if core_need == "usefulness":
+                return (
+                    "Helping or being helped settles me because it means I am still part of what keeps the room upright.",
+                    "if I stop holding the room, it tilts",
+                )
+            return (
+                "Support matters because it redraws the map of who is solid when the pressure hits.",
+                "who showed up is now part of the map",
+            )
+
+        if any(word in text for word in ("rent", "bill", "debt", "job", "lease", "buyout", "overdue", "severance")):
+            return (
+                "I keep filing this under what it could take from the life I am trying to hold together.",
+                "security is one bad week from collapse",
+            )
+
+        if any(word in text for word in ("leak", "memo", "documents", "recording", "hearing", "rumor", "story")) or threat_lens == "exposure":
+            return (
+                "The danger is not only what happened, but who gets to define it first and make that version stick.",
+                "the story can be stolen if I do not frame it",
+            )
+
+        if core_need == "control":
+            return (
+                "I am storing this as one more sign that the room can slip if nobody keeps a hand on the shape of it.",
+                "if I stop holding the room, it tilts",
+            )
+        if core_need == "dignity":
+            return (
+                "I keep replaying whether this left me smaller in someone else's eyes.",
+                "if I look weak, I become movable",
+            )
+        if core_need == "belonging":
+            return (
+                "What matters most is who stayed emotionally present and who started edging away.",
+                "who showed up is now part of the map",
+            )
+        return (
+            "I am tagging this as another reminder that pressure always reveals the real fault line.",
+            "help always comes with a price",
+        )
+
     def _trait_text(self) -> str:
+        profile_bits = " ".join([
+            self.personality.attachment_style,
+            self.personality.coping_style,
+            self.personality.threat_lens,
+            self.personality.core_need,
+            self.personality.shame_trigger,
+            self.personality.care_style,
+            self.personality.conflict_style,
+            self.personality.mask_tendency,
+            self.personality.self_story,
+            self.personality.longing,
+        ]).strip()
         extras = " ".join([
             *self.identity_tags,
             *self.coalitions,
             *self.rival_coalitions,
             self.private_burden,
         ]).strip()
-        return f"{self.personality.background} {self.personality.temperament} {extras}".lower()
+        return f"{self.personality.background} {self.personality.temperament} {profile_bits} {extras}".lower()
 
     def _has_any(self, *keywords: str) -> bool:
         text = self._trait_text()
         return any(keyword in text for keyword in keywords)
+
+    def get_human_profile(self) -> dict[str, str]:
+        """Return a stable human-profile view of this agent.
+
+        Explicit profile fields win. If they are absent, infer a usable profile
+        from the free-text background / temperament so older scenarios still
+        behave sensibly.
+        """
+        if self._human_profile_cache is not None:
+            return self._human_profile_cache
+
+        text = self._trait_text()
+
+        def choose(explicit: str, rules: list[tuple[tuple[str, ...], str]], default: str) -> str:
+            if explicit:
+                return explicit
+            for keywords, value in rules:
+                if any(keyword in text for keyword in keywords):
+                    return value
+            return default
+
+        profile = {
+            "attachment_style": choose(
+                self.personality.attachment_style,
+                [
+                    (("people-pleaser", "anxious", "worried", "lifeline", "first-gen", "rent stressed"), "anxious attachment"),
+                    (("guarded", "stoic", "cold", "analytical", "buries feelings", "matter-of-fact"), "guarded attachment"),
+                    (("supportive", "compassionate", "protective", "community connector", "counselor"), "secure attachment"),
+                    (("guilt-ridden", "drinks too much", "explosive"), "disorganized attachment"),
+                ],
+                "self-protective attachment",
+            ),
+            "coping_style": choose(
+                self.personality.coping_style,
+                [
+                    (("humor", "party", "free spirit", "joke"), "deflect with humor"),
+                    (("empathetic", "carries everyone's burdens", "company heart", "compassionate"), "caretake first"),
+                    (("analytical", "methodical", "calm under pressure", "cold"), "intellectualize"),
+                    (("authoritative", "ceo", "director", "manager"), "control the room"),
+                    (("buries feelings", "reliable", "quiet", "work"), "disappear into work"),
+                    (("gossip", "journalist", "story", "source", "documents"), "seek witnesses"),
+                    (("warm", "supportive", "protective", "gentle"), "reach for connection"),
+                    (("competitive", "masks insecurity", "ambitious"), "perform competence"),
+                    (("fierce", "blunt", "speaks his mind", "explosive"), "confront head-on"),
+                ],
+                "perform competence",
+            ),
+            "threat_lens": choose(
+                self.personality.threat_lens,
+                [
+                    (("poor", "lifeline", "money", "budget", "bills", "rent", "job security"), "scarcity"),
+                    (("betrayal", "loyal", "union", "management", "distrusts"), "betrayal"),
+                    (("ambitious", "competitive", "confidence", "proud"), "humiliation"),
+                    (("methodical", "efficient", "calm under pressure", "organized"), "chaos"),
+                    (("single mom", "people-pleaser", "lonely", "worried about mom"), "abandonment"),
+                    (("guilt-ridden", "gossip", "documents", "memo", "recording"), "exposure"),
+                ],
+                "chaos",
+            ),
+            "core_need": choose(
+                self.personality.core_need,
+                [
+                    (("provider", "poor", "lifeline", "budget", "job security"), "safety"),
+                    (("supportive", "protective", "single mom", "community"), "belonging"),
+                    (("ambitious", "competitive", "authoritative", "proud"), "dignity"),
+                    (("methodical", "organized", "analytical", "efficient"), "control"),
+                    (("teacher", "hr", "company heart", "compassionate"), "usefulness"),
+                    (("union", "distrusts management", "activist", "gossip"), "justice"),
+                    (("journalist", "story", "documents", "gossip"), "truth"),
+                ],
+                "control",
+            ),
+            "shame_trigger": choose(
+                self.personality.shame_trigger,
+                [
+                    (("provider", "toddler", "kids in college", "family"), "failing family"),
+                    (("ambitious", "competitive", "authoritative", "ceo"), "losing face in public"),
+                    (("people-pleaser", "supportive", "single mom"), "being a burden"),
+                    (("guarded", "stoic", "reliable"), "looking helpless"),
+                    (("gossip", "documents", "memo"), "being exposed as part of the mess"),
+                ],
+                "being easy to discard",
+            ),
+            "care_style": choose(
+                self.personality.care_style,
+                [
+                    (("teacher", "counselor", "hr", "company heart"), "emotional reassurance"),
+                    (("practical", "organized", "methodical", "doctor", "analytical"), "practical fixing"),
+                    (("protective", "provider", "budget", "family-first"), "protective provisioning"),
+                    (("supportive", "good listener", "patient"), "steady presence"),
+                ],
+                "quiet encouragement",
+            ),
+            "conflict_style": choose(
+                self.personality.conflict_style,
+                [
+                    (("blunt", "fierce", "explosive", "speaks his mind"), "go sharp"),
+                    (("analytical", "methodical", "organized", "calm under pressure"), "cool negotiation"),
+                    (("gossip", "story", "documents"), "triangulate the room"),
+                    (("competitive", "proud", "resentful"), "keep score"),
+                    (("authoritative", "ceo", "director"), "command"),
+                    (("people-pleaser", "kind", "drama-averse"), "appease first"),
+                ],
+                "cool negotiation",
+            ),
+            "mask_tendency": choose(
+                self.personality.mask_tendency,
+                [
+                    (("humor", "party", "free spirit"), "joke through it"),
+                    (("competitive", "ambitious", "confidence", "professional"), "polished competence"),
+                    (("authoritative", "ceo", "manager", "director"), "command presence"),
+                    (("warm", "kind", "supportive", "compassionate"), "soft warmth"),
+                    (("guarded", "stoic", "cold", "analytical"), "emotional shutdown"),
+                ],
+                "dutiful calm",
+            ),
+            "self_story": choose(
+                self.personality.self_story,
+                [
+                    (("provider", "budget", "job is her lifeline", "family-first"), "provider"),
+                    (("authoritative", "founded", "mba", "recently promoted"), "climber"),
+                    (("teacher", "hr", "counselor", "company heart"), "fixer"),
+                    (("poor", "divorced", "lonely", "seen layoffs before"), "survivor"),
+                    (("gossip", "story", "documents", "reporter"), "witness"),
+                    (("union", "loyal to coworkers", "protective of team"), "loyalist"),
+                    (("protective", "neighborhood", "family crew"), "guardian"),
+                ],
+                "survivor",
+            ),
+            "longing": choose(
+                self.personality.longing,
+                [
+                    (("provider", "poor", "budget", "job security"), "keep the house standing"),
+                    (("supportive", "protective", "single mom"), "be held without failing anyone"),
+                    (("competitive", "ambitious", "authoritative"), "be respected without begging for it"),
+                    (("guarded", "stoic", "analytical"), "stay composed enough to keep choice"),
+                    (("gossip", "story", "documents"), "get the real version on record"),
+                ],
+                "make it through without becoming smaller",
+            ),
+        }
+        self._human_profile_cache = profile
+        return profile
 
     def shared_coalitions(self, other: WorldAgent) -> tuple[str, ...]:
         return tuple(sorted(set(self.coalitions) & set(other.coalitions)))
@@ -551,7 +818,24 @@ class WorldAgent:
         s = self.heart
         recent = self.get_recent_memories(4)
         recent_text = " ".join(m.description.lower() for m in recent)
+        recent_story_beats = [m.story_beat for m in recent if m.story_beat]
+        dominant_story = Counter(recent_story_beats).most_common(1)[0][0] if recent_story_beats else ""
         rels = relationships.get_agent_relationships(self.agent_id)
+        profile = self.get_human_profile()
+        attachment = profile["attachment_style"]
+        coping = profile["coping_style"]
+        threat_lens = profile["threat_lens"]
+        core_need = profile["core_need"]
+        shame_trigger = profile["shame_trigger"]
+        care_style = profile["care_style"]
+        conflict_style = profile["conflict_style"]
+        mask_tendency = profile["mask_tendency"]
+        self_story = profile["self_story"]
+        longing = profile["longing"]
+        profile_text = " ".join(profile.values()).lower()
+
+        def profile_has(*keywords: str) -> bool:
+            return any(keyword in profile_text for keyword in keywords)
 
         warm_target = "nobody"
         warm_strength = 0.0
@@ -585,22 +869,28 @@ class WorldAgent:
         nearby_allies = sum(1 for other in nearby_agents.values() if self.shared_coalitions(other))
         nearby_rivals = sum(1 for other in nearby_agents.values() if self.rival_overlap(other))
 
-        caretaker = self._has_any(
+        caretaker = profile_has(
+            "caretake", "steady presence", "protective provisioning",
+            "emotional reassurance", "practical fixing", "quiet encouragement",
+        ) or self._has_any(
             "empathetic", "compassionate", "protective", "kind",
             "company heart", "counselor", "teacher", "community connector",
             "carries everyone's burdens", "carries heavy emotional load",
             "triage first", "duty bound", "shelter volunteer", "community kitchen",
         )
-        guarded = self._has_any(
+        guarded = profile_has(
+            "guarded attachment", "self-protective attachment", "emotional shutdown",
+            "intellectualize", "disappear into work", "perform competence",
+        ) or self._has_any(
             "guarded", "stoic", "analytical", "cold", "methodical",
             "pragmatic", "buries feelings", "matter-of-fact",
             "message discipline", "procedural loyalist", "paper trail keeper",
         )
-        humor_defense = self._has_any(
+        humor_defense = profile_has("deflect with humor", "joke through it") or self._has_any(
             "humor", "carefree", "party", "free spirit", "joke",
             "drama-averse", "uses humor as defense",
         )
-        authoritative = self._has_any(
+        authoritative = profile_has("control the room", "command", "command presence") or self._has_any(
             "authoritative", "ceo", "director", "manager",
             "assertive", "blunt", "operations manager",
             "hearing veteran", "office survivor",
@@ -608,37 +898,40 @@ class WorldAgent:
         guilt_driven = self._has_any(
             "guilt-ridden", "guilty", "responsible", "feels responsible",
         )
-        provider = self._has_any(
+        provider = profile_has("provider", "protective provisioning", "failing family", "keep the house standing") or self._has_any(
             "provider", "family-first", "lifeline", "controls the budget",
             "savings", "poor", "kids in college", "three kids",
             "toddler", "job security", "first-gen",
             "rent stressed", "survival math", "cash flow watcher",
         )
-        status_driven = self._has_any(
+        status_driven = profile_has("climber", "dignity", "be respected", "losing face") or self._has_any(
             "ambitious", "competitive", "proud", "recently promoted",
             "founded", "authoritative", "assertive", "strategic",
             "career climber", "deal facing", "polished operator", "message control",
         )
-        fierce = self._has_any(
+        fierce = profile_has("go sharp", "confront head-on", "keep score") or self._has_any(
             "fierce", "slow-burn anger", "quick to escalate",
             "explosive", "speaks his mind", "distrusts management",
         )
-        organizer = self._has_any(
+        organizer = profile_has("justice", "truth", "seek witnesses", "witness", "loyalist") or self._has_any(
             "organizer", "activist", "union", "campaign", "tenant defense",
             "mutual aid", "community board", "neighborhood captain",
             "network builder", "cause driven", "phone tree runner", "document hoarder",
         )
-        storyteller = self._has_any(
+        storyteller = profile_has("seek witnesses", "witness", "truth", "get the real version on record") or self._has_any(
             "journalist", "gossip", "story", "media", "always looking for the next story",
             "broker", "knows everyone's business", "story carrier", "story chaser",
             "local reporter", "message discipline",
         )
-        territorial = self._has_any(
+        territorial = profile_has(
+            "territorial", "neighborhood anchor", "neighborhood rooted",
+            "harbor loyalist", "waterfront pride", "block realist",
+        ) or self._has_any(
             "neighborhood", "waterfront", "local", "homeowners", "tenant", "community elder",
             "protective of neighborhood kids", "harbor loyalist", "family crew",
             "waterfront pride", "block realist", "neighborhood anchor",
         )
-        striver = self._has_any(
+        striver = profile_has("climber", "autonomy", "keep options open") or self._has_any(
             "upward", "promotion", "dealmaker", "broker", "operator",
             "networked", "builder", "ambitious", "career climber",
             "deal facing", "polished operator",
@@ -736,6 +1029,89 @@ class WorldAgent:
             min(0.24, nearby_rivals * 0.08)
         )
 
+        hide_weakness_bias = 0.0
+        if threat_lens == "scarcity":
+            threat += 0.08
+            economic_pressure += 0.16
+        elif threat_lens == "betrayal":
+            injustice += 0.14
+            loyalty_pressure += 0.08
+        elif threat_lens == "humiliation":
+            status_pressure += 0.16
+            hide_weakness_bias += 0.08
+        elif threat_lens == "chaos":
+            control_loss += 0.16
+        elif threat_lens == "abandonment":
+            social_need += 0.16
+        elif threat_lens == "exposure":
+            secrecy_pressure += 0.16
+            status_pressure += 0.05
+
+        if core_need == "safety":
+            threat += 0.1
+            economic_pressure += 0.08
+        elif core_need == "belonging":
+            social_need += 0.08
+            loyalty_pressure += 0.14
+        elif core_need == "dignity":
+            status_pressure += 0.14
+            injustice += 0.08
+        elif core_need == "control":
+            control_loss += 0.14
+        elif core_need == "autonomy":
+            control_loss += 0.08
+            opportunity_pressure += 0.1
+        elif core_need == "usefulness":
+            duty_pressure += 0.14
+            hide_weakness_bias += 0.08
+        elif core_need == "justice":
+            injustice += 0.14
+            opportunity_pressure += 0.05
+        elif core_need == "truth":
+            secrecy_pressure += 0.08
+            opportunity_pressure += 0.05
+
+        if self_story == "provider":
+            economic_pressure += 0.1
+            duty_pressure += 0.06
+        elif self_story == "climber":
+            status_pressure += 0.1
+            opportunity_pressure += 0.08
+        elif self_story == "fixer":
+            duty_pressure += 0.1
+            control_loss += 0.04
+        elif self_story == "survivor":
+            threat += 0.08
+            hide_weakness_bias += 0.08
+        elif self_story == "witness":
+            injustice += 0.08
+            opportunity_pressure += 0.08
+        elif self_story == "loyalist":
+            loyalty_pressure += 0.1
+        elif self_story == "guardian":
+            threat += 0.06
+            duty_pressure += 0.08
+
+        repair_bonds_bias = 0.0
+        if dominant_story == "security is one bad week from collapse":
+            threat += 0.08
+            economic_pressure += 0.1
+        elif dominant_story == "loyalty breaks the moment pressure rises":
+            injustice += 0.1
+            loyalty_pressure += 0.08
+        elif dominant_story == "if I look weak, I become movable":
+            status_pressure += 0.1
+            hide_weakness_bias += 0.08
+        elif dominant_story == "if I stop holding the room, it tilts":
+            control_loss += 0.1
+            duty_pressure += 0.06
+        elif dominant_story == "who showed up is now part of the map":
+            social_need += 0.08
+            repair_bonds_bias = 0.08
+        elif dominant_story == "the story can be stolen if I do not frame it":
+            secrecy_pressure += 0.08
+            opportunity_pressure += 0.08
+
         threat = min(1.0, threat)
         injustice = min(1.0, injustice)
         control_loss = min(1.0, control_loss)
@@ -784,9 +1160,54 @@ class WorldAgent:
             key=lambda item: item[1],
         )[0]
 
-        if secrecy_pressure > max(threat * 0.8, control_loss * 0.9, loyalty_pressure * 0.95) and secrecy_pressure > 0.45:
+        if dominant_story == "loyalty breaks the moment pressure rises" and dominant_signal in {"loyalty", "injustice"}:
+            primary_concern = "remember exactly who flinched first"
+            interpretation = "What keeps replaying is not the event alone, but how quickly people start protecting themselves."
+        elif dominant_story == "security is one bad week from collapse" and dominant_signal in {"economic", "threat"}:
+            primary_concern = "keep this from reaching home"
+            interpretation = "My mind keeps translating everything into how close it is to touching rent, food, or the next layer of safety."
+        elif dominant_story == "if I look weak, I become movable" and dominant_signal in {"status", "control", "injustice"}:
+            primary_concern = "leave no public sign of how much this landed"
+            interpretation = "The fear is not just pain; it is what people can do to me if they see where it landed."
+        elif dominant_story == "if I stop holding the room, it tilts" and dominant_signal in {"control", "duty"}:
+            primary_concern = "keep the room from tilting again"
+            interpretation = "I do not trust the situation to hold its own shape anymore, so I keep reaching for structure."
+        elif dominant_story == "who showed up is now part of the map" and dominant_signal in {"social", "loyalty"}:
+            primary_concern = "test who is still solid when it counts"
+            interpretation = "I am not just looking for comfort; I am updating the map of who actually stays present under stress."
+        elif dominant_story == "the story can be stolen if I do not frame it" and dominant_signal in {"secrecy", "opportunity"}:
+            primary_concern = "set the version people will repeat"
+            interpretation = "If I do not move first, somebody else will freeze this into a story that serves them better than me."
+        elif secrecy_pressure > max(threat * 0.8, control_loss * 0.9, loyalty_pressure * 0.95) and secrecy_pressure > 0.45:
             primary_concern = "keep a damaging secret buried"
             interpretation = "One loose version of the story could expose what I have been trying to keep contained."
+        elif threat_lens == "abandonment" and dominant_signal == "social":
+            primary_concern = "lock down one person who will not quietly drift away"
+            interpretation = "Distance from the wrong person feels like proof that I was only safe here by accident."
+        elif core_need == "dignity" and dominant_signal in {"status", "injustice"}:
+            primary_concern = "avoid being made small in public"
+            interpretation = "The hit is real, but the humiliation of how it lands is what keeps burning afterward."
+        elif core_need == "control" and dominant_signal == "control":
+            primary_concern = "get the room back into a shape I can steer"
+            interpretation = "I can survive bad news better than shapelessness; what scares me is losing the frame."
+        elif core_need == "usefulness" and dominant_signal in {"duty", "social"}:
+            primary_concern = "stay useful enough that no one has to carry me"
+            interpretation = "Neediness feels dangerous, so I reach for the task before I reach for comfort."
+        elif core_need == "truth" and dominant_signal in {"secrecy", "opportunity"}:
+            primary_concern = "get the real version on record before it curdles"
+            interpretation = "The event hurts, but the false story that will harden around it feels even more dangerous."
+        elif self_story == "provider" and dominant_signal == "economic":
+            primary_concern = "keep the house from feeling the dominoes"
+            interpretation = "Every new bill now feels like a verdict on whether I can still hold the line for other people."
+        elif self_story == "survivor" and dominant_signal in {"threat", "economic"}:
+            primary_concern = "keep one more door open before this closes in"
+            interpretation = "I have seen security disappear fast before, so my mind keeps scanning for the next foothold."
+        elif self_story == "witness" and dominant_signal in {"injustice", "opportunity"}:
+            primary_concern = "make sure this cannot be quietly rewritten"
+            interpretation = "If nobody remembers the shape of the harm, the powerful get to rename it as weather."
+        elif self_story == "loyalist" and dominant_signal == "loyalty":
+            primary_concern = "stop our side from splintering into self-protection"
+            interpretation = "Once people start cutting side deals, trust collapses faster than the original crisis."
         elif dominant_signal == "economic" and debt_target != "nobody":
             primary_concern = f"cover what I owe before {debt_target} calls it in"
             interpretation = "The next problem is not abstract anymore; it has a name, a due date, and somebody watching."
@@ -794,31 +1215,74 @@ class WorldAgent:
             primary_concern = f"make {blame_target} pay a price"
             interpretation = f"This no longer feels like absorbing the hit; it feels like keeping score against {blame_target}."
         elif territorial and max(economic_pressure, grievance_pressure) > 0.38:
-            primary_concern = "defend my neighborhood from the spillover"
-            interpretation = "What hits one block never stays there; if nobody draws a line, home becomes the next casualty."
+            if self_story == "guardian":
+                primary_concern = "defend my neighborhood from the spillover"
+                interpretation = "What hits one block never stays there; if nobody draws a line, home becomes the next casualty."
+            elif self_story == "provider":
+                primary_concern = "keep this mess from reaching my block and my bills"
+                interpretation = "Neighborhood trouble never stays abstract for long; it crawls into rent, groceries, and the people waiting at home."
+            elif self_story == "witness":
+                primary_concern = "make the neighborhood's losses impossible to wave away"
+                interpretation = "If nobody keeps the harm visible, the block gets renamed as collateral and the damage disappears on paper."
+            else:
+                primary_concern = "keep the block from fraying into private panic"
+                interpretation = "The danger is not only the event itself; it is what happens when everyone starts protecting their own door alone."
         elif caretaker and duty_pressure >= max(threat * 0.6, control_loss * 0.8, loyalty_pressure):
-            primary_concern = "keep other people steady"
-            interpretation = "If I lose my composure, other people will pay for it."
+            if care_style == "practical fixing":
+                primary_concern = "keep other people functioning through the next hour"
+                interpretation = "If I can turn the panic into tasks, the room might stay upright long enough to matter."
+            elif care_style == "emotional reassurance":
+                primary_concern = "keep other people from feeling abandoned by this"
+                interpretation = "If I go cold now, other people feel the drop immediately."
+            else:
+                primary_concern = "keep other people steady"
+                interpretation = "If I lose my composure, other people will pay for it."
         elif provider and economic_pressure >= max(threat * 0.78, loyalty_pressure, social_need * 0.9):
-            primary_concern = "keep income and home secure"
-            interpretation = "This is not abstract anymore; it threatens the life I'm holding together."
+            if self_story == "provider":
+                primary_concern = "keep income and home secure"
+                interpretation = "This is not abstract anymore; it threatens the life I'm holding together."
+            else:
+                primary_concern = "buy one more month before the floor gives way"
+                interpretation = "What matters now is time: one more paycheck, one more bill delayed, one more reason the walls do not move yet."
         elif dominant_signal == "opportunity" and opportunity_pressure > 0.45:
-            primary_concern = "turn chaos into leverage"
-            interpretation = "A vacuum is opening somewhere in this mess, and somebody is going to benefit from stepping into it."
+            if self_story == "climber":
+                primary_concern = "turn chaos into leverage"
+                interpretation = "A vacuum is opening somewhere in this mess, and somebody is going to benefit from stepping into it."
+            elif self_story == "witness":
+                primary_concern = "use the opening before the record seals shut"
+                interpretation = "Windows like this close fast; if I want a version on record, it has to happen before the room re-hardens."
+            else:
+                primary_concern = "keep my options open while the hierarchy shifts"
+                interpretation = "The important thing is not to commit too early while the power map is still moving."
         elif organizer and dominant_signal in {"injustice", "loyalty"}:
-            primary_concern = "force public accountability"
-            interpretation = "Private outrage only matters if it becomes collective enough that nobody can wave it away."
+            if core_need == "truth":
+                primary_concern = "force public accountability"
+                interpretation = "Private outrage only matters if it becomes collective enough that nobody can wave it away."
+            else:
+                primary_concern = "turn private anger into organized pressure"
+                interpretation = "Feeling it is not enough; it has to become numbers, witnesses, and something the room cannot privately dismiss."
         elif storyteller and scandal_hit:
-            primary_concern = "control the story before it controls me"
-            interpretation = "Whoever frames this first decides who looks guilty, weak, or disposable."
+            if self_story == "witness":
+                primary_concern = "control the story before it controls me"
+                interpretation = "Whoever frames this first decides who looks guilty, weak, or disposable."
+            else:
+                primary_concern = "set the first version before the wrong one hardens"
+                interpretation = "The facts do not travel alone; the framing around them decides who gets buried under them."
         elif (
             coalition_strain > max(duty_pressure * 0.85, social_need * 0.9, status_pressure) and
             loyalty_pressure > 0.34 and
             nearby_allies > 0 and
             (nearby_rivals > 0 or coalition_alert or max(grievance_pressure, secrecy_pressure, economic_pressure) > 0.34)
         ):
-            primary_concern = "hold my bloc together"
-            interpretation = "If our side splinters now, people start cutting private deals and we lose leverage fast."
+            if self_story == "loyalist":
+                primary_concern = "hold my bloc together"
+                interpretation = "If our side splinters now, people start cutting private deals and we lose leverage fast."
+            elif self_story == "guardian":
+                primary_concern = "keep our side from panicking into bad bargains"
+                interpretation = "The real danger is not only the opposition; it is what fear makes our own people agree to in private."
+            else:
+                primary_concern = "stop the coalition from fraying at the edges"
+                interpretation = "Once side conversations start replacing public alignment, trust drains out faster than anyone admits."
         elif dominant_signal == "status" and authoritative:
             primary_concern = "keep authority intact"
             interpretation = "If I look weak now, I lose the room and the story hardens around me."
@@ -873,6 +1337,57 @@ class WorldAgent:
             (0.1 if caretaker else 0.0) +
             loyalty_pressure * 0.12
         )
+        repair_bonds = min(1.0, repair_bonds + repair_bonds_bias)
+
+        if "anxious" in attachment:
+            seek_support = min(1.0, seek_support + 0.12)
+            repair_bonds = min(1.0, repair_bonds + 0.08)
+            hide_weakness = max(0.0, hide_weakness - 0.06)
+        elif "guarded" in attachment or "self-protective" in attachment:
+            seek_support *= 0.75
+            hide_weakness = min(1.0, hide_weakness + 0.12)
+            regain_control = min(1.0, regain_control + 0.06)
+        elif "secure" in attachment:
+            protect_others = min(1.0, protect_others + 0.05)
+            repair_bonds = min(1.0, repair_bonds + 0.08)
+        elif "disorganized" in attachment:
+            seek_support = min(1.0, seek_support + 0.06)
+            discharge_pressure = min(1.0, discharge_pressure + 0.08)
+            hide_weakness = min(1.0, hide_weakness + 0.04)
+
+        if coping == "deflect with humor":
+            hide_weakness = min(1.0, hide_weakness + 0.1)
+            seek_support = min(1.0, seek_support + 0.04)
+        elif coping == "caretake first":
+            protect_others = min(1.0, protect_others + 0.14)
+            seek_support *= 0.82
+        elif coping == "intellectualize":
+            regain_control = min(1.0, regain_control + 0.14)
+            hide_weakness = min(1.0, hide_weakness + 0.08)
+        elif coping == "control the room":
+            regain_control = min(1.0, regain_control + 0.12)
+            protect_status = min(1.0, protect_status + 0.1)
+        elif coping == "disappear into work":
+            regain_control = min(1.0, regain_control + 0.1)
+            hide_weakness = min(1.0, hide_weakness + 0.12)
+            seek_support *= 0.7
+        elif coping == "keep score quietly":
+            discharge_pressure = min(1.0, discharge_pressure + 0.1)
+            repair_bonds *= 0.8
+        elif coping == "seek witnesses":
+            seek_support = min(1.0, seek_support + 0.12)
+            opportunity_pressure = min(1.0, opportunity_pressure + 0.05)
+        elif coping == "reach for connection":
+            seek_support = min(1.0, seek_support + 0.14)
+            repair_bonds = min(1.0, repair_bonds + 0.1)
+        elif coping == "perform competence":
+            protect_status = min(1.0, protect_status + 0.12)
+            hide_weakness = min(1.0, hide_weakness + 0.14)
+        elif coping == "confront head-on":
+            discharge_pressure = min(1.0, discharge_pressure + 0.14)
+            protect_status = min(1.0, protect_status + 0.06)
+
+        hide_weakness = min(1.0, hide_weakness + hide_weakness_bias)
 
         motive_map = {
             "stay safe": seek_safety,
@@ -889,8 +1404,15 @@ class WorldAgent:
         priority = max(motive_map, key=motive_map.get)
 
         if secrecy_pressure > 0.52:
-            mask_style = "speaks in careful half-truths"
-            action_style = "careful omission"
+            if coping == "intellectualize":
+                mask_style = "reduces risk to clauses, sequence, and what can still be denied"
+                action_style = "redacted precision"
+            elif coping == "control the room":
+                mask_style = "locks the message before anyone else can name the crack"
+                action_style = "message locking"
+            else:
+                mask_style = "speaks in careful half-truths"
+                action_style = "careful omission"
         elif (
             loyalty_pressure > 0.52 and
             coalition_strain > 0.42 and
@@ -898,17 +1420,97 @@ class WorldAgent:
             not caretaker and
             economic_pressure < loyalty_pressure + 0.05
         ):
-            mask_style = "keeps a united front even when trust is fraying"
-            action_style = "bloc discipline"
+            if self_story == "guardian":
+                mask_style = "keeps people calm even while privately counting defections"
+                action_style = "contain-the-ranks"
+            else:
+                mask_style = "keeps a united front even when trust is fraying"
+                action_style = "bloc discipline"
         elif debt_load > 0.45:
-            mask_style = "acts normal while counting every favor"
-            action_style = "hustling restraint"
+            if coping == "perform competence":
+                mask_style = "looks solvent while quietly rebuilding the runway"
+                action_style = "smiling solvency theater"
+            elif coping == "reach for connection":
+                mask_style = "acts composed while mentally testing who might still say yes"
+                action_style = "quiet borrowing radar"
+            elif coping == "disappear into work":
+                mask_style = "tries to outrun debt by becoming more useful per hour"
+                action_style = "double-shift numbness"
+            else:
+                mask_style = "acts normal while counting every favor"
+                action_style = "hustling restraint"
         elif grievance_pressure > 0.52:
-            mask_style = "stops pretending this is fine"
-            action_style = "score-settling focus"
+            if "moralize" in conflict_style:
+                mask_style = "stops cushioning the truth and starts naming the offense publicly"
+                action_style = "public indictment"
+            elif "cornered strike" in conflict_style:
+                mask_style = "goes from pleading to sharp the moment the door closes"
+                action_style = "cornered snap"
+            elif "sidestep then snap" in conflict_style:
+                mask_style = "tries to keep it light until the hurt becomes impossible to hide"
+                action_style = "baited defiance"
+            elif "go sharp" in conflict_style or coping == "confront head-on":
+                mask_style = "drops restraint the moment the cut is visible"
+                action_style = "sharp escalation"
+            elif "command" in conflict_style:
+                mask_style = "tightens rank and tone so nobody can see where the insult landed"
+                action_style = "command reprimand"
+            elif "cool negotiation" in conflict_style:
+                mask_style = "sounds measured while pressing exactly where the structure is weakest"
+                action_style = "controlled pushback"
+            elif "soften then set terms" in conflict_style:
+                mask_style = "stays gentle in tone while quietly making the line non-negotiable"
+                action_style = "protective insistence"
+            elif "keep score" in conflict_style or coping == "keep score quietly":
+                mask_style = "goes colder and more exact with every remembered slight"
+                action_style = "cold bookkeeping"
+            else:
+                mask_style = "stops pretending this is fine"
+                action_style = "score-settling focus"
         elif opportunity_pressure > 0.5:
-            mask_style = "stays polished while scanning openings"
-            action_style = "calculated positioning"
+            if self_story == "climber":
+                mask_style = "stays polished while scanning openings"
+                action_style = "career triangulation"
+            elif self_story == "witness":
+                mask_style = "looks curious rather than hungry while testing what can be said aloud"
+                action_style = "narrative positioning"
+            else:
+                mask_style = "stays polished while scanning openings"
+                action_style = "calculated positioning"
+        elif coping == "deflect with humor":
+            mask_style = "turns fear into a bit before anyone can pity them"
+            action_style = "laughing misdirection"
+        elif coping == "caretake first":
+            if care_style == "practical fixing":
+                mask_style = "stays busy with triage so nobody notices the shake"
+                action_style = "steady triage"
+            else:
+                mask_style = "stays busy with other people's needs so their own do not show"
+                action_style = "overfunctioning care"
+        elif coping == "intellectualize":
+            mask_style = "reduces feeling to logistics and sequence"
+            action_style = "procedural narrowing"
+        elif coping == "control the room" or "command" in conflict_style or "command presence" in mask_tendency:
+            mask_style = "projects certainty before certainty exists"
+            action_style = "directive containment"
+        elif coping == "disappear into work":
+            mask_style = "hides panic inside useful tasks"
+            action_style = "task-anesthetizing focus"
+        elif coping == "keep score quietly" or "keep score" in conflict_style:
+            mask_style = "acts civil while privately bookkeeping every slight"
+            action_style = "cold bookkeeping"
+        elif coping == "seek witnesses":
+            mask_style = "turns private hurt into something legible to the room"
+            action_style = "witness-seeking candor"
+        elif coping == "reach for connection":
+            mask_style = "lets need leak through before pride can stop it"
+            action_style = "unguarded checking-in"
+        elif coping == "perform competence":
+            mask_style = "tries to look impossible to discard"
+            action_style = "overprepared poise"
+        elif coping == "confront head-on":
+            mask_style = "drops the cushion and names the cut"
+            action_style = "direct pressure"
         elif humor_defense and hide_weakness >= max(seek_support, seek_safety):
             mask_style = "covers fear with jokes"
             action_style = "joking deflection"
@@ -942,6 +1544,8 @@ class WorldAgent:
                     break
         inner_voice = (
             f"I need to {primary_concern}. {interpretation} "
+            f"What would really undo me is {shame_trigger}. "
+            f"Under that, I just want to {longing}. "
             f"Right now I am leaning toward {priority}."
         )
 
@@ -958,6 +1562,7 @@ class WorldAgent:
             opportunity_pressure=round(opportunity_pressure, 3),
             primary_concern=primary_concern,
             interpretation=interpretation,
+            ongoing_story=dominant_story or "trying to stay steady without giving away too much",
             blame_target=blame_target,
             support_target=support_target,
         )
@@ -1015,11 +1620,17 @@ class WorldAgent:
         app = self.appraisal
         motives = self.motives
         coalition_text = ", ".join(self.coalitions[:3]) if self.coalitions else "none"
+        profile = self.get_human_profile()
         return (
             f"Private read: {app.interpretation}\n"
             f"Primary concern: {app.primary_concern}\n"
+            f"Ongoing story: {app.ongoing_story}\n"
             f"Blame focus: {app.blame_target}\n"
             f"Likely support target: {app.support_target}\n"
+            f"Attachment: {profile['attachment_style']} | Coping: {profile['coping_style']} | Threat lens: {profile['threat_lens']}\n"
+            f"Core need: {profile['core_need']} | Shame trigger: {profile['shame_trigger']}\n"
+            f"Care style: {profile['care_style']} | Conflict style: {profile['conflict_style']}\n"
+            f"Mask tendency: {profile['mask_tendency']} | Self-story: {profile['self_story']} | Longing: {profile['longing']}\n"
             f"Coalitions: {coalition_text}\n"
             f"Economic pressure: {app.economic_pressure:.2f} | Loyalty pressure: {app.loyalty_pressure:.2f} | "
             f"Secrecy pressure: {app.secrecy_pressure:.2f}\n"
@@ -1032,10 +1643,12 @@ class WorldAgent:
 
     def get_dashboard_state(self) -> dict:
         """Return state dict for dashboard display."""
+        profile = self.get_human_profile()
         return {
             "id": self.agent_id,
             "name": self.personality.name,
             "location": self.location,
+            "role": self.social_role,
             "action": self.last_action,
             "arousal": round(self.heart.arousal, 2),
             "valence": round(self.heart.valence, 2),
@@ -1048,6 +1661,7 @@ class WorldAgent:
             "divergence": round(self.heart.divergence, 2),
             "primary_concern": self.appraisal.primary_concern,
             "interpretation": self.appraisal.interpretation,
+            "ongoing_story": self.appraisal.ongoing_story,
             "blame_target": self.appraisal.blame_target,
             "support_target": self.appraisal.support_target,
             "economic_pressure": round(self.appraisal.economic_pressure, 2),
@@ -1060,10 +1674,20 @@ class WorldAgent:
             "inner_voice": self.motives.inner_voice,
             "future_branches": self.get_future_branches(),
             "subjective_brief": self.render_subjective_brief(),
+            "human_profile": profile,
             "coalitions": list(self.coalitions),
             "identity_tags": list(self.identity_tags),
             "private_burden": self.private_burden,
             "debt_pressure": round(self.debt_pressure, 2),
             "secret_pressure": round(self.secret_pressure, 2),
             "ambition": round(self.ambition, 2),
+            "llm_salience": round(self.llm_salience, 3),
+            "llm_salience_level": self.llm_salience_level,
+            "llm_active": self.llm_active,
+            "llm_candidate_rank": self.llm_candidate_rank,
+            "llm_salience_reasons": list(self.llm_salience_reasons),
+            "llm_salience_factors": {
+                key: round(value, 3) for key, value in self.llm_salience_factors.items()
+            },
+            "llm_packet_preview": self.llm_packet_preview,
         }

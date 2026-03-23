@@ -26,7 +26,18 @@ import {
   classifyArchetype,
   type BuildingArchetype,
 } from '../layout';
+import { useWorldStore } from '../store';
 import type { LocationLayout } from '../types';
+
+/** Returns how strongly windows should glow (0 = day, 1 = deep night) */
+function useNightGlow(): number {
+  const tick = useWorldStore(s => s.currentTick);
+  const h = tick % 24;
+  if (h >= 7 && h < 18) return 0;      // day
+  if (h >= 20 || h < 5) return 1;       // night
+  if (h >= 18) return (h - 18) / 2;     // sunset transition
+  return 1 - (h - 5) / 2;               // dawn transition
+}
 
 // ── colour palette ──────────────────────────────────────────
 const PAL = {
@@ -90,10 +101,13 @@ function StylisedBuilding({ size, color, archetype }: {
   const trimCol   = new THREE.Color(color).multiplyScalar(1.15).getStyle();
   const darkCol   = new THREE.Color(color).multiplyScalar(0.55).getStyle();
 
+  const nightGlow = useNightGlow();
   const winCols = Math.max(1, Math.floor(sx / 2.8));
   const winRows = Math.max(1, Math.floor(sy / 3.5));
-  const winGlow = archetype === 'bar' || archetype === 'food' ? 0.4 : 0.15;
-  const winCol  = archetype === 'bar' ? '#fde68a' : archetype === 'food' ? '#fed7aa' : '#d4e8ff';
+  const baseGlow = archetype === 'bar' || archetype === 'food' ? 0.4 : 0.15;
+  const winGlow = baseGlow + nightGlow * 0.6; // windows glow much more at night
+  const winCol  = archetype === 'bar' ? '#fde68a' : archetype === 'food' ? '#fed7aa'
+    : nightGlow > 0.5 ? '#ffe4b5' : '#d4e8ff'; // warm glow at night vs cool blue by day
 
   return (
     <group position={[0, sy / 2, 0]}>
@@ -573,6 +587,9 @@ function AnimatedWater({ bounds }: { bounds: ReturnType<typeof getTownBounds> })
 }
 
 function StreetLamps({ layouts }: { layouts: LocationLayout[] }) {
+  const nightGlow = useNightGlow();
+  const lampIntensity = 0.15 + nightGlow * 0.8;
+  const bulbEmissive = 0.4 + nightGlow * 1.5;
   const positions = useMemo(() => {
     const lamps: [number, number, number][] = [];
     for (const l of layouts) {
@@ -607,9 +624,9 @@ function StreetLamps({ layouts }: { layouts: LocationLayout[] }) {
           {/* bulb */}
           <mesh position={[0.6, 3.65, 0]}>
             <sphereGeometry args={[0.08, 8, 6]} />
-            <meshStandardMaterial color={PAL.lamp} emissive={PAL.lamp} emissiveIntensity={1.2} roughness={0.2} />
+            <meshStandardMaterial color={PAL.lamp} emissive={PAL.lamp} emissiveIntensity={bulbEmissive} roughness={0.2} />
           </mesh>
-          <pointLight position={[0.6, 3.65, 0]} color={PAL.lamp} intensity={0.5} distance={8} />
+          <pointLight position={[0.6, 3.65, 0]} color={PAL.lamp} intensity={lampIntensity} distance={8 + nightGlow * 4} />
           {/* base plate */}
           <mesh position={[0, 0.03, 0]}>
             <cylinderGeometry args={[0.15, 0.15, 0.06, 8]} />
@@ -705,30 +722,9 @@ export function TownEnvironment() {
 
   return (
     <>
-      {/* Lighting — warm sun + cool sky fill */}
-      <ambientLight intensity={0.35} />
-      <hemisphereLight args={['#87ceeb', '#c2b280', 0.4]} />
-      {/* Main sun */}
-      <directionalLight
-        position={[bounds.centerX + bounds.radius * 0.8, 45, bounds.centerZ + bounds.radius * 0.4]}
-        intensity={1.3}
-        color="#fff5e6"
-        castShadow
-        shadow-mapSize-width={4096}
-        shadow-mapSize-height={4096}
-        shadow-camera-far={bounds.radius * 3.5}
-        shadow-camera-left={-bounds.radius * 1.8}
-        shadow-camera-right={bounds.radius * 1.8}
-        shadow-camera-top={bounds.radius * 1.8}
-        shadow-camera-bottom={-bounds.radius * 1.8}
-        shadow-bias={-0.0003}
-      />
-      {/* Rim / back light */}
-      <directionalLight
-        position={[bounds.centerX - bounds.radius, 25, bounds.centerZ - bounds.radius * 0.5]}
-        intensity={0.2}
-        color="#bfdbfe"
-      />
+      {/* Lighting is handled by DayNightCycle in the parent Scene */}
+      {/* Hemisphere fill for ground bounce — always active */}
+      <hemisphereLight args={['#87ceeb', '#c2b280', 0.15]} />
       <fog attach="fog" args={['#e8e0d8', bounds.radius * 1.5, bounds.radius * 3.5]} />
 
       <Ground bounds={bounds} />

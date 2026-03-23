@@ -8,7 +8,9 @@ The tick loop:
   5. Select actions deterministically
   6. Resolve interactions (pairs who interact at same location)
   7. Apply emotional contagion
-  8. Record state for dashboard
+  8. Propagate information through social network
+  9. Compute macro aggregation metrics
+  10. Record state for dashboard
 """
 
 from __future__ import annotations
@@ -23,6 +25,12 @@ from .world_agent import WorldAgent, SharedBrain, HeartState, Personality, updat
 from .relationship import RelationshipStore
 from .action_table import Action, select_action, TickContext, get_action_description
 from .contagion import apply_contagion
+from .llm_packet import build_agent_decision_packet
+from .llm_salience import SalienceContext, promote_llm_candidates, score_agent_salience
+from .world_information import apply_external_information, interpret_external_information
+from .macro_aggregator import MacroAggregator
+from .info_propagation import InfoPropagationEngine
+from .economic_actions import resolve_economic_actions, update_expectations
 
 
 @dataclass
@@ -59,6 +67,12 @@ class World:
         self.tick_log: list[dict] = []  # per-tick summary for dashboard
         self.scenario_name: str = "large_town"
         self.group_profiles: dict[str, dict] = {}
+        self.llm_focus: list[dict] = []
+        self.external_signals: list[dict] = []
+        # Macro aggregation and information propagation
+        self.macro_aggregator = MacroAggregator()
+        self.info_propagation = InfoPropagationEngine()
+        self._info_awareness: dict[str, set[str]] = {}
 
     def initialize(self):
         """Load the shared brain (SBERT + anchors). Call once before simulation."""
@@ -75,6 +89,23 @@ class World:
 
     def schedule_event(self, event: ScheduledEvent):
         self.events.append(event)
+
+    def ingest_information(self, text: str, *, start_tick: int | None = None) -> dict:
+        """Translate external information into town-level effects."""
+        plan = interpret_external_information(text, self, start_tick=start_tick)
+        result = apply_external_information(self, plan)
+        # Register with info propagation engine so it spreads through social network
+        self.info_propagation.register_info(
+            label=plan.label,
+            kind=plan.kind,
+            source_text=plan.source_text,
+            origin_tick=plan.start_tick,
+            severity=plan.severity,
+        )
+        # Mark directly-impacted agents as aware
+        for agent_id in self._info_awareness.get(plan.label, set()):
+            self.info_propagation.mark_aware(plan.label, agent_id, source="direct", tick=self.tick_count)
+        return result
 
     @property
     def hour_of_day(self) -> int:
@@ -99,6 +130,8 @@ class World:
             "actions": {},
             "interactions": [],
             "speeches": [],
+            "llm_focus": [],
+            "llm_packets": [],
         }
 
         # Phase 1: Move agents to scheduled locations (tick overrides take priority)
@@ -158,6 +191,48 @@ class World:
                     routine_emb = self.brain.encode(loc.default_activity)
                     update_heart(agent.heart, routine_emb, self.brain, agent.personality)
 
+        # Phase 3b: Apply persistent pressure to heart state
+        # Agents with high pressure feel ongoing emotional drag.
+        # Effects are PROPORTIONAL (not additive) to prevent runaway accumulation.
+        for agent in self.agents.values():
+            # Debt pressure: pull valence toward a floor proportional to pressure
+            if agent.debt_pressure > 0.15:
+                pressure = agent.debt_pressure
+                # Valence floor: higher debt = lower floor (0.5 at dp=0, 0.2 at dp=1)
+                valence_floor = max(0.15, 0.5 - pressure * 0.35)
+                if agent.heart.valence > valence_floor:
+                    agent.heart.valence -= (agent.heart.valence - valence_floor) * 0.06
+                # Tension ceiling: higher debt = higher floor for tension
+                tension_floor = min(0.6, pressure * 0.4)
+                if agent.heart.tension < tension_floor:
+                    agent.heart.tension += (tension_floor - agent.heart.tension) * 0.04
+
+            # Dread pressure: same proportional pull approach
+            if agent.dread_pressure > 0.15:
+                dp = agent.dread_pressure
+                valence_floor = max(0.15, 0.5 - dp * 0.3)
+                if agent.heart.valence > valence_floor:
+                    agent.heart.valence -= (agent.heart.valence - valence_floor) * 0.05
+                tension_floor = min(0.5, dp * 0.35)
+                if agent.heart.tension < tension_floor:
+                    agent.heart.tension += (tension_floor - agent.heart.tension) * 0.04
+                agent.heart.energy = max(0.15, agent.heart.energy - dp * 0.005)
+
+            # Secret pressure
+            if agent.secret_pressure > 0.15:
+                sp = agent.secret_pressure
+                tension_floor = min(0.4, sp * 0.3)
+                if agent.heart.tension < tension_floor:
+                    agent.heart.tension += (tension_floor - agent.heart.tension) * 0.03
+
+            # Slow natural decay of pressure over time
+            if agent.debt_pressure > 0.02:
+                agent.debt_pressure = max(0.0, agent.debt_pressure * 0.997)
+            if agent.secret_pressure > 0.02:
+                agent.secret_pressure = max(0.0, agent.secret_pressure * 0.998)
+            if agent.dread_pressure > 0.02:
+                agent.dread_pressure = max(0.0, agent.dread_pressure * 0.996)
+
         # Phase 4: Build nearby agent lists
         by_location: dict[str, list[str]] = defaultdict(list)
         for agent in self.agents.values():
@@ -172,8 +247,14 @@ class World:
             nearby_agents = {aid: self.agents[aid] for aid in nearby}
             agent.refresh_subjective_state(nearby_agents, self.relationships)
 
+        summary["llm_focus"] = self._refresh_llm_salience(
+            by_location,
+            event_context_by_location,
+        )
+
         # Phase 5: Select actions deterministically
         actions: dict[str, Action] = {}
+        tick_contexts: dict[str, TickContext] = {}
         for agent in self.agents.values():
             nearby = [aid for aid in by_location[agent.location] if aid != agent.agent_id]
             nearby_agents = {aid: self.agents[aid] for aid in nearby}
@@ -195,6 +276,7 @@ class World:
                     for item in event_context_by_location.get(agent.location, [])
                 ),
             )
+            tick_contexts[agent.agent_id] = ctx
             action = select_action(agent, ctx)
             actions[agent.agent_id] = action
             agent.last_action = action.name
@@ -218,12 +300,34 @@ class World:
                 "action_style": agent.motives.action_style,
             }
 
+        summary["llm_packets"] = self._build_llm_packet_previews(
+            actions,
+            tick_contexts,
+            summary["events"],
+        )
+
         # Phase 6: Resolve interactions
         interactions = self._resolve_interactions(actions, by_location)
         summary["interactions"] = interactions
 
-        # Phase 7: Emotional contagion
+        # Phase 7: Economic actions — agents make economic decisions that
+        # affect other agents (raise prices, cut shifts, reduce spending, etc.)
+        # This creates the cascading feedback loops that sustain macro shocks.
+        econ_resolution = resolve_economic_actions(
+            self.agents, by_location, self.relationships, self.tick_count,
+        )
+        summary["economic_actions"] = econ_resolution.as_dict()
+
+        # Phase 7b: Update forward-looking expectations
+        # Agents form beliefs about whether things will get better or worse
+        update_expectations(self.agents, self.tick_count)
+
+        # Phase 8: Emotional contagion
         apply_contagion(self.agents, self.relationships)
+
+        # Phase 9: Information propagation — spread knowledge through social network
+        info_summary = self.info_propagation.propagate(self)
+        summary["info_propagation"] = info_summary
 
         # Contagion and interaction outcomes can change the internal read even if
         # the macro action stays the same; refresh once more for dashboard/prompt use.
@@ -232,8 +336,85 @@ class World:
             nearby_agents = {aid: self.agents[aid] for aid in nearby}
             agent.refresh_subjective_state(nearby_agents, self.relationships)
 
+        # Phase 10: Macro aggregation — compute society-level metrics
+        macro_snap = self.macro_aggregator.compute(self, recent_interactions=interactions)
+        summary["macro"] = macro_snap.as_dict()
+
         self.tick_log.append(summary)
         return summary
+
+    def _refresh_llm_salience(
+        self,
+        by_location: dict[str, list[str]],
+        event_context_by_location: dict[str, list[dict]],
+    ) -> list[dict]:
+        """Score which agents are worth promoting into LLM mode this tick."""
+        scored = []
+        for agent in self.agents.values():
+            nearby_ids = [aid for aid in by_location[agent.location] if aid != agent.agent_id]
+            ctx = SalienceContext(
+                tick=self.tick_count,
+                hour_of_day=self.hour_of_day,
+                nearby_agents=tuple(self.agents[aid] for aid in nearby_ids),
+                event_count=len(event_context_by_location.get(agent.location, [])),
+                event_kinds=tuple(item["kind"] for item in event_context_by_location.get(agent.location, [])),
+                is_event_target=any(
+                    item["targets"] is not None and agent.agent_id in item["targets"]
+                    for item in event_context_by_location.get(agent.location, [])
+                ),
+            )
+            scored.append(score_agent_salience(agent, ctx, self.relationships))
+
+        ranked = promote_llm_candidates(scored, agent_count=len(self.agents))
+        ranked_by_id = {item.agent_id: item for item in ranked}
+        for agent in self.agents.values():
+            item = ranked_by_id[agent.agent_id]
+            agent.llm_salience = item.score
+            agent.llm_salience_level = item.level
+            agent.llm_active = item.active
+            agent.llm_candidate_rank = item.rank
+            agent.llm_salience_reasons = list(item.reasons)
+            agent.llm_salience_factors = dict(item.factors)
+
+        self.llm_focus = [
+            item.as_summary(self.agents[item.agent_id])
+            for item in ranked[:10]
+        ]
+        return self.llm_focus
+
+    def _build_llm_packet_previews(
+        self,
+        actions: dict[str, Action],
+        tick_contexts: dict[str, TickContext],
+        live_events: list[dict],
+    ) -> list[dict]:
+        """Build packet previews for agents promoted into LLM mode."""
+        packets: list[dict] = []
+        for agent in self.agents.values():
+            if not agent.llm_active:
+                agent.llm_packet_preview = None
+                continue
+            ctx = tick_contexts[agent.agent_id]
+            packet = build_agent_decision_packet(
+                agent,
+                world_time=self.time_str,
+                ctx=ctx,
+                relationships=self.relationships,
+                recommended_action=actions[agent.agent_id],
+                world_agents=self.agents,
+                live_events=live_events,
+            )
+            agent.llm_packet_preview = packet
+            packets.append(
+                {
+                    "agent_id": agent.agent_id,
+                    "name": agent.personality.name,
+                    "role": agent.social_role,
+                    "recommended_action": packet["recommended_action"],
+                    "allowed_actions": packet["allowed_actions"][:3],
+                }
+            )
+        return packets
 
     def _resolve_interactions(
         self,
@@ -638,6 +819,22 @@ class World:
             "workers_canteen",
         }
 
+    def get_macro_summary(self) -> dict:
+        """Return the macro aggregation summary with deltas from baseline."""
+        return self.macro_aggregator.get_summary()
+
+    def get_macro_timeline(self) -> list[dict]:
+        """Return the full macro metrics timeline."""
+        return self.macro_aggregator.get_timeline()
+
+    def get_shock_impact_report(self) -> dict:
+        """Return a report comparing macro metrics before and after shocks."""
+        return self.macro_aggregator.get_shock_impact_report()
+
+    def get_info_spread_report(self) -> dict:
+        """Return information propagation report."""
+        return self.info_propagation.get_spread_report(self)
+
     def get_agent_dashboard(self, agent_id: str) -> dict | None:
         """Full dashboard for one agent — for user exploration."""
         agent = self.agents.get(agent_id)
@@ -648,7 +845,8 @@ class World:
         state["recent_memories"] = [
             {"tick": m.tick, "time": f"Day {m.tick // 24 + 1} {m.tick % 24:02d}:00",
              "description": m.description, "valence": round(m.valence_at_time, 2),
-             "arousal": round(m.arousal_at_time, 2), "other": m.other_agent_id}
+             "arousal": round(m.arousal_at_time, 2), "other": m.other_agent_id,
+             "interpretation": m.interpretation, "story_beat": m.story_beat}
             for m in agent.get_recent_memories(15)
         ]
         state["relationships"] = [
@@ -682,7 +880,7 @@ class World:
         for a in agents_list:
             action_counts[a.last_action] += 1
 
-        return {
+        summary = {
             "tick": self.tick_count,
             "time": self.time_str,
             "agent_count": len(agents_list),
@@ -696,4 +894,31 @@ class World:
                 [a.get_dashboard_state() for a in agents_list],
                 key=lambda x: x["vulnerability"], reverse=True
             )[:5],
+            "llm_active_count": sum(1 for a in agents_list if a.llm_active),
+            "top_llm_candidates": [
+                a.get_dashboard_state()
+                for a in sorted(agents_list, key=lambda item: item.llm_salience, reverse=True)[:5]
+            ],
+            "external_signals": list(self.external_signals[-5:]),
         }
+
+        # Add macro metrics if available
+        macro = self.macro_aggregator.get_summary()
+        if "current" in macro:
+            current = macro["current"]
+            summary["macro"] = {
+                "consumer_confidence": current.get("consumer_confidence", 0.5),
+                "social_cohesion": current.get("social_cohesion", 0.5),
+                "institutional_trust": current.get("institutional_trust", 0.5),
+                "civil_unrest_potential": current.get("civil_unrest_potential", 0.0),
+                "market_pressure": current.get("market_pressure", 0.0),
+                "population_mood": current.get("population_mood", 0.0),
+                "information_awareness": current.get("information_awareness", {}),
+            }
+            summary["macro_deltas"] = macro.get("deltas", {})
+
+        # Add info propagation report
+        info_report = self.info_propagation.get_spread_report(self)
+        summary["info_spread"] = info_report.get("active_information", [])
+
+        return summary

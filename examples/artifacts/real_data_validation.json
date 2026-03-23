@@ -1,0 +1,363 @@
+{
+  "direction_accuracy": 0.812,
+  "avg_magnitude_ratio": 0.281,
+  "median_magnitude_ratio": 0.202,
+  "avg_sector_rank_correlation": 0.133,
+  "total_metric_comparisons": 16,
+  "events": [
+    {
+      "event_name": "2008 Oil Price Surge",
+      "metric_comparisons": [
+        {
+          "real_metric": "Consumer Confidence Index",
+          "real_source": "Conference Board CCI (FRED:CSCICP03USM665S)",
+          "real_pre": 87.3,
+          "real_post": 51.0,
+          "real_pct_change": -41.58,
+          "real_direction": "down",
+          "real_period": "Jan 2008 \u2192 Jul 2008",
+          "sim_metric": "consumer_confidence",
+          "sim_delta": -0.0624,
+          "sim_pct_change": -6.24,
+          "sim_direction": "down",
+          "direction_match": true,
+          "magnitude_ratio": 0.15,
+          "inverted": false
+        },
+        {
+          "real_metric": "Consumer Sentiment (Michigan)",
+          "real_source": "Univ. Michigan UMCSI (FRED:UMCSENT)",
+          "real_pre": 78.4,
+          "real_post": 61.2,
+          "real_pct_change": -21.94,
+          "real_direction": "down",
+          "real_period": "Jan 2008 \u2192 Jul 2008",
+          "sim_metric": "consumer_confidence",
+          "sim_delta": -0.0624,
+          "sim_pct_change": -6.24,
+          "sim_direction": "down",
+          "direction_match": true,
+          "magnitude_ratio": 0.284,
+          "inverted": false
+        },
+        {
+          "real_metric": "Unemployment Rate",
+          "real_source": "BLS (FRED:UNRATE)",
+          "real_pre": 4.9,
+          "real_post": 5.8,
+          "real_pct_change": 18.37,
+          "real_direction": "up",
+          "real_period": "Jan 2008 \u2192 Jul 2008",
+          "sim_metric": "market_pressure",
+          "sim_delta": 0.0988,
+          "sim_pct_change": 9.88,
+          "sim_direction": "up",
+          "direction_match": true,
+          "magnitude_ratio": 0.538,
+          "inverted": false
+        },
+        {
+          "real_metric": "S&P 500",
+          "real_source": "S&P 500 Index",
+          "real_pre": 1378.6,
+          "real_post": 1267.4,
+          "real_pct_change": -8.07,
+          "real_direction": "down",
+          "real_period": "Jan 2 2008 \u2192 Jul 31 2008",
+          "sim_metric": "market_pressure",
+          "sim_delta": 0.0988,
+          "sim_pct_change": 9.88,
+          "sim_direction": "up",
+          "direction_match": true,
+          "magnitude_ratio": 1.225,
+          "inverted": true
+        }
+      ],
+      "sector_comparisons": [
+        {
+          "real_source": "BLS Current Employment Statistics",
+          "real_measure": "Job losses (thousands) Jan-Jul 2008",
+          "real_ranking": [
+            "industrial",
+            "services",
+            "white_collar",
+            "public_sector",
+            "healthcare"
+          ],
+          "sim_ranking": [
+            "healthcare",
+            "industrial",
+            "services",
+            "white_collar",
+            "public_sector"
+          ],
+          "rank_correlation": 0.0,
+          "top_match": false,
+          "bottom_match": false,
+          "common_sectors": 5
+        }
+      ]
+    },
+    {
+      "event_name": "2008 Financial Crisis (Lehman Brothers)",
+      "metric_comparisons": [
+        {
+          "real_metric": "Consumer Confidence Index",
+          "real_source": "Conference Board CCI",
+          "real_pre": 61.4,
+          "real_post": 38.8,
+          "real_pct_change": -36.81,
+          "real_direction": "down",
+          "real_period": "Sep 2008 \u2192 Oct 2008",
+          "sim_metric": "consumer_confidence",
+          "sim_delta": -0.0432,
+          "sim_pct_change": -4.32,
+          "sim_direction": "down",
+          "direction_match": true,
+          "magnitude_ratio": 0.117,
+          "inverted": false
+        },
+        {
+          "real_metric": "Consumer Confidence Index (to trough)",
+          "real_source": "Conference Board CCI",
+          "real_pre": 61.4,
+          "real_post": 25.3,
+          "real_pct_change": -58.79,
+          "real_direction": "down",
+          "real_period": "Sep 2008 \u2192 Feb 2009",
+          "sim_metric": "consumer_confidence",
+          "sim_delta": -0.0432,
+          "sim_pct_change": -4.32,
+          "sim_direction": "down",
+          "direction_match": true,
+          "magnitude_ratio": 0.073,
+          "inverted": false
+        },
+        {
+          "real_metric": "Consumer Sentiment (Michigan)",
+          "real_source": "Univ. Michigan UMCSI (FRED:UMCSENT)",
+          "real_pre": 70.3,
+          "real_post": 57.6,
+          "real_pct_change": -18.07,
+          "real_direction": "down",
+          "real_period": "Sep 2008 \u2192 Nov 2008",
+          "sim_metric": "consumer_confidence",
+          "sim_delta": -0.0432,
+          "sim_pct_change": -4.32,
+          "sim_direction": "down",
+          "direction_match": true,
+          "magnitude_ratio": 0.239,
+          "inverted": false
+        },
+        {
+          "real_metric": "S&P 500 (1 month)",
+          "real_source": "S&P 500 Index",
+          "real_pre": 1251.7,
+          "real_post": 968.8,
+          "real_pct_change": -22.6,
+          "real_direction": "down",
+          "real_period": "Sep 12 2008 \u2192 Oct 10 2008",
+          "sim_metric": "market_pressure",
+          "sim_delta": 0.0457,
+          "sim_pct_change": 4.57,
+          "sim_direction": "up",
+          "direction_match": true,
+          "magnitude_ratio": 0.202,
+          "inverted": true
+        },
+        {
+          "real_metric": "Unemployment Rate",
+          "real_source": "BLS (FRED:UNRATE)",
+          "real_pre": 6.2,
+          "real_post": 6.6,
+          "real_pct_change": 6.45,
+          "real_direction": "up",
+          "real_period": "Sep 2008 \u2192 Oct 2008",
+          "sim_metric": "market_pressure",
+          "sim_delta": 0.0457,
+          "sim_pct_change": 4.57,
+          "sim_direction": "up",
+          "direction_match": true,
+          "magnitude_ratio": 0.708,
+          "inverted": false
+        },
+        {
+          "real_metric": "Trust in Banks",
+          "real_source": "Gallup 'Great deal/Quite a lot' confidence in banks",
+          "real_pre": 32.0,
+          "real_post": 22.0,
+          "real_pct_change": -31.25,
+          "real_direction": "down",
+          "real_period": "Jun 2008 \u2192 Jun 2009",
+          "sim_metric": "institutional_trust",
+          "sim_delta": -0.0527,
+          "sim_pct_change": -5.27,
+          "sim_direction": "down",
+          "direction_match": true,
+          "magnitude_ratio": 0.169,
+          "inverted": false
+        }
+      ],
+      "sector_comparisons": [
+        {
+          "real_source": "BLS Current Employment Statistics",
+          "real_measure": "Job losses (thousands) Sep 2008 - Mar 2009",
+          "real_ranking": [
+            "industrial",
+            "white_collar",
+            "services",
+            "public_sector",
+            "healthcare"
+          ],
+          "sim_ranking": [
+            "healthcare",
+            "industrial",
+            "services",
+            "white_collar",
+            "public_sector"
+          ],
+          "rank_correlation": -0.1,
+          "top_match": false,
+          "bottom_match": false,
+          "common_sectors": 5
+        }
+      ]
+    },
+    {
+      "event_name": "COVID-19 Pandemic (March 2020)",
+      "metric_comparisons": [
+        {
+          "real_metric": "Consumer Confidence Index",
+          "real_source": "Conference Board CCI",
+          "real_pre": 132.6,
+          "real_post": 118.8,
+          "real_pct_change": -10.41,
+          "real_direction": "down",
+          "real_period": "Feb 2020 \u2192 Mar 2020",
+          "sim_metric": "consumer_confidence",
+          "sim_delta": -0.0375,
+          "sim_pct_change": -3.75,
+          "sim_direction": "down",
+          "direction_match": true,
+          "magnitude_ratio": 0.36,
+          "inverted": false
+        },
+        {
+          "real_metric": "Consumer Confidence Index (to trough)",
+          "real_source": "Conference Board CCI",
+          "real_pre": 132.6,
+          "real_post": 85.7,
+          "real_pct_change": -35.37,
+          "real_direction": "down",
+          "real_period": "Feb 2020 \u2192 Apr 2020",
+          "sim_metric": "consumer_confidence",
+          "sim_delta": -0.0375,
+          "sim_pct_change": -3.75,
+          "sim_direction": "down",
+          "direction_match": true,
+          "magnitude_ratio": 0.106,
+          "inverted": false
+        },
+        {
+          "real_metric": "Consumer Sentiment (Michigan)",
+          "real_source": "Univ. Michigan UMCSI (FRED:UMCSENT)",
+          "real_pre": 101.0,
+          "real_post": 89.1,
+          "real_pct_change": -11.78,
+          "real_direction": "down",
+          "real_period": "Feb 2020 \u2192 Mar 2020 (mid-month revision)",
+          "sim_metric": "consumer_confidence",
+          "sim_delta": -0.0375,
+          "sim_pct_change": -3.75,
+          "sim_direction": "down",
+          "direction_match": true,
+          "magnitude_ratio": 0.318,
+          "inverted": false
+        },
+        {
+          "real_metric": "S&P 500 (to trough)",
+          "real_source": "S&P 500 Index",
+          "real_pre": 3386.2,
+          "real_post": 2237.4,
+          "real_pct_change": -33.93,
+          "real_direction": "down",
+          "real_period": "Feb 19 2020 \u2192 Mar 23 2020",
+          "sim_metric": "market_pressure",
+          "sim_delta": -0.0009,
+          "sim_pct_change": -0.09,
+          "sim_direction": "flat",
+          "direction_match": false,
+          "magnitude_ratio": 0.003,
+          "inverted": true
+        },
+        {
+          "real_metric": "Unemployment Rate",
+          "real_source": "BLS (FRED:UNRATE)",
+          "real_pre": 3.5,
+          "real_post": 14.7,
+          "real_pct_change": 320.0,
+          "real_direction": "up",
+          "real_period": "Feb 2020 \u2192 Apr 2020",
+          "sim_metric": "market_pressure",
+          "sim_delta": -0.0009,
+          "sim_pct_change": -0.09,
+          "sim_direction": "flat",
+          "direction_match": false,
+          "magnitude_ratio": 0.0,
+          "inverted": false
+        },
+        {
+          "real_metric": "Initial Jobless Claims (weekly)",
+          "real_source": "DOL (FRED:ICSA)",
+          "real_pre": 211000,
+          "real_post": 6867000,
+          "real_pct_change": 3154.5,
+          "real_direction": "up",
+          "real_period": "Mar 7 2020 \u2192 Mar 28 2020",
+          "sim_metric": "market_pressure",
+          "sim_delta": -0.0009,
+          "sim_pct_change": -0.09,
+          "sim_direction": "flat",
+          "direction_match": false,
+          "magnitude_ratio": 0.0,
+          "inverted": false
+        }
+      ],
+      "sector_comparisons": [
+        {
+          "real_source": "BLS Current Employment Statistics",
+          "real_measure": "Job losses (thousands) Feb-Apr 2020",
+          "real_ranking": [
+            "services",
+            "industrial",
+            "healthcare",
+            "white_collar",
+            "public_sector"
+          ],
+          "sim_ranking": [
+            "healthcare",
+            "industrial",
+            "services",
+            "public_sector",
+            "white_collar"
+          ],
+          "rank_correlation": 0.5,
+          "top_match": false,
+          "bottom_match": false,
+          "common_sectors": 5
+        }
+      ]
+    }
+  ],
+  "real_data_sources": [
+    "Conference Board Consumer Confidence Index",
+    "University of Michigan Consumer Sentiment Index (FRED:UMCSENT)",
+    "Bureau of Labor Statistics Current Employment Statistics",
+    "S&P 500 Index",
+    "BLS Unemployment Rate (FRED:UNRATE)",
+    "Gallup Institutional Confidence Surveys",
+    "DOL Initial Jobless Claims (FRED:ICSA)",
+    "BLS CPI-U (FRED:CPIAUCSL)"
+  ],
+  "time_seconds": 136.5
+}

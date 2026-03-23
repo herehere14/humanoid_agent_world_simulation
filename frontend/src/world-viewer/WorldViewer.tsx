@@ -1,6 +1,6 @@
 /** WorldViewer — main 3D world viewer page */
 
-import { useEffect, Suspense } from 'react';
+import { useCallback, useEffect, useMemo, Suspense, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Sky } from '@react-three/drei';
 import * as THREE from 'three';
@@ -12,11 +12,16 @@ import { InspectorPanel } from './components/InspectorPanel';
 import { PlaybackControls } from './components/PlaybackControls';
 import { EventOverlay } from './components/EventOverlay';
 import { PostProcessing } from './components/PostProcessing';
+import { EnvironmentEffects } from './components/EnvironmentEffects';
+import { DayNightCycle, useSkyInclination } from './components/DayNightCycle';
+import { ScenarioControlBar } from './components/ScenarioControlBar';
 import { getLayouts, getTownBounds } from './layout';
+import { generateUniverseSeed, getUniverseParams, applyUniverseToSnapshot } from './universe';
 import type { WorldSnapshot } from './types';
 
 function Scene() {
   const selectAgent = useWorldStore(s => s.selectAgent);
+  const skyInclination = useSkyInclination();
 
   // Camera and controls adapt to the generated town size
   const layouts = getLayouts();
@@ -32,7 +37,7 @@ function Scene() {
       />
       <OrbitControls
         maxPolarAngle={Math.PI / 2.2}
-        minDistance={5}
+        minDistance={3}
         maxDistance={camDist * 3}
         enableDamping
         dampingFactor={0.05}
@@ -41,16 +46,19 @@ function Scene() {
       <Sky
         distance={450000}
         sunPosition={[100, 60, -50]}
-        inclination={0.49}
+        inclination={skyInclination}
         azimuth={0.25}
         rayleigh={0.4}
         turbidity={4}
         mieCoefficient={0.003}
         mieDirectionalG={0.8}
       />
+      {/* Dynamic day/night lighting — replaces static lights in TownEnvironment */}
+      <DayNightCycle radius={bounds.radius} />
       <TownEnvironment />
       <Suspense fallback={null}>
         <AgentLayer />
+        <EnvironmentEffects />
       </Suspense>
       <PostProcessing />
       {/* Click on empty space to deselect */}
@@ -100,17 +108,53 @@ export default function WorldViewer() {
   const loadSnapshot = useWorldStore(s => s.loadSnapshot);
   const setLoading = useWorldStore(s => s.setLoading);
   const setError = useWorldStore(s => s.setError);
+  const currentTick = useWorldStore(s => s.currentTick);
+  const tickData = useWorldStore(s => s.snapshot?.ticks[s.currentTick] ?? null);
+  const [controlError, setControlError] = useState<string | null>(null);
+  const [activeInformation, setActiveInformation] = useState<string[]>([]);
 
-  // Load snapshot data
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      try {
-        // Prefer the backend snapshot so the viewer reflects live/exported
-        // simulation data. Fall back to the bundled mock if the API is not up.
-        let data: WorldSnapshot | null = null;
+  // Parse universe seed from URL: #/world?seed=12345
+  const universeSeed = useMemo(() => {
+    const match = window.location.hash.match(/[?&]seed=(\d+)/);
+    return match ? Number(match[1]) : generateUniverseSeed();
+  }, []);
+  const universeParams = useMemo(() => getUniverseParams(universeSeed), [universeSeed]);
 
-        // 1. Try backend API
+  const loadWorldData = useCallback(async (
+    options: {
+      information?: string[];
+      keepCurrentOnError?: boolean;
+    } = {},
+  ) => {
+    const cleanInformation = (options.information ?? []).map(item => item.trim()).filter(Boolean);
+    const keepCurrentOnError = options.keepCurrentOnError ?? false;
+    const currentSnapshot = useWorldStore.getState().snapshot;
+
+    setLoading(true);
+    setControlError(null);
+    if (!keepCurrentOnError) {
+      setError(null);
+    }
+
+    try {
+      let data: WorldSnapshot | null = null;
+
+      if (cleanInformation.length > 0) {
+        const res = await fetch('/api/world/snapshot/custom', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            scenario: currentSnapshot?.generation_meta?.scenario || currentSnapshot?.scenario || 'small_town',
+            ticks: currentSnapshot?.generation_meta?.ticks || currentSnapshot?.total_ticks || 240,
+            information: cleanInformation,
+          }),
+        });
+        if (!res.ok) {
+          const detail = await res.text();
+          throw new Error(detail || 'Failed to build custom world snapshot');
+        }
+        data = await res.json();
+      } else {
         try {
           const res = await fetch('/api/world/snapshot');
           if (res.ok) {
@@ -121,7 +165,6 @@ export default function WorldViewer() {
           // Backend not available
         }
 
-        // 2. Fall back to bundled mock snapshot
         if (!data) {
           try {
             const res = await fetch('/mock_snapshot.json');
@@ -133,18 +176,31 @@ export default function WorldViewer() {
             // Static file not available either
           }
         }
+      }
 
-        if (data) {
-          loadSnapshot(data);
-        } else {
-          throw new Error('Could not load simulation data from /api/world/snapshot or /mock_snapshot.json');
-        }
-      } catch (err: any) {
-        setError(err.message || 'Unknown error loading simulation data');
+      if (!data) {
+        throw new Error('Could not load simulation data from /api/world/snapshot or /mock_snapshot.json');
+      }
+
+      applyUniverseToSnapshot(data, universeParams);
+      loadSnapshot(data);
+      setActiveInformation(data.generation_meta?.external_information || cleanInformation);
+      setError(null);
+    } catch (err: any) {
+      const message = err.message || 'Unknown error loading simulation data';
+      if (keepCurrentOnError && currentSnapshot) {
+        setControlError(message);
+        setLoading(false);
+      } else {
+        setError(message);
       }
     }
-    load();
-  }, [loadSnapshot, setLoading, setError]);
+  }, [loadSnapshot, setLoading, setError, universeParams]);
+
+  // Load snapshot data and apply universe divergence
+  useEffect(() => {
+    void loadWorldData();
+  }, [loadWorldData, universeSeed]);
 
   if (loading) return <LoadingScreen />;
   if (error) return <ErrorScreen error={error} />;
@@ -175,12 +231,42 @@ export default function WorldViewer() {
 
       {/* UI Overlays */}
       <EventOverlay />
+      <ScenarioControlBar
+        loading={loading}
+        currentEventCount={tickData?.events.length ?? 0}
+        activeInformation={activeInformation}
+        onApply={async (information) => {
+          await loadWorldData({ information, keepCurrentOnError: true });
+        }}
+        onReset={async () => {
+          await loadWorldData({ information: [], keepCurrentOnError: true });
+        }}
+        error={controlError}
+      />
       <PlaybackControls />
       <InspectorPanel />
 
+      {/* Universe badge */}
+      <div className="universe-badge">
+        <div className="universe-label">{universeParams.label}</div>
+        <div className="universe-meta">
+          seed {universeSeed} · chaos {(universeParams.chaosFactor * 100).toFixed(0)}% · {universeParams.weatherMood}
+        </div>
+        <button
+          className="universe-btn"
+          onClick={() => {
+            const newSeed = generateUniverseSeed();
+            window.location.hash = `#/world?seed=${newSeed}`;
+            window.location.reload();
+          }}
+        >
+          New Universe
+        </button>
+      </div>
+
       {/* Help hint */}
       <div className="help-hint">
-        Click agent to inspect · Space to play/pause · Arrow keys to navigate
+        Click agent to inspect · Space to play/pause · Arrow keys to navigate · Each reload = new parallel universe
       </div>
     </div>
   );

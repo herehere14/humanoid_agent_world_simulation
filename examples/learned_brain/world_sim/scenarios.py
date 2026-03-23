@@ -7,6 +7,9 @@ Day 6-15: Ripple effects — anger, grief, drinking, support networks.
 
 from __future__ import annotations
 
+import random
+
+from .human_profiles import assign_human_profile
 from .world_agent import WorldAgent, HeartState, Personality
 from .world import World, Location, ScheduledEvent
 
@@ -264,6 +267,163 @@ AGENT_ROLES = {
     "Mike": "office_worker",  # summer job
 }
 
+MANUAL_HUMAN_PROFILES = {
+    "Marcus": {
+        "attachment_style": "anxious attachment",
+        "coping_style": "disappear into work",
+        "threat_lens": "scarcity",
+        "core_need": "safety",
+        "shame_trigger": "failing family",
+        "care_style": "protective provisioning",
+        "conflict_style": "keep score",
+        "mask_tendency": "dutiful calm",
+        "self_story": "provider",
+        "longing": "keep the house standing",
+    },
+    "Sarah": {
+        "attachment_style": "guarded attachment",
+        "coping_style": "perform competence",
+        "threat_lens": "humiliation",
+        "core_need": "dignity",
+        "shame_trigger": "looking easy to replace",
+        "care_style": "strategic problem-solving",
+        "conflict_style": "cool negotiation",
+        "mask_tendency": "polished competence",
+        "self_story": "climber",
+        "longing": "be taken seriously without blinking first",
+    },
+    "Priya": {
+        "attachment_style": "anxious attachment",
+        "coping_style": "caretake first",
+        "threat_lens": "abandonment",
+        "core_need": "belonging",
+        "shame_trigger": "letting family pressure show",
+        "care_style": "emotional reassurance",
+        "conflict_style": "appease first",
+        "mask_tendency": "soft warmth",
+        "self_story": "fixer",
+        "longing": "keep everyone close without disappointing anyone",
+    },
+    "Jake": {
+        "attachment_style": "self-protective attachment",
+        "coping_style": "deflect with humor",
+        "threat_lens": "humiliation",
+        "core_need": "autonomy",
+        "shame_trigger": "looking pathetic in front of the room",
+        "care_style": "teasing reassurance",
+        "conflict_style": "sidestep then snap",
+        "mask_tendency": "joke through it",
+        "self_story": "survivor",
+        "longing": "stay unpinned and impossible to corner",
+    },
+    "Diana": {
+        "attachment_style": "anxious attachment",
+        "coping_style": "caretake first",
+        "threat_lens": "abandonment",
+        "core_need": "usefulness",
+        "shame_trigger": "failing people who count on me",
+        "care_style": "steady presence",
+        "conflict_style": "soften then set terms",
+        "mask_tendency": "dutiful calm",
+        "self_story": "fixer",
+        "longing": "be needed without having to break first",
+    },
+    "Chen": {
+        "attachment_style": "guarded attachment",
+        "coping_style": "intellectualize",
+        "threat_lens": "chaos",
+        "core_need": "control",
+        "shame_trigger": "losing composure in public",
+        "care_style": "practical fixing",
+        "conflict_style": "cool negotiation",
+        "mask_tendency": "emotional shutdown",
+        "self_story": "operator",
+        "longing": "stay competent enough to keep choice",
+    },
+    "Rosa": {
+        "attachment_style": "anxious attachment",
+        "coping_style": "reach for connection",
+        "threat_lens": "scarcity",
+        "core_need": "safety",
+        "shame_trigger": "being treated like I should be grateful for scraps",
+        "care_style": "fierce reassurance",
+        "conflict_style": "cornered strike",
+        "mask_tendency": "soft warmth",
+        "self_story": "survivor",
+        "longing": "feel safe without owing the room my silence",
+    },
+    "Kevin": {
+        "attachment_style": "guarded attachment",
+        "coping_style": "disappear into work",
+        "threat_lens": "abandonment",
+        "core_need": "control",
+        "shame_trigger": "looking like I need somebody back",
+        "care_style": "practical fixing",
+        "conflict_style": "appease first",
+        "mask_tendency": "emotional shutdown",
+        "self_story": "survivor",
+        "longing": "have one bond that does not ask for a performance",
+    },
+    "Greg": {
+        "attachment_style": "secure attachment",
+        "coping_style": "confront head-on",
+        "threat_lens": "betrayal",
+        "core_need": "justice",
+        "shame_trigger": "letting management walk over the crew",
+        "care_style": "protective provisioning",
+        "conflict_style": "go sharp",
+        "mask_tendency": "quiet shutdown",
+        "self_story": "loyalist",
+        "longing": "make sure the crew does not get sold out quietly",
+    },
+    "Victoria": {
+        "attachment_style": "guarded attachment",
+        "coping_style": "perform competence",
+        "threat_lens": "exposure",
+        "core_need": "control",
+        "shame_trigger": "being seen as morally soft or politically naive",
+        "care_style": "strategic problem-solving",
+        "conflict_style": "command",
+        "mask_tendency": "polished competence",
+        "self_story": "operator",
+        "longing": "keep the numbers from becoming a public confession",
+    },
+    "Richard": {
+        "attachment_style": "disorganized attachment",
+        "coping_style": "control the room",
+        "threat_lens": "exposure",
+        "core_need": "control",
+        "shame_trigger": "being remembered as the man who failed everyone",
+        "care_style": "strategic problem-solving",
+        "conflict_style": "command",
+        "mask_tendency": "command presence",
+        "self_story": "guardian",
+        "longing": "get through this without public collapse",
+    },
+}
+
+
+def _role_to_profile_role(role: str, name: str) -> str:
+    if name == "Yuki":
+        return "healthcare"
+    if name in {"David", "Mike"}:
+        return "factory_worker"
+    if role in {"office_worker", "manager"}:
+        return "office_professional"
+    return "community"
+
+
+def _apply_human_profiles() -> None:
+    for personality in AGENTS:
+        role = _role_to_profile_role(AGENT_ROLES.get(personality.name, "office_worker"), personality.name)
+        assign_human_profile(personality, role, random.Random(f"small-town::{personality.name}"))
+        overrides = MANUAL_HUMAN_PROFILES.get(personality.name, {})
+        for field, value in overrides.items():
+            setattr(personality, field, value)
+
+
+_apply_human_profiles()
+
 # Who gets laid off on Day 5
 LAYOFF_TARGETS = ["Marcus", "Rosa", "Jake", "Mika", "Greg", "Nadia", "Carlos"]
 
@@ -290,6 +450,7 @@ def build_small_town() -> World:
             agent_id=personality.name.lower().replace(" ", "_"),
             personality=personality,
             schedule=_make_schedule(role),
+            social_role=role,
         )
         world.add_agent(agent)
 

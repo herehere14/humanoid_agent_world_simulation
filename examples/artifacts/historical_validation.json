@@ -1,0 +1,565 @@
+{
+  "total_checks": 61,
+  "total_passed": 51,
+  "overall_accuracy": 0.836,
+  "direction_accuracy": 0.867,
+  "ranking_accuracy": 0.714,
+  "magnitude_accuracy": 1.0,
+  "time_seconds": 222.2,
+  "events": [
+    {
+      "name": "2008 Oil Price Surge",
+      "shock_text": "Oil prices surge 63% from $90 to $147 per barrel",
+      "checks_total": 12,
+      "checks_passed": 12,
+      "accuracy": 1.0,
+      "deltas": {
+        "consumer_confidence": -0.0624,
+        "social_cohesion": -0.0024,
+        "institutional_trust": -0.0624,
+        "civil_unrest_potential": 0.0136,
+        "market_pressure": 0.0988,
+        "population_mood": -0.1527
+      },
+      "sector_stress": {
+        "industrial": 0.299,
+        "white_collar": 0.117,
+        "education": 0.146,
+        "services": 0.288,
+        "public_sector": 0.083,
+        "healthcare": 0.219,
+        "community": 0.262
+      },
+      "info_spread": {
+        "Oil price surge": 1.0
+      },
+      "details": [
+        {
+          "category": "direction",
+          "name": "Consumer confidence dropped",
+          "passed": true,
+          "detail": "delta=-0.0624"
+        },
+        {
+          "category": "direction",
+          "name": "Market pressure increased",
+          "passed": true,
+          "detail": "delta=+0.0988"
+        },
+        {
+          "category": "direction",
+          "name": "Civil unrest increased",
+          "passed": true,
+          "detail": "delta=+0.0136"
+        },
+        {
+          "category": "direction",
+          "name": "Institutional trust dropped",
+          "passed": true,
+          "detail": "delta=-0.0624"
+        },
+        {
+          "category": "direction",
+          "name": "Social cohesion dropped",
+          "passed": true,
+          "detail": "delta=-0.0024"
+        },
+        {
+          "category": "direction",
+          "name": "Population mood dropped",
+          "passed": true,
+          "detail": "delta=-0.1527"
+        },
+        {
+          "category": "ranking",
+          "name": "industrial in top half of stress",
+          "passed": true,
+          "detail": "rank=1/7, stress=0.299"
+        },
+        {
+          "category": "ranking",
+          "name": "services in top half of stress",
+          "passed": true,
+          "detail": "rank=2/7, stress=0.288"
+        },
+        {
+          "category": "ranking",
+          "name": "public_sector in bottom half of stress",
+          "passed": true,
+          "detail": "rank=7/7, stress=0.083"
+        },
+        {
+          "category": "ranking",
+          "name": "healthcare in bottom half of stress",
+          "passed": true,
+          "detail": "rank=4/7, stress=0.219"
+        },
+        {
+          "category": "magnitude",
+          "name": "Confidence drop magnitude reasonable",
+          "passed": true,
+          "detail": "actual=6.2pp, expected\u22488pp, ratio=0.8x"
+        },
+        {
+          "category": "magnitude",
+          "name": "Information reached >70% of population",
+          "passed": true,
+          "detail": "max awareness=100.0%"
+        }
+      ],
+      "historical_notes": [
+        "US Consumer Confidence Index dropped from 87.3 to 51.0 over 6 months (2008)",
+        "Transport and logistics sectors hit first (fuel costs)",
+        "Food prices followed within 1-2 weeks",
+        "Low-income households impacted 2-3x more than high-income",
+        "Gas station lines and consumer behavior changes within days"
+      ]
+    },
+    {
+      "name": "2008 Banking Panic (Lehman Brothers)",
+      "shock_text": "Major bank collapses, deposits may be frozen, banking system in crisis",
+      "checks_total": 13,
+      "checks_passed": 11,
+      "accuracy": 0.846,
+      "deltas": {
+        "consumer_confidence": -0.0432,
+        "social_cohesion": -0.0025,
+        "institutional_trust": -0.0527,
+        "civil_unrest_potential": 0.0099,
+        "market_pressure": 0.0457,
+        "population_mood": -0.0912
+      },
+      "sector_stress": {
+        "industrial": 0.254,
+        "white_collar": 0.095,
+        "education": 0.121,
+        "services": 0.255,
+        "public_sector": 0.072,
+        "healthcare": 0.234,
+        "community": 0.232
+      },
+      "info_spread": {
+        "Banking panic": 1.0
+      },
+      "details": [
+        {
+          "category": "direction",
+          "name": "Consumer confidence dropped",
+          "passed": true,
+          "detail": "delta=-0.0432"
+        },
+        {
+          "category": "direction",
+          "name": "Market pressure increased",
+          "passed": true,
+          "detail": "delta=+0.0457"
+        },
+        {
+          "category": "direction",
+          "name": "Civil unrest increased",
+          "passed": true,
+          "detail": "delta=+0.0099"
+        },
+        {
+          "category": "direction",
+          "name": "Institutional trust dropped",
+          "passed": true,
+          "detail": "delta=-0.0527"
+        },
+        {
+          "category": "direction",
+          "name": "Social cohesion dropped",
+          "passed": true,
+          "detail": "delta=-0.0025"
+        },
+        {
+          "category": "direction",
+          "name": "Population mood dropped",
+          "passed": true,
+          "detail": "delta=-0.0912"
+        },
+        {
+          "category": "ranking",
+          "name": "white_collar in top half of stress",
+          "passed": false,
+          "detail": "rank=6/7, stress=0.095"
+        },
+        {
+          "category": "ranking",
+          "name": "services in top half of stress",
+          "passed": true,
+          "detail": "rank=1/7, stress=0.255"
+        },
+        {
+          "category": "ranking",
+          "name": "industrial in top half of stress",
+          "passed": true,
+          "detail": "rank=2/7, stress=0.254"
+        },
+        {
+          "category": "ranking",
+          "name": "healthcare in bottom half of stress",
+          "passed": false,
+          "detail": "rank=3/7, stress=0.234"
+        },
+        {
+          "category": "ranking",
+          "name": "public_sector in bottom half of stress",
+          "passed": true,
+          "detail": "rank=7/7, stress=0.072"
+        },
+        {
+          "category": "magnitude",
+          "name": "Confidence drop magnitude reasonable",
+          "passed": true,
+          "detail": "actual=4.3pp, expected\u224815pp, ratio=0.3x"
+        },
+        {
+          "category": "magnitude",
+          "name": "Information reached >70% of population",
+          "passed": true,
+          "detail": "max awareness=100.0%"
+        }
+      ],
+      "historical_notes": [
+        "Consumer Confidence Index dropped from 61.4 to 38.0 in one month (Sep\u2192Oct 2008)",
+        "Gallup trust in banks: 41% \u2192 18% over the crisis",
+        "Universal impact \u2014 every sector affected, but finance/services worst",
+        "Protest movements (later Occupy) rooted in immediate anger",
+        "Bank runs at WaMu, IndyMac \u2014 physical lines at ATMs",
+        "Retirees especially devastated (savings/pension fears)"
+      ]
+    },
+    {
+      "name": "COVID-19 Pandemic (March 2020)",
+      "shock_text": "Virus outbreak declared pandemic, hospitals overwhelmed, quarantine orders issued",
+      "checks_total": 12,
+      "checks_passed": 10,
+      "accuracy": 0.833,
+      "deltas": {
+        "consumer_confidence": -0.0375,
+        "social_cohesion": -0.0029,
+        "institutional_trust": -0.0551,
+        "civil_unrest_potential": 0.012,
+        "market_pressure": -0.0009,
+        "population_mood": -0.0554
+      },
+      "sector_stress": {
+        "industrial": 0.224,
+        "white_collar": 0.086,
+        "education": 0.109,
+        "services": 0.223,
+        "public_sector": 0.084,
+        "healthcare": 0.231,
+        "community": 0.217
+      },
+      "info_spread": {
+        "Public health crisis": 1.0
+      },
+      "details": [
+        {
+          "category": "direction",
+          "name": "Consumer confidence dropped",
+          "passed": true,
+          "detail": "delta=-0.0375"
+        },
+        {
+          "category": "direction",
+          "name": "Market pressure increased",
+          "passed": false,
+          "detail": "delta=-0.0009"
+        },
+        {
+          "category": "direction",
+          "name": "Civil unrest stable/low",
+          "passed": true,
+          "detail": "delta=+0.0120"
+        },
+        {
+          "category": "direction",
+          "name": "Institutional trust stable",
+          "passed": false,
+          "detail": "delta=-0.0551"
+        },
+        {
+          "category": "direction",
+          "name": "Social cohesion stable/rose",
+          "passed": true,
+          "detail": "delta=-0.0029"
+        },
+        {
+          "category": "direction",
+          "name": "Population mood dropped",
+          "passed": true,
+          "detail": "delta=-0.0554"
+        },
+        {
+          "category": "ranking",
+          "name": "services in top half of stress",
+          "passed": true,
+          "detail": "rank=3/7, stress=0.223"
+        },
+        {
+          "category": "ranking",
+          "name": "healthcare in top half of stress",
+          "passed": true,
+          "detail": "rank=1/7, stress=0.231"
+        },
+        {
+          "category": "ranking",
+          "name": "public_sector in bottom half of stress",
+          "passed": true,
+          "detail": "rank=7/7, stress=0.084"
+        },
+        {
+          "category": "ranking",
+          "name": "white_collar in bottom half of stress",
+          "passed": true,
+          "detail": "rank=6/7, stress=0.086"
+        },
+        {
+          "category": "magnitude",
+          "name": "Confidence drop magnitude reasonable",
+          "passed": true,
+          "detail": "actual=3.8pp, expected\u224810pp, ratio=0.4x"
+        },
+        {
+          "category": "magnitude",
+          "name": "Information reached >70% of population",
+          "passed": true,
+          "detail": "max awareness=100.0%"
+        }
+      ],
+      "historical_notes": [
+        "Consumer Confidence dropped from 132.6 to 118.8 first month (-10%), then to 85.7 (-35%)",
+        "Healthcare system: ICUs at 80-120% capacity in hotspots within 2 weeks",
+        "Service sector: restaurants, retail, hospitality decimated (70-90% revenue loss)",
+        "INITIAL SOLIDARITY: mutual aid groups, balcony applause, NHS volunteer 750k signups in 24h",
+        "Social cohesion initially ROSE, then fragmented along political lines after ~2 weeks",
+        "Government approval ratings SPIKED +10-20pts in first 2 weeks (rally-around-flag)",
+        "Retirees faced highest personal health risk \u2192 extreme anxiety"
+      ]
+    },
+    {
+      "name": "Brand Scandal (Nestl\u00e9 / Child Labor Pattern)",
+      "shock_text": "Major chocolate company caught using child labor in cocoa supply chain, internal documents leaked",
+      "checks_total": 12,
+      "checks_passed": 9,
+      "accuracy": 0.75,
+      "deltas": {
+        "consumer_confidence": -0.0126,
+        "social_cohesion": -0.0032,
+        "institutional_trust": -0.0542,
+        "civil_unrest_potential": 0.011,
+        "market_pressure": -0.0115,
+        "population_mood": -0.0079
+      },
+      "sector_stress": {
+        "industrial": 0.174,
+        "white_collar": 0.081,
+        "education": 0.1,
+        "services": 0.173,
+        "public_sector": 0.071,
+        "healthcare": 0.194,
+        "community": 0.225
+      },
+      "info_spread": {
+        "Brand scandal (child labor)": 1.0
+      },
+      "details": [
+        {
+          "category": "direction",
+          "name": "Consumer confidence dropped",
+          "passed": true,
+          "detail": "delta=-0.0126"
+        },
+        {
+          "category": "direction",
+          "name": "Market pressure increased",
+          "passed": false,
+          "detail": "delta=-0.0115"
+        },
+        {
+          "category": "direction",
+          "name": "Civil unrest increased",
+          "passed": true,
+          "detail": "delta=+0.0110"
+        },
+        {
+          "category": "direction",
+          "name": "Institutional trust dropped",
+          "passed": true,
+          "detail": "delta=-0.0542"
+        },
+        {
+          "category": "direction",
+          "name": "Social cohesion stable/rose",
+          "passed": true,
+          "detail": "delta=-0.0032"
+        },
+        {
+          "category": "direction",
+          "name": "Population mood dropped",
+          "passed": true,
+          "detail": "delta=-0.0079"
+        },
+        {
+          "category": "ranking",
+          "name": "services in top half of stress",
+          "passed": false,
+          "detail": "rank=4/7, stress=0.173"
+        },
+        {
+          "category": "ranking",
+          "name": "industrial in top half of stress",
+          "passed": true,
+          "detail": "rank=3/7, stress=0.174"
+        },
+        {
+          "category": "ranking",
+          "name": "healthcare in bottom half of stress",
+          "passed": false,
+          "detail": "rank=2/7, stress=0.194"
+        },
+        {
+          "category": "ranking",
+          "name": "public_sector in bottom half of stress",
+          "passed": true,
+          "detail": "rank=7/7, stress=0.071"
+        },
+        {
+          "category": "magnitude",
+          "name": "Confidence drop magnitude reasonable",
+          "passed": true,
+          "detail": "actual=1.3pp, expected\u22483pp, ratio=0.4x"
+        },
+        {
+          "category": "magnitude",
+          "name": "Information reached >70% of population",
+          "passed": true,
+          "detail": "max awareness=100.0%"
+        }
+      ],
+      "historical_notes": [
+        "VW emissions (2015): stock -37%, US sales -25% next month, but broader CCI barely moved",
+        "Brand trust: 20-40% drop for affected brand specifically",
+        "Employees face moral injury \u2014 attrition increases",
+        "Students and activists drive initial boycott pressure",
+        "Government investigation timeline: 1-4 weeks to begin",
+        "Competitor sales typically rise 5-10% from switching",
+        "Overall economy minimally affected; impact is concentrated on one company/sector"
+      ]
+    },
+    {
+      "name": "Military Crisis (Cuban Missile Crisis Pattern)",
+      "shock_text": "Government launches nuclear strike, military crisis escalates",
+      "checks_total": 12,
+      "checks_passed": 9,
+      "accuracy": 0.75,
+      "deltas": {
+        "consumer_confidence": -0.076,
+        "social_cohesion": -0.0031,
+        "institutional_trust": -0.0693,
+        "civil_unrest_potential": 0.0207,
+        "market_pressure": 0.0291,
+        "population_mood": -0.1431
+      },
+      "sector_stress": {
+        "industrial": 0.267,
+        "white_collar": 0.113,
+        "education": 0.145,
+        "services": 0.267,
+        "public_sector": 0.098,
+        "healthcare": 0.269,
+        "community": 0.263
+      },
+      "info_spread": {
+        "Military/nuclear crisis": 1.0
+      },
+      "details": [
+        {
+          "category": "direction",
+          "name": "Consumer confidence dropped",
+          "passed": true,
+          "detail": "delta=-0.0760"
+        },
+        {
+          "category": "direction",
+          "name": "Market pressure increased",
+          "passed": true,
+          "detail": "delta=+0.0291"
+        },
+        {
+          "category": "direction",
+          "name": "Civil unrest stable/low",
+          "passed": true,
+          "detail": "delta=+0.0207"
+        },
+        {
+          "category": "direction",
+          "name": "Institutional trust stable",
+          "passed": false,
+          "detail": "delta=-0.0693"
+        },
+        {
+          "category": "direction",
+          "name": "Social cohesion stable/rose",
+          "passed": true,
+          "detail": "delta=-0.0031"
+        },
+        {
+          "category": "direction",
+          "name": "Population mood dropped",
+          "passed": true,
+          "detail": "delta=-0.1431"
+        },
+        {
+          "category": "ranking",
+          "name": "community in top half of stress",
+          "passed": false,
+          "detail": "rank=4/7, stress=0.263"
+        },
+        {
+          "category": "ranking",
+          "name": "services in top half of stress",
+          "passed": true,
+          "detail": "rank=3/7, stress=0.267"
+        },
+        {
+          "category": "ranking",
+          "name": "education in top half of stress",
+          "passed": false,
+          "detail": "rank=5/7, stress=0.145"
+        },
+        {
+          "category": "ranking",
+          "name": "public_sector in bottom half of stress",
+          "passed": true,
+          "detail": "rank=7/7, stress=0.098"
+        },
+        {
+          "category": "magnitude",
+          "name": "Confidence drop magnitude reasonable",
+          "passed": true,
+          "detail": "actual=7.6pp, expected\u22485pp, ratio=1.5x"
+        },
+        {
+          "category": "magnitude",
+          "name": "Information reached >70% of population",
+          "passed": true,
+          "detail": "max awareness=100.0%"
+        }
+      ],
+      "historical_notes": [
+        "Cuban Missile Crisis: DJIA -2.5% day 1, full recovery in 5 trading days",
+        "Kennedy approval surged from 62% to 76% (rally-around-flag)",
+        "Institutional trust ROSE in first 2 weeks; decline came only in prolonged crises",
+        "Social cohesion ROSE: church attendance spiked, communities unified",
+        "Civil unrest was NEGLIGIBLE during the crisis itself",
+        "Panic buying of supplies within hours but subsided within 3-5 days",
+        "Psychiatric ER visits up 20-30%, phone lines jammed",
+        "Population mood: extreme anxiety/dread despite institutional trust holding"
+      ]
+    }
+  ]
+}

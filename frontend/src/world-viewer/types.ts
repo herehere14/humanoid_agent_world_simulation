@@ -106,6 +106,8 @@ export interface TickData {
   time: string;
   events: EventRecord[];
   interactions: InteractionRecord[];
+  llm_focus?: Array<Record<string, unknown>>;
+  llm_packets?: Array<Record<string, unknown>>;
   agent_states: Record<string, AgentState>;
 }
 
@@ -115,6 +117,12 @@ export interface WorldSnapshot {
   locations: Record<string, LocationMeta>;
   agents: Record<string, AgentMeta>;
   ticks: TickData[];
+  generation_meta?: {
+    scenario: string;
+    ticks: number;
+    external_information: string[];
+    generated_at: number;
+  };
 }
 
 /** Action types from the simulation */

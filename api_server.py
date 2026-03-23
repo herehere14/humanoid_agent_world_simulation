@@ -92,6 +92,20 @@ class FeedbackRequest(BaseModel):
     comment: Optional[str] = None
 
 
+class WorldWhatIfRequest(BaseModel):
+    scenario: str = "heatwave_harbor"
+    days: int = 14
+    information: str
+    llm_samples: int = 0
+    llm_model: str = "gpt-5-mini"
+
+
+class WorldSnapshotRequest(BaseModel):
+    scenario: str = "small_town"
+    ticks: int = 240
+    information: list[str] = []
+
+
 # ─── SSE Helper ──────────────────────────────────────────────────────────────
 
 def sse(event_type: str, data: Any) -> str:
@@ -453,6 +467,130 @@ async def health():
 
 # ─── World Simulation Viewer API ────────────────────────────────────────────
 
+def _build_world_snapshot_payload(
+    *,
+    scenario: str = "small_town",
+    ticks: int = 240,
+    external_information: list[str] | None = None,
+) -> dict:
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).parent / "examples" / "learned_brain"))
+    from world_sim.scenarios import build_small_town
+    from world_sim.scenarios_large import build_large_town
+    from world_sim.scenarios_heatwave_harbor import build_heatwave_harbor
+
+    scenario_builders = {
+        "small_town": lambda: build_small_town(),
+        "large_town": lambda: build_large_town(n_agents=300, seed=42),
+        "heatwave_harbor": lambda: build_heatwave_harbor(n_agents=300, seed=84),
+    }
+    if scenario not in scenario_builders:
+        raise HTTPException(status_code=400, detail=f"Unknown scenario: {scenario}")
+
+    built = scenario_builders[scenario]()
+    world = built[0] if isinstance(built, tuple) else built
+    world.initialize()
+
+    for info in external_information or []:
+        world.ingest_information(info)
+
+    locations_meta = {
+        loc_id: {
+            "id": loc_id,
+            "name": loc.name,
+            "default_activity": loc.default_activity,
+        }
+        for loc_id, loc in world.locations.items()
+    }
+    agents_meta = {
+        aid: {
+            "id": aid,
+            "name": agent.personality.name,
+            "background": agent.personality.background,
+            "temperament": agent.personality.temperament,
+            "identity_tags": list(agent.identity_tags),
+            "coalitions": list(agent.coalitions),
+            "rival_coalitions": list(agent.rival_coalitions),
+            "private_burden": agent.private_burden,
+        }
+        for aid, agent in world.agents.items()
+    }
+
+    ticks_data = []
+    for _ in range(ticks):
+        tick_summary = world.tick()
+        agent_states = {}
+        for aid, agent in world.agents.items():
+            dashboard = agent.get_dashboard_state()
+            rels = []
+            for other_id, rel in world.relationships.get_agent_relationships(aid)[:8]:
+                other_name = world.agents[other_id].personality.name if other_id in world.agents else other_id
+                rels.append({
+                    "other_id": other_id,
+                    "other_name": other_name,
+                    "trust": round(rel.trust, 2),
+                    "warmth": round(rel.warmth, 2),
+                    "resentment_toward": round(world.relationships.get_resentment(aid, other_id), 2),
+                    "resentment_from": round(world.relationships.get_resentment(other_id, aid), 2),
+                    "grievance_toward": round(world.relationships.get_grievance(aid, other_id), 2),
+                    "grievance_from": round(world.relationships.get_grievance(other_id, aid), 2),
+                    "debt_toward": round(world.relationships.get_debt(aid, other_id), 2),
+                    "debt_from": round(world.relationships.get_debt(other_id, aid), 2),
+                    "alliance_strength": round(rel.alliance_strength, 2),
+                    "rivalry": round(rel.rivalry, 2),
+                    "support_events": rel.support_events,
+                    "conflict_events": rel.conflict_events,
+                    "betrayal_events": rel.betrayal_events,
+                })
+            dashboard["relationships"] = rels
+            dashboard["recent_memories"] = [
+                {
+                    "tick": m.tick,
+                    "description": m.description,
+                    "interpretation": m.interpretation,
+                    "story_beat": m.story_beat,
+                    "valence": round(m.valence_at_time, 2),
+                    "other": m.other_agent_id,
+                }
+                for m in agent.get_recent_memories(10)
+            ]
+            agent_states[aid] = dashboard
+
+        ticks_data.append({
+            "tick": tick_summary["tick"],
+            "time": tick_summary["time"],
+            "events": tick_summary["events"],
+            "interactions": tick_summary["interactions"],
+            "llm_focus": tick_summary.get("llm_focus", []),
+            "llm_packets": tick_summary.get("llm_packets", []),
+            "agent_states": agent_states,
+            "macro": tick_summary.get("macro", {}),
+            "info_propagation": tick_summary.get("info_propagation", {}),
+        })
+
+    # Build final macro report
+    macro_summary = world.get_macro_summary()
+    shock_impact = world.get_shock_impact_report()
+    info_spread = world.get_info_spread_report()
+
+    return {
+        "scenario": scenario,
+        "total_ticks": ticks,
+        "locations": locations_meta,
+        "agents": agents_meta,
+        "ticks": ticks_data,
+        "macro_summary": macro_summary,
+        "shock_impact": shock_impact,
+        "info_spread": info_spread,
+        "generation_meta": {
+            "scenario": scenario,
+            "ticks": ticks,
+            "external_information": list(external_information or []),
+            "generated_at": int(time.time() * 1000),
+        },
+    }
+
 @app.get("/api/world/snapshot")
 async def get_world_snapshot():
     """Serve the world simulation snapshot for the 3D viewer.
@@ -490,6 +628,27 @@ async def get_world_snapshot():
             "X-World-Snapshot-Source": snapshot_source,
         },
     )
+
+
+@app.post("/api/world/snapshot/custom")
+async def build_custom_world_snapshot(req: WorldSnapshotRequest):
+    """Build a fresh snapshot with optional injected external events."""
+    try:
+        loop = asyncio.get_event_loop()
+        snapshot = await loop.run_in_executor(
+            None,
+            lambda: _build_world_snapshot_payload(
+                scenario=req.scenario,
+                ticks=req.ticks,
+                external_information=req.information,
+            ),
+        )
+        return snapshot
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/world/stream")
@@ -565,6 +724,7 @@ async def stream_world_simulation(
                     agent_states[aid]["relationships"] = rels
                     agent_states[aid]["recent_memories"] = [
                         {"tick": m.tick, "description": m.description,
+                         "interpretation": m.interpretation, "story_beat": m.story_beat,
                          "valence": round(m.valence_at_time, 2), "other": m.other_agent_id}
                         for m in agent.get_recent_memories(8)
                     ]
@@ -574,6 +734,8 @@ async def stream_world_simulation(
                     "time": summary["time"],
                     "events": summary["events"],
                     "interactions": summary["interactions"],
+                    "llm_focus": summary.get("llm_focus", []),
+                    "llm_packets": summary.get("llm_packets", []),
                     "agent_states": agent_states,
                 }
                 yield f"event: tick\ndata: {json.dumps(tick_data)}\n\n"
@@ -596,6 +758,67 @@ async def stream_world_simulation(
             "Connection": "keep-alive",
         },
     )
+
+
+@app.post("/api/world/what_if")
+async def run_world_what_if(req: WorldWhatIfRequest):
+    """Run a what-if simulation with injected external information."""
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent / "examples" / "learned_brain"))
+        from world_sim.run_large_diagnostic import run_diagnostic
+
+        slug = "".join(ch if ch.isalnum() else "_" for ch in req.information.lower())[:48].strip("_") or "shock"
+        out_json = str(Path(__file__).parent / "artifacts" / f"what_if_{slug}.json")
+        out_md = str(Path(__file__).parent / "artifacts" / f"what_if_{slug}.md")
+
+        loop = asyncio.get_event_loop()
+        report = await loop.run_in_executor(
+            None,
+            lambda: run_diagnostic(
+                days=req.days,
+                output_md=out_md,
+                output_json=out_json,
+                llm_samples=req.llm_samples,
+                llm_model=req.llm_model,
+                scenario=req.scenario,
+                external_information=[req.information],
+            ),
+        )
+
+        top_concerns = sorted(
+            report["aggregate"]["final_concerns"].items(),
+            key=lambda item: item[1],
+            reverse=True,
+        )[:8]
+        top_llm_candidates = sorted(
+            report["final_agents"].values(),
+            key=lambda item: item.get("llm_salience", 0.0),
+            reverse=True,
+        )[:8]
+
+        result = {
+            "status": "ok",
+            "meta": report["meta"],
+            "top_concerns": top_concerns,
+            "top_llm_candidates": top_llm_candidates,
+            "where_we_lack": report["where_we_lack"],
+            "report_json": out_json,
+            "report_md": out_md,
+        }
+
+        # Include macro metrics if available
+        if "macro_summary" in report:
+            result["macro_summary"] = report["macro_summary"]
+        if "shock_impact" in report:
+            result["shock_impact"] = report["shock_impact"]
+        if "info_spread" in report:
+            result["info_spread"] = report["info_spread"]
+
+        return result
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ─── Main ─────────────────────────────────────────────────────────────────────

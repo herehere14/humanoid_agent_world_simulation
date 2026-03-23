@@ -86,6 +86,8 @@ def export_world_snapshot(max_ticks: int = 360, out_path: str | None = None) -> 
                 {
                     "tick": m.tick,
                     "description": m.description,
+                    "interpretation": m.interpretation,
+                    "story_beat": m.story_beat,
                     "valence": round(m.valence_at_time, 2),
                     "other": m.other_agent_id,
                 }
@@ -100,6 +102,8 @@ def export_world_snapshot(max_ticks: int = 360, out_path: str | None = None) -> 
             "time": tick_summary["time"],
             "events": tick_summary["events"],
             "interactions": tick_summary["interactions"],
+            "llm_focus": tick_summary.get("llm_focus", []),
+            "llm_packets": tick_summary.get("llm_packets", []),
             "agent_states": agent_states,
         }
         ticks_data.append(tick_record)

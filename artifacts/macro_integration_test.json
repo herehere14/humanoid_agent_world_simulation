@@ -1,0 +1,950 @@
+{
+  "baseline_macro": {
+    "tick": 48,
+    "time": "Day 3, 00:00",
+    "consumer_confidence": 0.682,
+    "social_cohesion": 0.683,
+    "institutional_trust": 0.469,
+    "civil_unrest_potential": 0.054,
+    "market_pressure": 0.214,
+    "population_mood": -0.002,
+    "information_awareness": {},
+    "sectors": {
+      "industrial": {
+        "sector": "industrial",
+        "agent_count": 65,
+        "avg_valence": 0.446,
+        "avg_tension": 0.086,
+        "avg_energy": 0.994,
+        "avg_vulnerability": 0.016,
+        "avg_debt_pressure": 0.344,
+        "employment_stress": 0.151,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 0.985,
+          "RUMINATE": 0.015
+        }
+      },
+      "white_collar": {
+        "sector": "white_collar",
+        "agent_count": 35,
+        "avg_valence": 0.477,
+        "avg_tension": 0.16,
+        "avg_energy": 0.992,
+        "avg_vulnerability": 0.029,
+        "avg_debt_pressure": 0.157,
+        "employment_stress": 0.11,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 0.829,
+          "RUMINATE": 0.171
+        }
+      },
+      "education": {
+        "sector": "education",
+        "agent_count": 30,
+        "avg_valence": 0.466,
+        "avg_tension": 0.139,
+        "avg_energy": 0.998,
+        "avg_vulnerability": 0.03,
+        "avg_debt_pressure": 0.263,
+        "employment_stress": 0.14,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 0.867,
+          "RUMINATE": 0.133
+        }
+      },
+      "services": {
+        "sector": "services",
+        "agent_count": 30,
+        "avg_valence": 0.437,
+        "avg_tension": 0.212,
+        "avg_energy": 0.978,
+        "avg_vulnerability": 0.045,
+        "avg_debt_pressure": 0.43,
+        "employment_stress": 0.226,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 1.0
+        }
+      },
+      "public_sector": {
+        "sector": "public_sector",
+        "agent_count": 25,
+        "avg_valence": 0.488,
+        "avg_tension": 0.225,
+        "avg_energy": 0.993,
+        "avg_vulnerability": 0.035,
+        "avg_debt_pressure": 0.109,
+        "employment_stress": 0.114,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 0.64,
+          "RUMINATE": 0.36
+        }
+      },
+      "healthcare": {
+        "sector": "healthcare",
+        "agent_count": 25,
+        "avg_valence": 0.483,
+        "avg_tension": 0.21,
+        "avg_energy": 0.544,
+        "avg_vulnerability": 0.207,
+        "avg_debt_pressure": 0.144,
+        "employment_stress": 0.223,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 1.0
+        }
+      },
+      "community": {
+        "sector": "community",
+        "agent_count": 90,
+        "avg_valence": 0.431,
+        "avg_tension": 0.235,
+        "avg_energy": 0.973,
+        "avg_vulnerability": 0.05,
+        "avg_debt_pressure": 0.465,
+        "employment_stress": 0.248,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 0.989,
+          "RUMINATE": 0.011
+        }
+      }
+    },
+    "factions": {
+      "grid_union": {
+        "name": "grid_union",
+        "member_count": 43,
+        "avg_alliance_strength": 0.208,
+        "avg_internal_trust": 0.128,
+        "avg_external_rivalry": 0.129,
+        "cohesion": 0.628,
+        "power_index": 0.109,
+        "avg_valence": 0.449,
+        "dominant_concern": "turn private anger into organized pressure"
+      },
+      "mutual_aid_ring": {
+        "name": "mutual_aid_ring",
+        "member_count": 97,
+        "avg_alliance_strength": 0.237,
+        "avg_internal_trust": 0.129,
+        "avg_external_rivalry": 0.107,
+        "cohesion": 0.629,
+        "power_index": 0.252,
+        "avg_valence": 0.437,
+        "dominant_concern": "defend my neighborhood from the spillover"
+      },
+      "redevelopment_board": {
+        "name": "redevelopment_board",
+        "member_count": 21,
+        "avg_alliance_strength": 0.225,
+        "avg_internal_trust": 0.14,
+        "avg_external_rivalry": 0.14,
+        "cohesion": 0.64,
+        "power_index": 0.055,
+        "avg_valence": 0.474,
+        "dominant_concern": "turn private anger into organized pressure"
+      },
+      "city_hall_caucus": {
+        "name": "city_hall_caucus",
+        "member_count": 27,
+        "avg_alliance_strength": 0.235,
+        "avg_internal_trust": 0.129,
+        "avg_external_rivalry": 0.125,
+        "cohesion": 0.629,
+        "power_index": 0.07,
+        "avg_valence": 0.486,
+        "dominant_concern": "turn private anger into organized pressure"
+      },
+      "campus_action_network": {
+        "name": "campus_action_network",
+        "member_count": 28,
+        "avg_alliance_strength": 0.217,
+        "avg_internal_trust": 0.13,
+        "avg_external_rivalry": 0.159,
+        "cohesion": 0.63,
+        "power_index": 0.072,
+        "avg_valence": 0.465,
+        "dominant_concern": "force public accountability"
+      },
+      "small_business_circle": {
+        "name": "small_business_circle",
+        "member_count": 29,
+        "avg_alliance_strength": 0.218,
+        "avg_internal_trust": 0.116,
+        "avg_external_rivalry": 0.147,
+        "cohesion": 0.616,
+        "power_index": 0.073,
+        "avg_valence": 0.431,
+        "dominant_concern": "keep this mess from reaching my block and my bills"
+      },
+      "tenant_defense_network": {
+        "name": "tenant_defense_network",
+        "member_count": 49,
+        "avg_alliance_strength": 0.245,
+        "avg_internal_trust": 0.13,
+        "avg_external_rivalry": 0.115,
+        "cohesion": 0.63,
+        "power_index": 0.128,
+        "avg_valence": 0.432,
+        "dominant_concern": "make the neighborhood's losses impossible to wave away"
+      },
+      "harbor_families": {
+        "name": "harbor_families",
+        "member_count": 18,
+        "avg_alliance_strength": 0.17,
+        "avg_internal_trust": 0.117,
+        "avg_external_rivalry": 0.186,
+        "cohesion": 0.617,
+        "power_index": 0.043,
+        "avg_valence": 0.447,
+        "dominant_concern": "defend my neighborhood from the spillover"
+      },
+      "care_network": {
+        "name": "care_network",
+        "member_count": 24,
+        "avg_alliance_strength": 0.138,
+        "avg_internal_trust": 0.115,
+        "avg_external_rivalry": 0.0,
+        "cohesion": 0.615,
+        "power_index": 0.056,
+        "avg_valence": 0.482,
+        "dominant_concern": "test who is still solid when it counts"
+      }
+    },
+    "action_distribution": {
+      "REST": 0.93,
+      "RUMINATE": 0.07
+    },
+    "emotion_distribution": {
+      "neutral": 1.0
+    },
+    "top_concerns": [
+      [
+        "turn private anger into organized pressure",
+        0.263
+      ],
+      [
+        "defend my neighborhood from the spillover",
+        0.18
+      ],
+      [
+        "make the neighborhood's losses impossible to wave away",
+        0.127
+      ],
+      [
+        "force public accountability",
+        0.077
+      ],
+      [
+        "keep the block from fraying into private panic",
+        0.063
+      ],
+      [
+        "test who is still solid when it counts",
+        0.057
+      ],
+      [
+        "keep this mess from reaching my block and my bills",
+        0.053
+      ],
+      [
+        "buy one more month before the floor gives way",
+        0.033
+      ]
+    ]
+  },
+  "post_oil_macro": {
+    "tick": 120,
+    "time": "Day 6, 00:00",
+    "consumer_confidence": 0.643,
+    "social_cohesion": 0.681,
+    "institutional_trust": 0.465,
+    "civil_unrest_potential": 0.059,
+    "market_pressure": 0.283,
+    "population_mood": -0.107,
+    "information_awareness": {
+      "Oil price surge": 1.0
+    },
+    "sectors": {
+      "industrial": {
+        "sector": "industrial",
+        "agent_count": 65,
+        "avg_valence": 0.416,
+        "avg_tension": 0.31,
+        "avg_energy": 0.92,
+        "avg_vulnerability": 0.085,
+        "avg_debt_pressure": 0.543,
+        "employment_stress": 0.312,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 0.985,
+          "RUMINATE": 0.015
+        }
+      },
+      "white_collar": {
+        "sector": "white_collar",
+        "agent_count": 35,
+        "avg_valence": 0.464,
+        "avg_tension": 0.088,
+        "avg_energy": 0.996,
+        "avg_vulnerability": 0.014,
+        "avg_debt_pressure": 0.223,
+        "employment_stress": 0.108,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 0.857,
+          "RUMINATE": 0.143
+        }
+      },
+      "education": {
+        "sector": "education",
+        "agent_count": 30,
+        "avg_valence": 0.473,
+        "avg_tension": 0.056,
+        "avg_energy": 0.999,
+        "avg_vulnerability": 0.011,
+        "avg_debt_pressure": 0.212,
+        "employment_stress": 0.093,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "RUMINATE": 0.267,
+          "REST": 0.733
+        }
+      },
+      "services": {
+        "sector": "services",
+        "agent_count": 30,
+        "avg_valence": 0.407,
+        "avg_tension": 0.202,
+        "avg_energy": 0.952,
+        "avg_vulnerability": 0.05,
+        "avg_debt_pressure": 0.636,
+        "employment_stress": 0.3,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 1.0
+        }
+      },
+      "public_sector": {
+        "sector": "public_sector",
+        "agent_count": 25,
+        "avg_valence": 0.491,
+        "avg_tension": 0.117,
+        "avg_energy": 0.949,
+        "avg_vulnerability": 0.029,
+        "avg_debt_pressure": 0.088,
+        "employment_stress": 0.079,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "RUMINATE": 0.68,
+          "REST": 0.32
+        }
+      },
+      "healthcare": {
+        "sector": "healthcare",
+        "agent_count": 25,
+        "avg_valence": 0.486,
+        "avg_tension": 0.058,
+        "avg_energy": 0.377,
+        "avg_vulnerability": 0.236,
+        "avg_debt_pressure": 0.116,
+        "employment_stress": 0.198,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 0.96,
+          "RUMINATE": 0.04
+        }
+      },
+      "community": {
+        "sector": "community",
+        "agent_count": 90,
+        "avg_valence": 0.415,
+        "avg_tension": 0.244,
+        "avg_energy": 0.953,
+        "avg_vulnerability": 0.057,
+        "avg_debt_pressure": 0.568,
+        "employment_stress": 0.29,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 1.0
+        }
+      }
+    },
+    "factions": {
+      "grid_union": {
+        "name": "grid_union",
+        "member_count": 43,
+        "avg_alliance_strength": 0.187,
+        "avg_internal_trust": 0.113,
+        "avg_external_rivalry": 0.115,
+        "cohesion": 0.612,
+        "power_index": 0.104,
+        "avg_valence": 0.422,
+        "dominant_concern": "keep income and home secure"
+      },
+      "mutual_aid_ring": {
+        "name": "mutual_aid_ring",
+        "member_count": 97,
+        "avg_alliance_strength": 0.225,
+        "avg_internal_trust": 0.122,
+        "avg_external_rivalry": 0.101,
+        "cohesion": 0.622,
+        "power_index": 0.246,
+        "avg_valence": 0.42,
+        "dominant_concern": "defend my neighborhood from the spillover"
+      },
+      "redevelopment_board": {
+        "name": "redevelopment_board",
+        "member_count": 21,
+        "avg_alliance_strength": 0.227,
+        "avg_internal_trust": 0.141,
+        "avg_external_rivalry": 0.139,
+        "cohesion": 0.641,
+        "power_index": 0.055,
+        "avg_valence": 0.465,
+        "dominant_concern": "turn private anger into organized pressure"
+      },
+      "city_hall_caucus": {
+        "name": "city_hall_caucus",
+        "member_count": 27,
+        "avg_alliance_strength": 0.23,
+        "avg_internal_trust": 0.126,
+        "avg_external_rivalry": 0.106,
+        "cohesion": 0.623,
+        "power_index": 0.069,
+        "avg_valence": 0.482,
+        "dominant_concern": "turn private anger into organized pressure"
+      },
+      "campus_action_network": {
+        "name": "campus_action_network",
+        "member_count": 28,
+        "avg_alliance_strength": 0.182,
+        "avg_internal_trust": 0.109,
+        "avg_external_rivalry": 0.14,
+        "cohesion": 0.609,
+        "power_index": 0.067,
+        "avg_valence": 0.473,
+        "dominant_concern": "force public accountability"
+      },
+      "small_business_circle": {
+        "name": "small_business_circle",
+        "member_count": 29,
+        "avg_alliance_strength": 0.215,
+        "avg_internal_trust": 0.114,
+        "avg_external_rivalry": 0.146,
+        "cohesion": 0.613,
+        "power_index": 0.072,
+        "avg_valence": 0.406,
+        "dominant_concern": "keep this mess from reaching my block and my bills"
+      },
+      "tenant_defense_network": {
+        "name": "tenant_defense_network",
+        "member_count": 49,
+        "avg_alliance_strength": 0.239,
+        "avg_internal_trust": 0.127,
+        "avg_external_rivalry": 0.113,
+        "cohesion": 0.627,
+        "power_index": 0.127,
+        "avg_valence": 0.415,
+        "dominant_concern": "make the neighborhood's losses impossible to wave away"
+      },
+      "harbor_families": {
+        "name": "harbor_families",
+        "member_count": 18,
+        "avg_alliance_strength": 0.146,
+        "avg_internal_trust": 0.096,
+        "avg_external_rivalry": 0.186,
+        "cohesion": 0.596,
+        "power_index": 0.041,
+        "avg_valence": 0.401,
+        "dominant_concern": "defend my neighborhood from the spillover"
+      },
+      "care_network": {
+        "name": "care_network",
+        "member_count": 24,
+        "avg_alliance_strength": 0.144,
+        "avg_internal_trust": 0.117,
+        "avg_external_rivalry": 0.0,
+        "cohesion": 0.617,
+        "power_index": 0.056,
+        "avg_valence": 0.486,
+        "dominant_concern": "turn private anger into organized pressure"
+      }
+    },
+    "action_distribution": {
+      "REST": 0.893,
+      "RUMINATE": 0.107
+    },
+    "emotion_distribution": {
+      "neutral": 1.0
+    },
+    "top_concerns": [
+      [
+        "turn private anger into organized pressure",
+        0.217
+      ],
+      [
+        "defend my neighborhood from the spillover",
+        0.183
+      ],
+      [
+        "make the neighborhood's losses impossible to wave away",
+        0.127
+      ],
+      [
+        "keep income and home secure",
+        0.077
+      ],
+      [
+        "test who is still solid when it counts",
+        0.07
+      ],
+      [
+        "force public accountability",
+        0.067
+      ],
+      [
+        "keep the block from fraying into private panic",
+        0.057
+      ],
+      [
+        "keep this mess from reaching my block and my bills",
+        0.05
+      ]
+    ]
+  },
+  "post_oil_deltas": {
+    "consumer_confidence": -0.0485,
+    "social_cohesion": -0.0024,
+    "institutional_trust": -0.0502,
+    "civil_unrest_potential": 0.0072,
+    "market_pressure": 0.0685,
+    "population_mood": -0.1115
+  },
+  "final_macro": {
+    "tick": 168,
+    "time": "Day 8, 00:00",
+    "consumer_confidence": 0.65,
+    "social_cohesion": 0.68,
+    "institutional_trust": 0.455,
+    "civil_unrest_potential": 0.07,
+    "market_pressure": 0.27,
+    "population_mood": -0.086,
+    "information_awareness": {
+      "Oil price surge": 1.0,
+      "Brand scandal (child labor)": 1.0
+    },
+    "sectors": {
+      "industrial": {
+        "sector": "industrial",
+        "agent_count": 65,
+        "avg_valence": 0.426,
+        "avg_tension": 0.262,
+        "avg_energy": 0.953,
+        "avg_vulnerability": 0.064,
+        "avg_debt_pressure": 0.47,
+        "employment_stress": 0.263,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 0.985,
+          "RUMINATE": 0.015
+        }
+      },
+      "white_collar": {
+        "sector": "white_collar",
+        "agent_count": 35,
+        "avg_valence": 0.469,
+        "avg_tension": 0.13,
+        "avg_energy": 0.996,
+        "avg_vulnerability": 0.022,
+        "avg_debt_pressure": 0.193,
+        "employment_stress": 0.112,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 0.743,
+          "RUMINATE": 0.257
+        }
+      },
+      "education": {
+        "sector": "education",
+        "agent_count": 30,
+        "avg_valence": 0.478,
+        "avg_tension": 0.045,
+        "avg_energy": 1.0,
+        "avg_vulnerability": 0.009,
+        "avg_debt_pressure": 0.183,
+        "employment_stress": 0.079,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "RUMINATE": 0.2,
+          "REST": 0.8
+        }
+      },
+      "services": {
+        "sector": "services",
+        "agent_count": 30,
+        "avg_valence": 0.404,
+        "avg_tension": 0.202,
+        "avg_energy": 0.949,
+        "avg_vulnerability": 0.051,
+        "avg_debt_pressure": 0.654,
+        "employment_stress": 0.307,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 1.0
+        }
+      },
+      "public_sector": {
+        "sector": "public_sector",
+        "agent_count": 25,
+        "avg_valence": 0.493,
+        "avg_tension": 0.244,
+        "avg_energy": 0.987,
+        "avg_vulnerability": 0.04,
+        "avg_debt_pressure": 0.076,
+        "employment_stress": 0.11,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "RUMINATE": 0.76,
+          "REST": 0.24
+        }
+      },
+      "healthcare": {
+        "sector": "healthcare",
+        "agent_count": 25,
+        "avg_valence": 0.491,
+        "avg_tension": 0.272,
+        "avg_energy": 0.277,
+        "avg_vulnerability": 0.337,
+        "avg_debt_pressure": 0.1,
+        "employment_stress": 0.292,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 1.0
+        }
+      },
+      "community": {
+        "sector": "community",
+        "agent_count": 90,
+        "avg_valence": 0.427,
+        "avg_tension": 0.286,
+        "avg_energy": 0.95,
+        "avg_vulnerability": 0.068,
+        "avg_debt_pressure": 0.492,
+        "employment_stress": 0.279,
+        "dominant_emotion": "neutral",
+        "conflict_rate": 0.0,
+        "support_rate": 0.0,
+        "action_distribution": {
+          "REST": 1.0
+        }
+      }
+    },
+    "factions": {
+      "grid_union": {
+        "name": "grid_union",
+        "member_count": 43,
+        "avg_alliance_strength": 0.191,
+        "avg_internal_trust": 0.114,
+        "avg_external_rivalry": 0.105,
+        "cohesion": 0.61,
+        "power_index": 0.104,
+        "avg_valence": 0.431,
+        "dominant_concern": "keep income and home secure"
+      },
+      "mutual_aid_ring": {
+        "name": "mutual_aid_ring",
+        "member_count": 97,
+        "avg_alliance_strength": 0.226,
+        "avg_internal_trust": 0.123,
+        "avg_external_rivalry": 0.098,
+        "cohesion": 0.622,
+        "power_index": 0.246,
+        "avg_valence": 0.429,
+        "dominant_concern": "defend my neighborhood from the spillover"
+      },
+      "redevelopment_board": {
+        "name": "redevelopment_board",
+        "member_count": 21,
+        "avg_alliance_strength": 0.222,
+        "avg_internal_trust": 0.139,
+        "avg_external_rivalry": 0.133,
+        "cohesion": 0.639,
+        "power_index": 0.055,
+        "avg_valence": 0.469,
+        "dominant_concern": "turn private anger into organized pressure"
+      },
+      "city_hall_caucus": {
+        "name": "city_hall_caucus",
+        "member_count": 27,
+        "avg_alliance_strength": 0.19,
+        "avg_internal_trust": 0.102,
+        "avg_external_rivalry": 0.103,
+        "cohesion": 0.6,
+        "power_index": 0.064,
+        "avg_valence": 0.485,
+        "dominant_concern": "turn private anger into organized pressure"
+      },
+      "campus_action_network": {
+        "name": "campus_action_network",
+        "member_count": 28,
+        "avg_alliance_strength": 0.183,
+        "avg_internal_trust": 0.11,
+        "avg_external_rivalry": 0.139,
+        "cohesion": 0.61,
+        "power_index": 0.067,
+        "avg_valence": 0.477,
+        "dominant_concern": "force public accountability"
+      },
+      "small_business_circle": {
+        "name": "small_business_circle",
+        "member_count": 29,
+        "avg_alliance_strength": 0.221,
+        "avg_internal_trust": 0.116,
+        "avg_external_rivalry": 0.144,
+        "cohesion": 0.615,
+        "power_index": 0.073,
+        "avg_valence": 0.408,
+        "dominant_concern": "keep this mess from reaching my block and my bills"
+      },
+      "tenant_defense_network": {
+        "name": "tenant_defense_network",
+        "member_count": 49,
+        "avg_alliance_strength": 0.239,
+        "avg_internal_trust": 0.126,
+        "avg_external_rivalry": 0.109,
+        "cohesion": 0.626,
+        "power_index": 0.127,
+        "avg_valence": 0.425,
+        "dominant_concern": "make the neighborhood's losses impossible to wave away"
+      },
+      "harbor_families": {
+        "name": "harbor_families",
+        "member_count": 18,
+        "avg_alliance_strength": 0.141,
+        "avg_internal_trust": 0.089,
+        "avg_external_rivalry": 0.186,
+        "cohesion": 0.589,
+        "power_index": 0.04,
+        "avg_valence": 0.412,
+        "dominant_concern": "defend my neighborhood from the spillover"
+      },
+      "care_network": {
+        "name": "care_network",
+        "member_count": 24,
+        "avg_alliance_strength": 0.15,
+        "avg_internal_trust": 0.119,
+        "avg_external_rivalry": 0.0,
+        "cohesion": 0.615,
+        "power_index": 0.057,
+        "avg_valence": 0.491,
+        "dominant_concern": "turn private anger into organized pressure"
+      }
+    },
+    "action_distribution": {
+      "REST": 0.883,
+      "RUMINATE": 0.117
+    },
+    "emotion_distribution": {
+      "neutral": 1.0
+    },
+    "top_concerns": [
+      [
+        "turn private anger into organized pressure",
+        0.21
+      ],
+      [
+        "defend my neighborhood from the spillover",
+        0.19
+      ],
+      [
+        "make the neighborhood's losses impossible to wave away",
+        0.13
+      ],
+      [
+        "test who is still solid when it counts",
+        0.09
+      ],
+      [
+        "keep income and home secure",
+        0.077
+      ],
+      [
+        "force public accountability",
+        0.063
+      ],
+      [
+        "keep the block from fraying into private panic",
+        0.05
+      ],
+      [
+        "keep this mess from reaching my block and my bills",
+        0.047
+      ]
+    ]
+  },
+  "final_deltas": {
+    "consumer_confidence": -0.0414,
+    "social_cohesion": -0.0032,
+    "institutional_trust": -0.0602,
+    "civil_unrest_potential": 0.018,
+    "market_pressure": 0.0554,
+    "population_mood": -0.0912
+  },
+  "info_spread": {
+    "active_information": [
+      {
+        "label": "Oil price surge",
+        "kind": "oil_price_surge",
+        "origin_tick": 49,
+        "severity": 3.0,
+        "total_aware": 300,
+        "pct_aware": 1.0,
+        "source_breakdown": {
+          "direct": 245,
+          "rumor": 45,
+          "faction": 10
+        },
+        "avg_distortion": 0.05
+      },
+      {
+        "label": "Brand scandal (child labor)",
+        "kind": "brand_scandal",
+        "origin_tick": 121,
+        "severity": 2.2,
+        "total_aware": 300,
+        "pct_aware": 1.0,
+        "source_breakdown": {
+          "direct": 300
+        },
+        "avg_distortion": 0.0
+      }
+    ],
+    "total_agents": 300
+  },
+  "shock_impact": {
+    "shock_onset_tick": 49,
+    "shock_onset_time": "Day 3, 01:00",
+    "pre_period": "tick 25-48",
+    "post_period": "tick 49-96",
+    "impact": {
+      "consumer_confidence": {
+        "pre": 0.674,
+        "post": 0.6068,
+        "delta": -0.0672,
+        "pct_change": -10.0
+      },
+      "social_cohesion": {
+        "pre": 0.6833,
+        "post": 0.6824,
+        "delta": -0.0009,
+        "pct_change": -0.1
+      },
+      "institutional_trust": {
+        "pre": 0.4663,
+        "post": 0.4481,
+        "delta": -0.0182,
+        "pct_change": -3.9
+      },
+      "civil_unrest_potential": {
+        "pre": 0.0577,
+        "post": 0.0801,
+        "delta": 0.0224,
+        "pct_change": 38.8
+      },
+      "market_pressure": {
+        "pre": 0.2226,
+        "post": 0.3337,
+        "delta": 0.1111,
+        "pct_change": 49.9
+      },
+      "population_mood": {
+        "pre": -0.0214,
+        "post": -0.2044,
+        "delta": -0.183,
+        "pct_change": 855.7
+      }
+    },
+    "sector_impact": {
+      "industrial": {
+        "employment_stress_delta": 0.1758,
+        "valence_delta": -0.037
+      },
+      "white_collar": {
+        "employment_stress_delta": 0.0061,
+        "valence_delta": -0.0158
+      },
+      "education": {
+        "employment_stress_delta": -0.0416,
+        "valence_delta": 0.0057
+      },
+      "services": {
+        "employment_stress_delta": 0.0843,
+        "valence_delta": -0.0369
+      },
+      "public_sector": {
+        "employment_stress_delta": -0.0446,
+        "valence_delta": 0.0014
+      },
+      "healthcare": {
+        "employment_stress_delta": 0.0748,
+        "valence_delta": 0.0027
+      },
+      "community": {
+        "employment_stress_delta": 0.0501,
+        "valence_delta": -0.0216
+      }
+    }
+  },
+  "checks_passed": 8,
+  "checks_total": 8,
+  "timing": {
+    "baseline_s": 12.2,
+    "post_shock1_s": 19.4,
+    "post_shock2_s": 13.1
+  }
+}

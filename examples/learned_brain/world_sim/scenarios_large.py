@@ -20,6 +20,7 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass
 
+from .human_profiles import assign_human_profile
 from .world import World, Location, ScheduledEvent
 from .world_agent import WorldAgent, Personality
 
@@ -839,6 +840,7 @@ def build_large_town(n_agents: int = 300, seed: int = 42) -> tuple[World, dict]:
                 temperament=temperament,
                 **params,
             )
+            assign_human_profile(personality, archetype["role"], rng)
 
             # Build schedule
             work_loc = rng.choice(archetype["work_locs"])
@@ -850,6 +852,7 @@ def build_large_town(n_agents: int = 300, seed: int = 42) -> tuple[World, dict]:
                 agent_id=agent_id,
                 personality=personality,
                 schedule=schedule,
+                social_role=archetype["role"],
             )
             world.add_agent(agent)
 

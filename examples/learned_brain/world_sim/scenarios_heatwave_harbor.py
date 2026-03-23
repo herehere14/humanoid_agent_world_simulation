@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import random
 
+from .human_profiles import assign_human_profile
 from .scenarios_large import NAME_POOL, ROLE_ARCHETYPES, _make_schedule, _perturb_params, _seed_relationships
 from .world import Location, ScheduledEvent, World
 from .world_agent import Personality, WorldAgent
@@ -387,6 +388,13 @@ def _assign_social_profile(agent: WorldAgent, role: str, rng: random.Random):
     agent.debt_pressure = round(rng.uniform(*profile["debt_range"]), 3)
     agent.secret_pressure = round(secret_pressure, 3)
     agent.ambition = round(rng.uniform(*profile["ambition_range"]), 3)
+    assign_human_profile(
+        agent.personality,
+        role,
+        rng,
+        identity_tags=identity_tags,
+        private_burden=burden,
+    )
 
 
 def _seed_heatwave_relationships(world: World, agent_meta: dict[str, dict], rng: random.Random):
@@ -605,8 +613,13 @@ def build_heatwave_harbor(n_agents: int = 300, seed: int = 84) -> tuple[World, d
 
     names = list(NAME_POOL)
     rng.shuffle(names)
-    if len(names) < n_agents:
-        raise ValueError(f"Need {n_agents} names, only have {len(names)}")
+    # Auto-extend names if pool is too small for requested agent count
+    while len(names) < n_agents:
+        suffix = len(names) // len(NAME_POOL) + 1
+        for base in NAME_POOL:
+            names.append(f"{base}_{suffix}")
+            if len(names) >= n_agents:
+                break
 
     base_roles = {item["role"]: item for item in ROLE_ARCHETYPES}
     agent_meta: dict[str, dict] = {}
@@ -650,6 +663,7 @@ def build_heatwave_harbor(n_agents: int = 300, seed: int = 84) -> tuple[World, d
                 agent_id=agent_id,
                 personality=personality,
                 schedule=schedule,
+                social_role=role,
             )
             _assign_social_profile(agent, role, rng)
             world.add_agent(agent)

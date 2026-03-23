@@ -46,6 +46,7 @@ export function AgentLayer() {
       {agents.map((agent: AgentState) => {
         const pos = agentPositions.get(agent.id) ?? [0, 0, 0] as [number, number, number];
         const ix = interactionMap.get(agent.id);
+        const pPos = ix ? (agentPositions.get(ix.partner) ?? null) : null;
         return (
           <AgentAvatar
             key={agent.id}
@@ -53,6 +54,7 @@ export function AgentLayer() {
             targetPosition={pos}
             interactionPartner={ix?.partner ?? null}
             interactionType={ix?.type ?? null}
+            partnerPosition={pPos}
           />
         );
       })}

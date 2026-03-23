@@ -98,6 +98,12 @@ def select_action(agent: WorldAgent, ctx: TickContext) -> Action:
     s = agent.heart
     motives = agent.motives
     appraisal = agent.appraisal
+    profile = agent.get_human_profile()
+    attachment = profile["attachment_style"]
+    coping = profile["coping_style"]
+    care_style = profile["care_style"]
+    conflict_style = profile["conflict_style"]
+    ongoing_story = appraisal.ongoing_story
     nearby_resentment = max(
         (ctx.relationships.get_resentment(agent.agent_id, nid) for nid in ctx.nearby_agent_ids),
         default=0.0,
@@ -165,7 +171,7 @@ def select_action(agent: WorldAgent, ctx: TickContext) -> Action:
             rel = ctx.relationships.get(agent.agent_id, nid)
             if (
                 rel and rel.warmth > 0.4 and rel.trust > 0.3
-                and motives.seek_support >= motives.hide_weakness
+                and motives.seek_support >= motives.hide_weakness * (0.78 if "anxious" in attachment else 1.0)
             ):
                 return Action.SEEK_COMFORT
         return Action.WITHDRAW
@@ -181,16 +187,28 @@ def select_action(agent: WorldAgent, ctx: TickContext) -> Action:
                 ctx.is_event_target or
                 has_rival_present
             ):
+                prefers_confrontation = any(
+                    keyword in conflict_style
+                    for keyword in ("go sharp", "confront", "command", "keep score")
+                )
                 for nid in ctx.nearby_agent_ids:
                     if (
                         ctx.relationships.get_resentment(agent.agent_id, nid) > 0.18 or
                         ctx.relationships.get_grievance(agent.agent_id, nid) > 0.18
                     ):
-                        return Action.CONFRONT
+                        if prefers_confrontation or motives.discharge_pressure >= motives.seek_support:
+                            return Action.CONFRONT
+                        return Action.VENT
                 if motives.seek_support >= motives.hide_weakness and has_ally_present:
                     return Action.VENT
-        if event_kinds & {"mutual_aid_hub", "neighborhood_meeting", "hospital_surge", "waterfront_watch", "debt_crunch"}:
-            if motives.protect_others > 0.32:
+        if event_kinds & {"mutual_aid_hub", "neighborhood_meeting", "hospital_surge", "waterfront_watch", "debt_crunch", "macro_cost_shock", "external_macro_signal"}:
+            is_true_caretaker = any(keyword in care_style for keyword in ("practical", "protective", "steady", "emotional reassurance"))
+            if (
+                motives.protect_others > (0.3 if is_true_caretaker else 0.42) and
+                motives.seek_safety < motives.protect_others * 1.05 and
+                appraisal.economic_pressure < 0.62 and
+                not any(tag in ongoing_story for tag in ("security is one bad week from collapse", "if I look weak, I become movable"))
+            ):
                 return Action.HELP_OTHERS
             if nearby_debt > 0.35 and appraisal.economic_pressure > 0.45 and has_rival_present:
                 return Action.CONFRONT
@@ -221,7 +239,8 @@ def select_action(agent: WorldAgent, ctx: TickContext) -> Action:
         if (
             has_rival_present and
             (nearby_grievance > 0.22 or appraisal.injustice > 0.35) and
-            motives.discharge_pressure >= motives.seek_support
+            motives.discharge_pressure >= motives.seek_support and
+            any(keyword in conflict_style for keyword in ("go sharp", "keep score", "confront", "command"))
         ):
             return Action.CONFRONT
 
@@ -230,6 +249,9 @@ def select_action(agent: WorldAgent, ctx: TickContext) -> Action:
                 rel = ctx.relationships.get(agent.agent_id, nid)
                 if rel and rel.warmth > 0.2 and motives.seek_support > motives.regain_control:
                     return Action.VENT
+
+        if coping in {"disappear into work", "perform competence"} and s.valence < 0.45 and motives.hide_weakness >= motives.seek_support * 0.8:
+            return Action.WORK
 
         if motives.regain_control > 0.55 or motives.protect_status > 0.5:
             return Action.WORK
@@ -245,11 +267,16 @@ def select_action(agent: WorldAgent, ctx: TickContext) -> Action:
 
     # 7. Needs to vent: negative + has someone to talk to
     if s.valence < 0.4 and s.arousal > 0.3 and s.impulse_control < 0.4:
-        if has_rival_present and nearby_grievance > 0.24 and motives.discharge_pressure > motives.seek_support:
+        if (
+            has_rival_present and
+            nearby_grievance > 0.24 and
+            motives.discharge_pressure > motives.seek_support and
+            any(keyword in conflict_style for keyword in ("go sharp", "confront", "keep score", "command"))
+        ):
             return Action.CONFRONT
         for nid in ctx.nearby_agent_ids:
             rel = ctx.relationships.get(agent.agent_id, nid)
-            if rel and rel.warmth > 0.2 and motives.seek_support >= motives.hide_weakness:
+            if rel and rel.warmth > 0.2 and motives.seek_support >= motives.hide_weakness * (0.78 if "anxious" in attachment else 1.0):
                 return Action.VENT
 
     # 8. High positive + high energy → celebrate (rare)
@@ -258,18 +285,28 @@ def select_action(agent: WorldAgent, ctx: TickContext) -> Action:
             return Action.CELEBRATE
 
     # 9. Help others: only when a nearby agent is actually struggling
-    if s.valence > 0.6 and s.energy > 0.5 or motives.protect_others > 0.5:
+    if (
+        s.valence > 0.6 and s.energy > 0.5 or
+        motives.protect_others > (0.44 if any(keyword in care_style for keyword in ("practical", "protective", "steady", "emotional reassurance")) else 0.58)
+    ):
         for nid in ctx.nearby_agent_ids:
             other = ctx.nearby_agents.get(nid)
             if other and other.heart.valence < 0.3 and other.heart.vulnerability > 0.3:
                 rel = ctx.relationships.get(agent.agent_id, nid)
-                if rel and rel.warmth > 0.2:
+                if (
+                    rel and rel.warmth > 0.2 and
+                    motives.seek_safety < motives.protect_others * 1.05 and
+                    appraisal.economic_pressure < 0.62 and
+                    not any(tag in ongoing_story for tag in ("security is one bad week from collapse", "if I look weak, I become movable"))
+                ):
                     return Action.HELP_OTHERS
 
     # 10. Socialize: evening/weekend + positive + people nearby
     if (s.valence > 0.55 and s.arousal > 0.3 and ctx.nearby_agent_ids
             and ctx.hour_of_day >= 17):
         if has_ally_present and appraisal.loyalty_pressure > 0.32:
+            return Action.SOCIALIZE
+        if coping in {"seek witnesses", "reach for connection", "deflect with humor"}:
             return Action.SOCIALIZE
         if motives.action_style in {"joking deflection", "protective caretaking", "plainspoken honesty"}:
             return Action.SOCIALIZE
@@ -286,11 +323,14 @@ def get_action_description(action: Action, agent: WorldAgent) -> str:
     s = agent.heart
     name = agent.personality.name
     style = agent.motives.action_style
+    profile = agent.get_human_profile()
+    care_style = profile["care_style"]
+    conflict_style = profile["conflict_style"]
 
     descriptions = {
         Action.COLLAPSE: f"{name} has shut down — sitting motionless, unable to function",
-        Action.LASH_OUT: f"{name} snaps at whoever is nearby with {style} — no filter left",
-        Action.CONFRONT: f"{name} confronts someone they're angry at through {style}",
+        Action.LASH_OUT: f"{name} snaps at whoever is nearby with {style} and {conflict_style} instincts — no filter left",
+        Action.CONFRONT: f"{name} confronts someone they're angry at through {style} and {conflict_style}",
         Action.FLEE: f"{name} abruptly leaves — needs to get away",
         Action.WITHDRAW: f"{name} withdraws to be alone and regroup",
         Action.SEEK_COMFORT: f"{name} reaches out to someone they trust with {style}",
@@ -298,7 +338,7 @@ def get_action_description(action: Action, agent: WorldAgent) -> str:
         Action.VENT: f"{name} needs to talk — unloading through {style}",
         Action.SOCIALIZE: f"{name} is chatting with people around them through {style}",
         Action.CELEBRATE: f"{name} is in high spirits, sharing good energy",
-        Action.HELP_OTHERS: f"{name} notices someone struggling and reaches out with {style}",
+        Action.HELP_OTHERS: f"{name} notices someone struggling and reaches out with {style} and {care_style}",
         Action.WORK: f"{name} is working in a {style} mode",
         Action.REST: f"{name} is resting",
         Action.IDLE: f"{name} is idle",

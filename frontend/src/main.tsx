@@ -15,7 +15,7 @@ function Root() {
     return () => window.removeEventListener('hashchange', handler)
   }, [])
 
-  if (route === '#/world') {
+  if (route === '#/world' || route.startsWith('#/world?')) {
     return (
       <Suspense fallback={
         <div style={{

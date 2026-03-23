@@ -1,0 +1,553 @@
+{
+  "model": "gpt-5-mini",
+  "candidate_count": 8,
+  "sample_count": 24,
+  "chance_accuracy": 0.125,
+  "accuracy": 0.75,
+  "lift_over_chance": 6.0,
+  "by_phase": {
+    "pre_shock": 0.625,
+    "post_shock": 0.875,
+    "crisis": 0.75
+  },
+  "by_agent": {
+    "daria": {
+      "name": "Daria",
+      "role": "dock_worker",
+      "accuracy": 1.0,
+      "n": 3
+    },
+    "taro": {
+      "name": "Taro",
+      "role": "factory_worker",
+      "accuracy": 0.333,
+      "n": 3
+    },
+    "lance": {
+      "name": "Lance",
+      "role": "office_professional",
+      "accuracy": 0.0,
+      "n": 3
+    },
+    "hans": {
+      "name": "Hans",
+      "role": "market_vendor",
+      "accuracy": 1.0,
+      "n": 3
+    },
+    "natasha": {
+      "name": "Natasha",
+      "role": "student",
+      "accuracy": 1.0,
+      "n": 3
+    },
+    "finn": {
+      "name": "Finn",
+      "role": "healthcare",
+      "accuracy": 1.0,
+      "n": 3
+    },
+    "caleb": {
+      "name": "Caleb",
+      "role": "government_worker",
+      "accuracy": 0.667,
+      "n": 3
+    },
+    "kira": {
+      "name": "Kira",
+      "role": "community",
+      "accuracy": 1.0,
+      "n": 3
+    }
+  },
+  "confusion": {
+    "daria": {
+      "daria": 3
+    },
+    "taro": {
+      "natasha": 1,
+      "taro": 1,
+      "kira": 1
+    },
+    "lance": {
+      "caleb": 2,
+      "hans": 1
+    },
+    "hans": {
+      "hans": 3
+    },
+    "natasha": {
+      "natasha": 3
+    },
+    "finn": {
+      "finn": 3
+    },
+    "caleb": {
+      "kira": 1,
+      "caleb": 2
+    },
+    "kira": {
+      "kira": 3
+    }
+  },
+  "samples": [
+    {
+      "tick": 48,
+      "time_str": "Day 3, 00:00",
+      "true_agent_id": "daria",
+      "true_agent_name": "Daria",
+      "role": "dock_worker",
+      "action": "REST",
+      "speech": "(Checks the bolt marks on her palm, then tucks them into her pocket.) Keep your voices low \u2014 rumors spread faster than repairs. I don\u2019t care who\u2019s saying what; if anyone starts picking names, you tell me first. We hold the line here, understood?",
+      "context_summary": "Role: dock_worker, Action: REST, Internal: neutral, Surface: neutral, Concern: defend my neighborhood from the spillover"
+    },
+    {
+      "tick": 48,
+      "time_str": "Day 3, 00:00",
+      "true_agent_id": "taro",
+      "true_agent_name": "Taro",
+      "role": "factory_worker",
+      "action": "REST",
+      "speech": "[PERSON] sits up, rubbing his temple, voice low and steady: \"Listen \u2014 at the caucus tomorrow I won't be the lone voice. Get ten names, show up sharp",
+      "context_summary": "Role: factory_worker, Action: REST, Internal: neutral, Surface: neutral, Concern: turn private anger into organized pressure"
+    },
+    {
+      "tick": 48,
+      "time_str": "Day 3, 00:00",
+      "true_agent_id": "lance",
+      "true_agent_name": "Lance",
+      "role": "office_professional",
+      "action": "RUMINATE",
+      "speech": "(Glances up, hands folded on the clipboard.) Okay\u2014listen up: there are rumors, yes, but we don\u2019t let them run the room. [PERSON], keep the press line tight and factual; [PERSON], sweep the east corridor and report anything out of pattern in fifteen. We stabilize tonight, then decide the story in the morning\u2014no lone doors.",
+      "context_summary": "Role: office_professional, Action: RUMINATE, Internal: neutral, Surface: neutral, Concern: keep the block from fraying into private panic"
+    },
+    {
+      "tick": 48,
+      "time_str": "Day 3, 00:00",
+      "true_agent_id": "hans",
+      "true_agent_name": "Hans",
+      "role": "market_vendor",
+      "action": "REST",
+      "speech": "[PERSON] rubs his knuckles, glances at his phone, then lifts his voice low and steady: \"Listen \u2014 I can keep baking tomorrow, make extra loaves for the hub, but we need to sort fuel for the oven and somebody has to cover my stall if I do. I don't want promises; tell me names and times so I can make it work.\"",
+      "context_summary": "Role: market_vendor, Action: REST, Internal: neutral, Surface: neutral, Concern: keep income and home secure"
+    },
+    {
+      "tick": 48,
+      "time_str": "Day 3, 00:00",
+      "true_agent_id": "natasha",
+      "true_agent_name": "Natasha",
+      "role": "student",
+      "action": "REST",
+      "speech": "(soft laugh, rubbing temples) Alright\u2014rumor mill\u2019s spinning, but we don\u2019t let other folks write our chapter. I\u2019ll put out a clear timeline and who-said-what so the story can\u2019t be stolen, and I want two people on outreach to Suburbs South\u2014no heroics, just facts and calm. If this blows back and hits rents or my tuition, I will personally haunt whoever started it.",
+      "context_summary": "Role: student, Action: REST, Internal: neutral, Surface: neutral, Concern: keep this mess from reaching my block and my bills"
+    },
+    {
+      "tick": 48,
+      "time_str": "Day 3, 00:00",
+      "true_agent_id": "finn",
+      "true_agent_name": "Finn",
+      "role": "healthcare",
+      "action": "REST",
+      "speech": "(sits up, pulls the tablet closer, fingers through the patient list) \"Give me a headcount \u2014 who\u2019s in overflow and who\u2019s cleared? If we start signing transfers without the numbers I want, tell me and I\u2019ll hold the line. And someone point me at coffee; I\u2019m taking the next quiet hour to actually chart so nobody has to hunt me down.\"",
+      "context_summary": "Role: healthcare, Action: REST, Internal: neutral, Surface: neutral, Concern: keep our side from panicking into bad bargains"
+    },
+    {
+      "tick": 48,
+      "time_str": "Day 3, 00:00",
+      "true_agent_id": "caleb",
+      "true_agent_name": "Caleb",
+      "role": "government_worker",
+      "action": "REST",
+      "speech": "(quiet, clipped) [PERSON] \u2014 make a list: names, contact, when they were out, and one-sentence account of what they saw. Get it to me by noon; I\u2019ll draft the timeline and the ask the city council can\u2019t ignore. (keeps eyes on the group, voice steady though my jaw tightens) Don\u2019t let this become whisper-work \u2014 we put paper in their hands and witnesses in the room.",
+      "context_summary": "Role: government_worker, Action: REST, Internal: neutral, Surface: neutral, Concern: turn private anger into organized pressure"
+    },
+    {
+      "tick": 48,
+      "time_str": "Day 3, 00:00",
+      "true_agent_id": "kira",
+      "true_agent_name": "Kira",
+      "role": "community",
+      "action": "REST",
+      "speech": "I rub my hands together and force a small smile. \"Before we sleep, jot down who helped who today\u2014names, times, anything. I don't want this to get renamed 'collateral' down the line; if we keep the paper trail, nobody can sweep it away.\"",
+      "context_summary": "Role: community, Action: REST, Internal: neutral, Surface: neutral, Concern: make the neighborhood's losses impossible to wave away"
+    },
+    {
+      "tick": 96,
+      "time_str": "Day 5, 00:00",
+      "true_agent_id": "daria",
+      "true_agent_name": "Daria",
+      "role": "dock_worker",
+      "action": "REST",
+      "speech": "Keep it down and listen \u2014 gossip's poison and we've got real work. Rumors won't fix warped ramps or pay the lights; if someone trips up this block for a quick gain, they answer to me. [PERSON], you hear anything solid, you bring it straight to me.",
+      "context_summary": "Role: dock_worker, Action: REST, Internal: neutral, Surface: neutral, Concern: defend my neighborhood from the spillover"
+    },
+    {
+      "tick": 96,
+      "time_str": "Day 5, 00:00",
+      "true_agent_id": "taro",
+      "true_agent_name": "Taro",
+      "role": "factory_worker",
+      "action": "REST",
+      "speech": "[PERSON] sits up, rubs the heel of his hand along his jaw, and looks at the group with flat calm. \"One missed paycheck isn't a fluke \u2014 it's on the",
+      "context_summary": "Role: factory_worker, Action: REST, Internal: neutral, Surface: neutral, Concern: turn private anger into organized pressure"
+    },
+    {
+      "tick": 96,
+      "time_str": "Day 5, 00:00",
+      "true_agent_id": "lance",
+      "true_agent_name": "Lance",
+      "role": "office_professional",
+      "action": "RUMINATE",
+      "speech": "[PERSON] glances up, palms flat on the hood of a car, voice even. \"Alright\u2014stay tight and keep it local: check the doors, note times, don\u2019t trade names or gossip outside this group. I\u2019ve put a priority alert in with the board\u2014if anything changes, tell me first and we\u2019ll decide what goes public.\"",
+      "context_summary": "Role: office_professional, Action: RUMINATE, Internal: neutral, Surface: neutral, Concern: keep the block from fraying into private panic"
+    },
+    {
+      "tick": 96,
+      "time_str": "Day 5, 00:00",
+      "true_agent_id": "hans",
+      "true_agent_name": "Hans",
+      "role": "market_vendor",
+      "action": "REST",
+      "speech": "(quietly, rubbing his temple) I\u2019ll bring the extra loaves to the hub at first light and cover delivery if [PERSON] can\u2019t\u2014just tell me who needs priority. I\u2019m not sleeping much; I\u2019m counting every favor and every kWh, so if the power stays iffy we need a generator plan now.",
+      "context_summary": "Role: market_vendor, Action: REST, Internal: neutral, Surface: neutral, Concern: keep income and home secure"
+    },
+    {
+      "tick": 96,
+      "time_str": "Day 5, 00:00",
+      "true_agent_id": "natasha",
+      "true_agent_name": "Natasha",
+      "role": "student",
+      "action": "REST",
+      "speech": "(soft laugh) Okay, everyone\u2014rumors travel faster than rent checks, so let\u2019s lock down what we put out before the suburbs write our obituary. I\u2019ll text campus_action_network a one-paragraph timeline and have the mutual_aid_ring post the verified resources by noon; who wants the copy? Don\u2019t make me carry this into my bills \u2014 I\u2019ll handle framing if you handle facts.",
+      "context_summary": "Role: student, Action: REST, Internal: neutral, Surface: neutral, Concern: keep this mess from reaching my block and my bills"
+    },
+    {
+      "tick": 96,
+      "time_str": "Day 5, 00:00",
+      "true_agent_id": "finn",
+      "true_agent_name": "Finn",
+      "role": "healthcare",
+      "action": "REST",
+      "speech": "I checked the generator logs again\u2014no surprises, two battery packs at 70% and cycling normally. If anyone wants to sleep, I\u2019ll take the rounds for the next hour so alarms don\u2019t wake you; I\u2019d rather do that than stand around talking. I\u2019m fine\u2014just tell me what needs fixing.",
+      "context_summary": "Role: healthcare, Action: REST, Internal: neutral, Surface: neutral, Concern: keep our side from panicking into bad bargains"
+    },
+    {
+      "tick": 96,
+      "time_str": "Day 5, 00:00",
+      "true_agent_id": "caleb",
+      "true_agent_name": "Caleb",
+      "role": "government_worker",
+      "action": "REST",
+      "speech": "[PERSON] \u2014 pull every attendance list, timestamps, and call logs from the last three days and put them in order. I want sworn witness statements drafted and a clean timeline on my desk by 0900, no exceptions. Don\u2019t let anyone off the record; if it isn\u2019t documented, it doesn\u2019t exist.",
+      "context_summary": "Role: government_worker, Action: REST, Internal: neutral, Surface: neutral, Concern: turn private anger into organized pressure"
+    },
+    {
+      "tick": 96,
+      "time_str": "Day 5, 00:00",
+      "true_agent_id": "kira",
+      "true_agent_name": "Kira",
+      "role": "community",
+      "action": "REST",
+      "speech": "Hey\u2014sorry to interrupt, can I ask something quick? Who kept showing up",
+      "context_summary": "Role: community, Action: REST, Internal: neutral, Surface: neutral, Concern: make the neighborhood's losses impossible to wave away"
+    },
+    {
+      "tick": 120,
+      "time_str": "Day 6, 00:00",
+      "true_agent_id": "daria",
+      "true_agent_name": "Daria",
+      "role": "dock_worker",
+      "action": "REST",
+      "speech": "Eyes on the street, not the headlines \u2014 if someone shows up with promises, make them put it in writing. I\u2019ll keep the ramps running; you keep the list of who owes what and who\u2019s paid up. (I sit up, fingers tapping the wood like I\u2019m counting bolts; don\u2019t test me.)",
+      "context_summary": "Role: dock_worker, Action: REST, Internal: neutral, Surface: neutral, Concern: defend my neighborhood from the spillover"
+    },
+    {
+      "tick": 120,
+      "time_str": "Day 6, 00:00",
+      "true_agent_id": "taro",
+      "true_agent_name": "Taro",
+      "role": "factory_worker",
+      "action": "REST",
+      "speech": "I sit up, rub my jaw, and say quietly, \"Listen \u2014 private gripes won't change a damn thing. [PERSON], get me a list: names, dates, who missed pay \u2014 I want witnesses, not whispers.\" I pause, eyes on the door, voice steady but hard, \"We build pressure smart and loud enough they can't rewrite it.",
+      "context_summary": "Role: factory_worker, Action: REST, Internal: neutral, Surface: neutral, Concern: turn private anger into organized pressure"
+    },
+    {
+      "tick": 120,
+      "time_str": "Day 6, 00:00",
+      "true_agent_id": "lance",
+      "true_agent_name": "Lance",
+      "role": "office_professional",
+      "action": "REST",
+      "speech": "Keep your radios on and do rounds every three hours \u2014 log who\u2019s up and who\u2019s not. I\u2019ll put together the rota in the morning; for now, don\u2019t split off chasing rumors. If anyone needs cash or a fridge moved, tell me quietly \u2014 we\u2019ll handle it without blowing it up.",
+      "context_summary": "Role: office_professional, Action: REST, Internal: neutral, Surface: neutral, Concern: keep the block from fraying into private panic"
+    },
+    {
+      "tick": 120,
+      "time_str": "Day 6, 00:00",
+      "true_agent_id": "hans",
+      "true_agent_name": "Hans",
+      "role": "market_vendor",
+      "action": "REST",
+      "speech": "I sit up, thumb tracing the edge of my notebook. \"Listen \u2014 I can front the flour and cover two morning shifts this week, but someone needs to take the late recon with the neighbors so we don't get blindsided if the power goes. Tell me who, I'll sort the numbers tonight.\"",
+      "context_summary": "Role: market_vendor, Action: REST, Internal: neutral, Surface: neutral, Concern: keep income and home secure"
+    },
+    {
+      "tick": 120,
+      "time_str": "Day 6, 00:00",
+      "true_agent_id": "natasha",
+      "true_agent_name": "Natasha",
+      "role": "student",
+      "action": "REST",
+      "speech": "(soft laugh) Okay, quick huddle \u2014 no sharing unverified names. Rumors land like rent notices: they compound and someone here ends up paying. Lock phones, copy any bank notices to me, and if the deposit freeze hits anyone, we move the mutual-aid pot first \u2014 I\u2019d rather eat my tactics than let a neighbor go hungry.",
+      "context_summary": "Role: student, Action: REST, Internal: neutral, Surface: neutral, Concern: keep this mess from reaching my block and my bills"
+    },
+    {
+      "tick": 120,
+      "time_str": "Day 6, 00:00",
+      "true_agent_id": "finn",
+      "true_agent_name": "Finn",
+      "role": "healthcare",
+      "action": "REST",
+      "speech": "Hands on the tablet, I squint at the roster. \"Give me the staffing list and a five\u2011minute meds rundown \u2014 I'm going through the triage logs. If anything's off, say it now; we can't let panic or bad numbers make decisions for us.\" I rub my temple, voice steady though my jaw tightens.",
+      "context_summary": "Role: healthcare, Action: REST, Internal: neutral, Surface: neutral, Concern: keep our side from panicking into bad bargains"
+    },
+    {
+      "tick": 120,
+      "time_str": "Day 6, 00:00",
+      "true_agent_id": "caleb",
+      "true_agent_name": "Caleb",
+      "role": "government_worker",
+      "action": "REST",
+      "speech": "(He taps a manila folder on his knee, eyes sweeping the room.) We need a witness list, timestamped timelines, and hard copies of every outage report\u2014no one speaks without the paper trail. [PERSON], you and I meet at 0900 to lock names and assign spokespeople; if the room starts to rewrite what happened, we publish first.",
+      "context_summary": "Role: government_worker, Action: REST, Internal: neutral, Surface: neutral, Concern: turn private anger into organized pressure"
+    },
+    {
+      "tick": 120,
+      "time_str": "Day 6, 00:00",
+      "true_agent_id": "kira",
+      "true_agent_name": "Kira",
+      "role": "community",
+      "action": "REST",
+      "speech": "I sit up, rubbing my palms together, and whisper, \"Before anyone sleeps, tell me one name and one thing they lost \u2014 I want it written down so it doesn't vanish.\" I tap my pocket where a battered notebook lives and offer it to [PERSON], \"You don't have to say more than that; just let me witness it.\" My voice softens, \"I'm not here to stir trouble \u2014 just to make sure we can prove what happened later.\"",
+      "context_summary": "Role: community, Action: REST, Internal: neutral, Surface: neutral, Concern: make the neighborhood's losses impossible to wave away"
+    }
+  ],
+  "judgments": [
+    {
+      "tick": 48,
+      "true_agent_id": "daria",
+      "predicted_agent_id": "daria",
+      "correct": true,
+      "confidence": 0.92,
+      "reasoning": "The physical detail (bolt marks) and pragmatic, watchful command fit a mechanic protecting operations. The direct, confrontational tone about rumors and 'holding the line' matches Daria\u2019s coping style, fear of scarcity, need for safety, and self-story as a guardian.",
+      "speech_snippet": "(Checks the bolt marks on her palm, then tucks them into her pocket.) Keep your voices low \u2014 rumors "
+    },
+    {
+      "tick": 48,
+      "true_agent_id": "taro",
+      "predicted_agent_id": "natasha",
+      "correct": false,
+      "confidence": 0.86,
+      "reasoning": "The line is organizing-focused and political\u2014asking for names and mobilizing to the caucus fits Natasha\u2019s labor-studies role and provider self-story. The low, steady tone and practical instruction match her observant, people-centered coping (building collective safety) rather than a reporter gathering evidence or a procedural regulator.",
+      "speech_snippet": "[PERSON] sits up, rubbing his temple, voice low and steady: \"Listen \u2014 at the caucus tomorrow I won't"
+    },
+    {
+      "tick": 48,
+      "true_agent_id": "lance",
+      "predicted_agent_id": "caleb",
+      "correct": false,
+      "confidence": 0.88,
+      "reasoning": "The tone is procedural and controlling\u2014organizing teams, managing press, stabilizing the situation\u2014matching Caleb's coping by intellectualizing, fear of chaos, and need for control. The clipboard detail and emphasis on no lone doors fit his paper-trail, witness self-story rather than a front-line caregiver or activist.",
+      "speech_snippet": "(Glances up, hands folded on the clipboard.) Okay\u2014listen up: there are rumors, yes, but we don\u2019t let"
+    },
+    {
+      "tick": 48,
+      "true_agent_id": "hans",
+      "predicted_agent_id": "hans",
+      "correct": true,
+      "confidence": 0.92,
+      "reasoning": "The speaker is a baker negotiating practical cover and fuel for an oven, which directly matches Hans\u2019s role as a bakery owner and caretaker. The tone\u2014low, steady, action-oriented requests for names and times\u2014fits Hans\u2019s coping-by-caretaking, fear of scarcity, need to be useful, and self-story as a provider.",
+      "speech_snippet": "[PERSON] rubs his knuckles, glances at his phone, then lifts his voice low and steady: \"Listen \u2014 I c"
+    },
+    {
+      "tick": 48,
+      "true_agent_id": "natasha",
+      "predicted_agent_id": "natasha",
+      "correct": true,
+      "confidence": 0.9,
+      "reasoning": "The line about tuition and protecting rents points to someone juggling student concerns and tenant advocacy. The speaker organizes facts, outreach, and deflects with a soft laugh\u2014matching Natasha\u2019s observant, political temper and coping-by-humor while prioritizing safety and collective care.",
+      "speech_snippet": "(soft laugh, rubbing temples) Alright\u2014rumor mill\u2019s spinning, but we don\u2019t let other folks write our "
+    },
+    {
+      "tick": 48,
+      "true_agent_id": "finn",
+      "predicted_agent_id": "finn",
+      "correct": true,
+      "confidence": 0.92,
+      "reasoning": "The speaker is in a clinical setting (patient list, overflow, transfers, charting) and takes a calm, procedural tone focused on numbers and keeping lines clear\u2014matching Finn\u2019s coping by disappearing into work, need for usefulness, and clinical temperament. The demand for coffee and a quiet hour to chart fits a respiratory therapist protecting time to do necessary work rather than perform or intellectualize.",
+      "speech_snippet": "(sits up, pulls the tablet closer, fingers through the patient list) \"Give me a headcount \u2014 who\u2019s in"
+    },
+    {
+      "tick": 48,
+      "true_agent_id": "caleb",
+      "predicted_agent_id": "kira",
+      "correct": false,
+      "confidence": 0.88,
+      "reasoning": "The line focuses on gathering witnesses, creating a public timeline, and forcing a civic response\u2014directly matching a reporter\u2019s instinct to seek witnesses and expose truth. The clipped, steady directive and emphasis on paper and council action fit Kira\u2019s coping (seek witnesses), need for truth, and self-story as a witness.",
+      "speech_snippet": "(quiet, clipped) [PERSON] \u2014 make a list: names, contact, when they were out, and one-sentence accoun"
+    },
+    {
+      "tick": 48,
+      "true_agent_id": "kira",
+      "predicted_agent_id": "kira",
+      "correct": true,
+      "confidence": 0.85,
+      "reasoning": "The line about keeping a paper trail to prevent stories being erased matches a reporter\u2019s impulse to document and protect witnesses. The coping style (seek witnesses), need for truth, and political wording (\u2018collateral\u2019) fit Kira\u2019s temperament and self-story.",
+      "speech_snippet": "I rub my hands together and force a small smile. \"Before we sleep, jot down who helped who today\u2014nam"
+    },
+    {
+      "tick": 96,
+      "true_agent_id": "daria",
+      "predicted_agent_id": "daria",
+      "correct": true,
+      "confidence": 0.85,
+      "reasoning": "The line references 'warped ramps' and protecting the block, matching a pier mechanic who sees herself as a guardian. The tone is gruff, confrontational, and protective\u2014fits daria's coping-by-confronting, fear of scarcity, need for safety, and self-story of guardian.",
+      "speech_snippet": "Keep it down and listen \u2014 gossip's poison and we've got real work. Rumors won't fix warped ramps or "
+    },
+    {
+      "tick": 96,
+      "true_agent_id": "taro",
+      "predicted_agent_id": "taro",
+      "correct": true,
+      "confidence": 0.92,
+      "reasoning": "The line directly references a missed paycheck and frames it as systemic blame, matching Taro's lived stress around pay and his confront-head-on coping. The flat, weary calm and focus on dignity/exposure fit his temperament and self-story as a hardworking survivor defending his standing.",
+      "speech_snippet": "[PERSON] sits up, rubs the heel of his hand along his jaw, and looks at the group with flat calm. \"O"
+    },
+    {
+      "tick": 96,
+      "true_agent_id": "lance",
+      "predicted_agent_id": "caleb",
+      "correct": false,
+      "confidence": 0.8,
+      "reasoning": "The line is procedural and control-focused\u2014ordering info containment, logging times, and filing a \u2018priority alert with the board\u2019\u2014which matches Caleb\u2019s procedural, tense temperament and need for control. The even voice and emphasis on paper trails and managing what goes public fit his coping (intellectualize) and self-story as a witness.",
+      "speech_snippet": "[PERSON] glances up, palms flat on the hood of a car, voice even. \"Alright\u2014stay tight and keep it lo"
+    },
+    {
+      "tick": 96,
+      "true_agent_id": "hans",
+      "predicted_agent_id": "hans",
+      "correct": true,
+      "confidence": 0.92,
+      "reasoning": "Mentioning extra loaves, delivery and early morning hub aligns directly with a bakery owner who caretakes in crisis. The line about counting favors and kWh, fear of scarcity and push for a generator plan fits Hans\u2019s provider role, caretaking coping style, and hard-edged concern for usefulness.",
+      "speech_snippet": "(quietly, rubbing his temple) I\u2019ll bring the extra loaves to the hub at first light and cover delive"
+    },
+    {
+      "tick": 96,
+      "true_agent_id": "natasha",
+      "predicted_agent_id": "natasha",
+      "correct": true,
+      "confidence": 0.85,
+      "reasoning": "The voice uses light deflection and humor plus organizing mutual-aid and tenant/campus networks\u2014matching Natasha\u2019s coping style and role as a labor-studies student helping workers/tenants. References to rent checks and safety concerns align with her fear of scarcity and need for safety, and the line about framing vs facts fits her political, observant temperament.",
+      "speech_snippet": "(soft laugh) Okay, everyone\u2014rumors travel faster than rent checks, so let\u2019s lock down what we put ou"
+    },
+    {
+      "tick": 96,
+      "true_agent_id": "finn",
+      "predicted_agent_id": "finn",
+      "correct": true,
+      "confidence": 0.85,
+      "reasoning": "The speaker is calm, technical (generator logs, battery %), and offers to take practical shifts so others can sleep\u2014matching Finn\u2019s coping by disappearing into work, need to be useful, and guardian self-story. The emphasis on numbers and a tightened tolerance for talk fits Finn\u2019s clinically calm, data-focused temperament.",
+      "speech_snippet": "I checked the generator logs again\u2014no surprises, two battery packs at 70% and cycling normally. If a"
+    },
+    {
+      "tick": 96,
+      "true_agent_id": "caleb",
+      "predicted_agent_id": "caleb",
+      "correct": true,
+      "confidence": 0.92,
+      "reasoning": "The language is procedural, paper-trail-focused and demanding sworn statements and logs\u2014matching Caleb\u2019s temperament (procedural, tense), coping (intellectualize), fear (chaos) and need for control. The command-and-timestamp tone fits a regulator assembling an official timeline rather than a caregiver or reporter.",
+      "speech_snippet": "[PERSON] \u2014 pull every attendance list, timestamps, and call logs from the last three days and put th"
+    },
+    {
+      "tick": 96,
+      "true_agent_id": "kira",
+      "predicted_agent_id": "kira",
+      "correct": true,
+      "confidence": 0.78,
+      "reasoning": "The line is a polite, witness-seeking question \u2014 exactly the reporter impulse to interrupt briefly and gather testimony. Kira\u2019s coping style (seek witnesses), need for truth, and temperament (good-hearted, political, asking proximate questions) fit this behavior better than the others.",
+      "speech_snippet": "Hey\u2014sorry to interrupt, can I ask something quick? Who kept showing up"
+    },
+    {
+      "tick": 120,
+      "true_agent_id": "daria",
+      "predicted_agent_id": "daria",
+      "correct": true,
+      "confidence": 0.9,
+      "reasoning": "Hands-on, tactile image (counting bolts, ramps) and gruff, watchful tone match Daria\u2019s pier mechanic role and confront-head-on coping. The focus on promises in writing and tracking who owes/has paid aligns with fear of scarcity, need for safety, and her self-story as a guardian.",
+      "speech_snippet": "Eyes on the street, not the headlines \u2014 if someone shows up with promises, make them put it in writi"
+    },
+    {
+      "tick": 120,
+      "true_agent_id": "taro",
+      "predicted_agent_id": "kira",
+      "correct": false,
+      "confidence": 0.88,
+      "reasoning": "The line focuses on gathering witness names/dates and pressuring 'smart and loud' to prevent rewriting the record\u2014matching a reporter's drive to find witnesses and expose truth. The direct, steady ordering and political tone fit Kira's coping (seek witnesses), needs (truth), and self-story (witness).",
+      "speech_snippet": "I sit up, rub my jaw, and say quietly, \"Listen \u2014 private gripes won't change a damn thing. [PERSON],"
+    },
+    {
+      "tick": 120,
+      "true_agent_id": "lance",
+      "predicted_agent_id": "hans",
+      "correct": false,
+      "confidence": 0.78,
+      "reasoning": "The speaker is directing practical caregiving\u2014organizing rounds, radios, rota\u2014and offering quiet material help, matching a provider who prioritizes usefulness and scarcity management. Hans\u2019s warm-but-hard-edged temperament and habit of quietly handling community needs fits the tone and self-story better than the others.",
+      "speech_snippet": "Keep your radios on and do rounds every three hours \u2014 log who\u2019s up and who\u2019s not. I\u2019ll put together "
+    },
+    {
+      "tick": 120,
+      "true_agent_id": "hans",
+      "predicted_agent_id": "hans",
+      "correct": true,
+      "confidence": 0.9,
+      "reasoning": "The speaker offers to front flour and cover morning shifts and talks logistics and numbers\u2014concrete caretaking tied to a bakery business. That matches Hans\u2019s role, coping-by-caretaking, fear of scarcity, need to be useful, and provider self-story, plus the practical, warm-but-firm tone.",
+      "speech_snippet": "I sit up, thumb tracing the edge of my notebook. \"Listen \u2014 I can front the flour and cover two morni"
+    },
+    {
+      "tick": 120,
+      "true_agent_id": "natasha",
+      "predicted_agent_id": "natasha",
+      "correct": true,
+      "confidence": 0.9,
+      "reasoning": "The speaker organizes a quick mutual-aid tactic, uses a soft laugh and dry metaphor to deflect tension, and emphasizes protecting neighbors and documents\u2014matching Natasha\u2019s political, observant style, humor coping, fear of scarcity, need for safety, and self-story as a provider.",
+      "speech_snippet": "(soft laugh) Okay, quick huddle \u2014 no sharing unverified names. Rumors land like rent notices: they c"
+    },
+    {
+      "tick": 120,
+      "true_agent_id": "finn",
+      "predicted_agent_id": "finn",
+      "correct": true,
+      "confidence": 0.9,
+      "reasoning": "The language is clinical and task-focused\u2014triage logs, meds rundown, staffing\u2014which matches a respiratory therapist who copes by disappearing into work. The steady but tightened tone fits Finn\u2019s \u2018clinically calm until somebody lies about the numbers\u2019 temperament and guardian self-story (pressing for accurate data to be useful).",
+      "speech_snippet": "Hands on the tablet, I squint at the roster. \"Give me the staffing list and a five\u2011minute meds rundo"
+    },
+    {
+      "tick": 120,
+      "true_agent_id": "caleb",
+      "predicted_agent_id": "caleb",
+      "correct": true,
+      "confidence": 0.95,
+      "reasoning": "The focus on paperwork, timestamps, hard copies and controlling the narrative matches a procedural, paper-trail\u2013oriented temperament and fear of chaos. The line about publishing first and locking names fits Caleb\u2019s coping by intellectualizing and his self-story as a witness.",
+      "speech_snippet": "(He taps a manila folder on his knee, eyes sweeping the room.) We need a witness list, timestamped t"
+    },
+    {
+      "tick": 120,
+      "true_agent_id": "kira",
+      "predicted_agent_id": "kira",
+      "correct": true,
+      "confidence": 0.85,
+      "reasoning": "The speaker seeks witnesses, records names and losses, and frames documentation as protecting truth rather than stirring trouble\u2014matching a reporter\u2019s impulse to collect testimony. The gentle, witness-focused phrasing and offer of a battered notebook fit Kira\u2019s temperament and self-story.",
+      "speech_snippet": "I sit up, rubbing my palms together, and whisper, \"Before anyone sleeps, tell me one name and one th"
+    }
+  ]
+}

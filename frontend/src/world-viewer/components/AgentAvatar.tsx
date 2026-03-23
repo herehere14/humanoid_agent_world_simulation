@@ -21,23 +21,20 @@
  *   walking      — walk cycle between locations (interpolated)
  */
 
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import type { AgentState } from '../types';
+import { getSubActivity } from '../activities';
+import { ActivityProp } from './ActivityProps';
 import {
   actionToBehavior,
   getEmotionColor,
   type BehaviorClass,
 } from '../layout';
 import { useWorldStore } from '../store';
-
-// ─── constants ───────────────────────────────────────────────
-const SKIN = '#e8b88a';
-const SKIN_DARK = '#c69c6d';
-const PANTS = '#374151';
-const SHOE = '#1f2937';
+import { getAgentAppearance, getMovementProfile } from '../appearance';
 
 // ─── helpers ─────────────────────────────────────────────────
 function truncate(s: string, n: number) {
@@ -77,6 +74,148 @@ interface Pose {
   lHipX: number; lKneeX: number;
   // right leg
   rHipX: number; rKneeX: number;
+  // micro-gestures (layered on top of base pose)
+  breathScale: number;     // torso breathing (scale pulse)
+  fingerSpread: number;    // 0=fist, 1=open palm
+  headShake: number;       // rapid side-to-side
+  shoulderTense: number;   // shoulders raised (0-0.15)
+}
+
+/** Emotion + personality driven micro-gesture layer.
+ *  The movement profile makes each person physically distinct:
+ *  Marcus's anxiety shows as rapid fidgeting, Tom's stoicism as rigid stillness,
+ *  Jake's humor as loose swaying, Diana's empathy as leaning in. */
+function addMicroGestures(
+  base: Pose,
+  agent: AgentState,
+  t: number,
+  phase: number,
+  mp: ReturnType<typeof getMovementProfile>,
+): void {
+  const p = t * mp.tempo + phase;
+  const s = Math.sin;
+
+  // Scale all gestures by personality
+  const gs = mp.gestureScale;
+
+  // Resting posture from personality
+  base.torsoLean += mp.leanForward;
+  base.lShoulderX += mp.shoulderDrop;
+  base.rShoulderX += mp.shoulderDrop;
+
+  // Breathing — modulated by personality tempo
+  const breathRate = (1.0 + agent.arousal * 2.5) * mp.tempo;
+  base.breathScale = 1.0 + s(p * breathRate) * (0.005 + agent.arousal * 0.015);
+
+  // Shoulder tension
+  base.shoulderTense = agent.tension * 0.12 + mp.stiffness * 0.03;
+
+  // Idle sway — personality-driven amplitude
+  base.torsoSway += s(p * 0.7) * 0.015 * mp.swayAmount;
+  base.headTurn += s(p * 0.4) * 0.04 * mp.headMovement;
+
+  // Finger spread
+  if (agent.action === 'CONFRONT' || agent.action === 'LASH_OUT') {
+    base.fingerSpread = 0;
+  } else if (agent.action === 'SOCIALIZE' || agent.action === 'HELP_OTHERS') {
+    base.fingerSpread = 0.8 + s(p * 1.5) * 0.2;
+  } else if (agent.action === 'CELEBRATE') {
+    base.fingerSpread = 1.0;
+  } else {
+    base.fingerSpread = 0.3 + agent.valence * 0.3 + (1 - mp.stiffness) * 0.2;
+  }
+
+  // Head shake — more pronounced for animated personalities
+  if (agent.arousal > 0.5 && agent.valence < 0.35) {
+    base.headShake = s(p * 12) * 0.04 * agent.arousal * mp.headMovement;
+  }
+
+  // Personality-specific confront modulation
+  if (agent.action === 'CONFRONT' || agent.action === 'LASH_OUT') {
+    switch (mp.confrontStyle) {
+      case 'looming':
+        // Stand tall, lean in slowly, minimal arm movement — intimidation
+        base.torsoLean = -0.12 + s(p * 0.8) * 0.02;
+        base.rShoulderX *= 0.5; // arms more at sides
+        base.lShoulderX *= 0.5;
+        base.headNod = -0.2; // chin down, glaring
+        break;
+      case 'pacing':
+        // Side-to-side movement, hands behind back or on hips
+        base.torsoTwist = s(p * 1.5) * 0.15;
+        base.lHipX = s(p * 2) * 0.12;
+        base.rHipX = -s(p * 2) * 0.12;
+        break;
+      case 'rigid':
+        // Barely moves, controlled fury, tight jaw
+        base.torsoSway *= 0.2;
+        base.torsoTwist *= 0.3;
+        base.headShake = s(p * 15) * 0.01; // micro-shake from suppressed rage
+        base.shoulderTense += 0.08;
+        break;
+      // 'jabbing' is the default in computePose, no override needed
+    }
+  }
+
+  // Personality-specific distress modulation
+  if (agent.vulnerability > 0.4) {
+    switch (mp.distressStyle) {
+      case 'shaking':
+        const tremble = agent.vulnerability * 0.025 * gs;
+        base.torsoSway += s(p * 15) * tremble;
+        base.lShoulderX += s(p * 18) * tremble;
+        base.rShoulderX += s(p * 17 + 1) * tremble;
+        base.headNod += s(p * 13) * tremble * 0.5;
+        break;
+      case 'freezing':
+        // Body goes still, only breathing visible
+        base.torsoSway *= 0.15;
+        base.headTurn *= 0.2;
+        base.lShoulderX *= 0.7;
+        base.rShoulderX *= 0.7;
+        base.shoulderTense += agent.vulnerability * 0.1;
+        break;
+      case 'pacing':
+        // Restless movement even when "still"
+        base.lHipX += s(p * 3) * agent.vulnerability * 0.08;
+        base.rHipX += s(p * 3 + 1) * agent.vulnerability * 0.08;
+        base.torsoTwist += s(p * 2) * agent.vulnerability * 0.06;
+        break;
+      case 'curling':
+        // Drawing inward, protecting self
+        base.torsoLean += agent.vulnerability * 0.08;
+        base.lShoulderZ += agent.vulnerability * 0.1;
+        base.rShoulderZ -= agent.vulnerability * 0.1;
+        base.headNod += agent.vulnerability * 0.1;
+        break;
+    }
+  }
+
+  // Fidgeting when low impulse control — scaled by personality
+  if (agent.impulse_control < 0.4) {
+    const fidget = (0.4 - agent.impulse_control) * 0.1 * mp.swayAmount;
+    base.lWristX += s(p * 6) * fidget;
+    base.rWristX += s(p * 5.5 + 1) * fidget;
+    base.lHipX += s(p * 3) * fidget * 0.5;
+  }
+
+  // Exhaustion — scaled by personality
+  if (agent.energy < 0.3) {
+    base.torsoSway += s(p * 0.4) * 0.04;
+    base.torsoLean += 0.05;
+    base.headNod += 0.05 * (1 - mp.stiffness); // stoic types don't droop as much
+    base.lShoulderX += 0.04;
+    base.rShoulderX += 0.04;
+  }
+
+  // Suppression visible — scaled by personality stiffness
+  if (agent.divergence > 0.3) {
+    const suppression = agent.divergence * (0.5 + mp.stiffness * 0.5);
+    base.headNod += s(p * 8) * 0.01 * suppression;
+    base.shoulderTense += suppression * 0.06;
+    base.lShoulderZ += -suppression * 0.05;
+    base.rShoulderZ += suppression * 0.05;
+  }
 }
 
 function computePose(behavior: BehaviorClass, t: number, phase: number): Pose {
@@ -90,6 +229,7 @@ function computePose(behavior: BehaviorClass, t: number, phase: number): Pose {
     lShoulderX: 0.15, lShoulderZ: -0.1, lElbowX: 0.1, lWristX: 0,
     rShoulderX: 0.15, rShoulderZ: 0.1,  rElbowX: 0.1, rWristX: 0,
     lHipX: 0, lKneeX: 0, rHipX: 0, rKneeX: 0,
+    breathScale: 1.0, fingerSpread: 0.4, headShake: 0, shoulderTense: 0,
   };
 
   switch (behavior) {
@@ -313,11 +453,13 @@ export function AgentAvatar({
   targetPosition,
   interactionPartner,
   interactionType,
+  partnerPosition,
 }: {
   agent: AgentState;
   targetPosition: [number, number, number];
   interactionPartner: string | null;
   interactionType: string | null;
+  partnerPosition: [number, number, number] | null;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const currentPos = useRef(new THREE.Vector3(...targetPosition));
@@ -347,6 +489,30 @@ export function AgentAvatar({
   const behavior    = actionToBehavior(agent.action);
   const emotionColor = getEmotionColor(agent.valence, agent.arousal, agent.vulnerability);
   const showThought = shouldShowThought(agent);
+  const snapshot = useWorldStore(s => s.snapshot);
+  const agentMeta = snapshot?.agents[agent.id];
+  const look = useMemo(() => getAgentAppearance(agent.id), [agent.id]);
+  const moveProfile = useMemo(
+    () => getMovementProfile(
+      agentMeta?.temperament ?? '',
+      agent.action_style ?? '',
+    ),
+    [agentMeta?.temperament, agent.action_style],
+  );
+
+  const currentTick = useWorldStore(s => s.currentTick);
+  const hour = currentTick % 24;
+
+  // What specific activity is this agent doing right now?
+  const activity = useMemo(
+    () => getSubActivity(
+      agent.id, agent.action, agent.location, hour,
+      agent.valence, agent.energy, agent.tension,
+      agentMeta?.temperament ?? '', currentTick,
+    ),
+    [agent.id, agent.action, agent.location, hour, currentTick,
+     agent.valence, agent.energy, agent.tension, agentMeta?.temperament],
+  );
 
   // per-agent phase offset so they don't all sync
   const phase = useRef(
@@ -358,7 +524,7 @@ export function AgentAvatar({
     if (!groupRef.current) return;
     const t = performance.now() * 0.001;
     const target = new THREE.Vector3(...targetPosition);
-    const speed = behavior === 'fleeing' ? 5 : behavior === 'walking' ? 3.5 : 2.5;
+    const speed = behavior === 'fleeing' ? 5 : behavior === 'walking' ? 3.5 * moveProfile.tempo : 2.5;
     currentPos.current.lerp(target, Math.min(1, delta * speed));
     groupRef.current.position.copy(currentPos.current);
 
@@ -370,6 +536,7 @@ export function AgentAvatar({
         : behavior;
 
     const pose = computePose(effectiveBehavior, t, phase);
+    addMicroGestures(pose, agent, t, phase, moveProfile);
 
     // apply pose to joints
     groupRef.current.position.y = currentPos.current.y + pose.torsoY;
@@ -378,10 +545,14 @@ export function AgentAvatar({
       torsoRef.current.rotation.x = pose.torsoLean;
       torsoRef.current.rotation.y = pose.torsoTwist;
       torsoRef.current.rotation.z = pose.torsoSway;
+      // breathing scale
+      torsoRef.current.scale.y = pose.breathScale;
+      // shoulder tension (raise shoulders)
+      torsoRef.current.position.y = pose.shoulderTense;
     }
     if (headRef.current) {
       headRef.current.rotation.x = pose.headNod;
-      headRef.current.rotation.y = pose.headTurn;
+      headRef.current.rotation.y = pose.headTurn + pose.headShake;
       headRef.current.rotation.z = pose.headTilt;
     }
     if (lUpperArm.current) {
@@ -401,11 +572,18 @@ export function AgentAvatar({
     if (rUpperLeg.current) rUpperLeg.current.rotation.x = pose.rHipX;
     if (rLowerLeg.current) rLowerLeg.current.rotation.x = pose.rKneeX;
 
-    // face partner during interactions
-    if (interactionPartner && torsoRef.current) {
-      // gentle turn toward partner would need partner pos;
-      // for now slight extra twist toward interaction
-      torsoRef.current.rotation.y += Math.sin(t * 2) * 0.04;
+    // Face toward interaction partner
+    if (partnerPosition && groupRef.current) {
+      const dx = partnerPosition[0] - currentPos.current.x;
+      const dz = partnerPosition[2] - currentPos.current.z;
+      const targetAngle = Math.atan2(dx, dz);
+      // Smooth rotation toward partner
+      const currentY = groupRef.current.rotation.y;
+      let diff = targetAngle - currentY;
+      // Normalize to [-PI, PI]
+      while (diff > Math.PI) diff -= Math.PI * 2;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      groupRef.current.rotation.y += diff * 0.08;
     }
   });
 
@@ -430,26 +608,26 @@ export function AgentAvatar({
       {/* ─── articulated body ─── */}
       {/* hierarchy: root → torso → (head, arms, legs) */}
       <group ref={torsoRef}>
-        {/* TORSO */}
+        {/* TORSO — shirt color with emotional emissive tint */}
         <mesh position={[0, 0.95, 0]} castShadow>
-          <capsuleGeometry args={[0.2, 0.55, 4, 8]} />
+          <capsuleGeometry args={[0.2 * look.bulk, 0.55 * look.height, 4, 8]} />
           <meshStandardMaterial
-            color={emotionColor} roughness={0.55} metalness={0.05}
+            color={look.shirt} roughness={0.55} metalness={0.05}
             emissive={emotionColor}
-            emissiveIntensity={isSelected ? 0.25 : agent.arousal > 0.6 ? 0.12 : 0.03}
+            emissiveIntensity={isSelected ? 0.25 : agent.arousal > 0.6 ? 0.15 : 0.04}
           />
         </mesh>
         {/* NECK */}
         <mesh position={[0, 1.32, 0]}>
           <cylinderGeometry args={[0.06, 0.08, 0.12, 6]} />
-          <meshStandardMaterial color={SKIN} roughness={0.7} />
+          <meshStandardMaterial color={look.skin} roughness={0.7} />
         </mesh>
 
         {/* HEAD */}
         <group ref={headRef} position={[0, 1.48, 0]}>
           <mesh castShadow>
             <sphereGeometry args={[0.2, 14, 10]} />
-            <meshStandardMaterial color={SKIN} roughness={0.65} />
+            <meshStandardMaterial color={look.skin} roughness={0.65} />
           </mesh>
           {/* eyes */}
           <mesh position={[-0.07, 0.04, 0.17]}>
@@ -460,33 +638,69 @@ export function AgentAvatar({
             <sphereGeometry args={[0.03, 6, 6]} />
             <meshStandardMaterial color="#1e293b" />
           </mesh>
-          {/* hair */}
-          <mesh position={[0, 0.1, -0.02]} castShadow>
-            <sphereGeometry args={[0.19, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.55]} />
-            <meshStandardMaterial color="#3d2b1f" roughness={0.9} />
-          </mesh>
+          {/* hair — varies by style */}
+          {look.hairStyle === 'short' && (
+            <mesh position={[0, 0.1, -0.02]} castShadow>
+              <sphereGeometry args={[0.2, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.45]} />
+              <meshStandardMaterial color={look.hair} roughness={0.9} />
+            </mesh>
+          )}
+          {look.hairStyle === 'medium' && (
+            <mesh position={[0, 0.08, -0.02]} castShadow>
+              <sphereGeometry args={[0.21, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
+              <meshStandardMaterial color={look.hair} roughness={0.85} />
+            </mesh>
+          )}
+          {look.hairStyle === 'long' && (
+            <group>
+              <mesh position={[0, 0.08, -0.02]} castShadow>
+                <sphereGeometry args={[0.21, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
+                <meshStandardMaterial color={look.hair} roughness={0.85} />
+              </mesh>
+              {/* back hair hanging down */}
+              <mesh position={[0, -0.08, -0.12]} castShadow>
+                <capsuleGeometry args={[0.12, 0.2, 4, 6]} />
+                <meshStandardMaterial color={look.hair} roughness={0.85} />
+              </mesh>
+            </group>
+          )}
+          {look.hairStyle === 'mohawk' && (
+            <mesh position={[0, 0.18, 0]} castShadow>
+              <boxGeometry args={[0.04, 0.15, 0.22]} />
+              <meshStandardMaterial color={look.hair} roughness={0.8} />
+            </mesh>
+          )}
+          {/* bald = no hair mesh */}
         </group>
 
         {/* ─── LEFT ARM ─── */}
         <group ref={lUpperArm} position={[-0.32, 1.18, 0]}>
           <mesh position={[0, -0.17, 0]} castShadow>
             <capsuleGeometry args={[0.065, 0.22, 4, 6]} />
-            <meshStandardMaterial color={emotionColor} roughness={0.6} />
+            <meshStandardMaterial color={look.shirt} roughness={0.6} />
           </mesh>
           <group ref={lForearm} position={[0, -0.35, 0]}>
             <mesh position={[0, -0.14, 0]} castShadow>
               <capsuleGeometry args={[0.055, 0.2, 4, 6]} />
-              <meshStandardMaterial color={SKIN_DARK} roughness={0.65} />
+              <meshStandardMaterial color={look.skinDark} roughness={0.65} />
             </mesh>
             <group ref={lHand} position={[0, -0.3, 0]}>
+              {/* palm */}
               <mesh castShadow>
-                <boxGeometry args={[0.08, 0.1, 0.05]} />
-                <meshStandardMaterial color={SKIN} roughness={0.7} />
+                <boxGeometry args={[0.09, 0.08, 0.05]} />
+                <meshStandardMaterial color={look.skin} roughness={0.7} />
               </mesh>
-              {/* fingers hint */}
-              <mesh position={[0, -0.06, 0]}>
-                <boxGeometry args={[0.07, 0.05, 0.04]} />
-                <meshStandardMaterial color={SKIN} roughness={0.7} />
+              {/* fingers — 4 individual digits */}
+              {[-0.03, -0.01, 0.01, 0.03].map((fx, fi) => (
+                <mesh key={`lf${fi}`} position={[fx, -0.07, 0]}>
+                  <boxGeometry args={[0.015, 0.05, 0.015]} />
+                  <meshStandardMaterial color={look.skin} roughness={0.7} />
+                </mesh>
+              ))}
+              {/* thumb */}
+              <mesh position={[0.045, -0.02, 0.02]} rotation={[0, 0, -0.5]}>
+                <boxGeometry args={[0.015, 0.04, 0.015]} />
+                <meshStandardMaterial color={look.skin} roughness={0.7} />
               </mesh>
             </group>
           </group>
@@ -496,21 +710,27 @@ export function AgentAvatar({
         <group ref={rUpperArm} position={[0.32, 1.18, 0]}>
           <mesh position={[0, -0.17, 0]} castShadow>
             <capsuleGeometry args={[0.065, 0.22, 4, 6]} />
-            <meshStandardMaterial color={emotionColor} roughness={0.6} />
+            <meshStandardMaterial color={look.shirt} roughness={0.6} />
           </mesh>
           <group ref={rForearm} position={[0, -0.35, 0]}>
             <mesh position={[0, -0.14, 0]} castShadow>
               <capsuleGeometry args={[0.055, 0.2, 4, 6]} />
-              <meshStandardMaterial color={SKIN_DARK} roughness={0.65} />
+              <meshStandardMaterial color={look.skinDark} roughness={0.65} />
             </mesh>
             <group ref={rHand} position={[0, -0.3, 0]}>
               <mesh castShadow>
-                <boxGeometry args={[0.08, 0.1, 0.05]} />
-                <meshStandardMaterial color={SKIN} roughness={0.7} />
+                <boxGeometry args={[0.09, 0.08, 0.05]} />
+                <meshStandardMaterial color={look.skin} roughness={0.7} />
               </mesh>
-              <mesh position={[0, -0.06, 0]}>
-                <boxGeometry args={[0.07, 0.05, 0.04]} />
-                <meshStandardMaterial color={SKIN} roughness={0.7} />
+              {[-0.03, -0.01, 0.01, 0.03].map((fx, fi) => (
+                <mesh key={`rf${fi}`} position={[fx, -0.07, 0]}>
+                  <boxGeometry args={[0.015, 0.05, 0.015]} />
+                  <meshStandardMaterial color={look.skin} roughness={0.7} />
+                </mesh>
+              ))}
+              <mesh position={[-0.045, -0.02, 0.02]} rotation={[0, 0, 0.5]}>
+                <boxGeometry args={[0.015, 0.04, 0.015]} />
+                <meshStandardMaterial color={look.skin} roughness={0.7} />
               </mesh>
             </group>
           </group>
@@ -519,24 +739,24 @@ export function AgentAvatar({
         {/* HIPS */}
         <mesh position={[0, 0.6, 0]}>
           <boxGeometry args={[0.32, 0.12, 0.18]} />
-          <meshStandardMaterial color={PANTS} roughness={0.8} />
+          <meshStandardMaterial color={look.pants} roughness={0.8} />
         </mesh>
 
         {/* ─── LEFT LEG ─── */}
         <group ref={lUpperLeg} position={[-0.1, 0.55, 0]}>
           <mesh position={[0, -0.2, 0]} castShadow>
             <capsuleGeometry args={[0.085, 0.25, 4, 6]} />
-            <meshStandardMaterial color={PANTS} roughness={0.8} />
+            <meshStandardMaterial color={look.pants} roughness={0.8} />
           </mesh>
           <group ref={lLowerLeg} position={[0, -0.42, 0]}>
             <mesh position={[0, -0.17, 0]} castShadow>
               <capsuleGeometry args={[0.07, 0.22, 4, 6]} />
-              <meshStandardMaterial color={PANTS} roughness={0.8} />
+              <meshStandardMaterial color={look.pants} roughness={0.8} />
             </mesh>
             {/* shoe */}
             <mesh position={[0, -0.35, 0.04]} castShadow>
               <boxGeometry args={[0.1, 0.06, 0.16]} />
-              <meshStandardMaterial color={SHOE} roughness={0.9} />
+              <meshStandardMaterial color={look.shoes} roughness={0.9} />
             </mesh>
           </group>
         </group>
@@ -545,20 +765,23 @@ export function AgentAvatar({
         <group ref={rUpperLeg} position={[0.1, 0.55, 0]}>
           <mesh position={[0, -0.2, 0]} castShadow>
             <capsuleGeometry args={[0.085, 0.25, 4, 6]} />
-            <meshStandardMaterial color={PANTS} roughness={0.8} />
+            <meshStandardMaterial color={look.pants} roughness={0.8} />
           </mesh>
           <group ref={rLowerLeg} position={[0, -0.42, 0]}>
             <mesh position={[0, -0.17, 0]} castShadow>
               <capsuleGeometry args={[0.07, 0.22, 4, 6]} />
-              <meshStandardMaterial color={PANTS} roughness={0.8} />
+              <meshStandardMaterial color={look.pants} roughness={0.8} />
             </mesh>
             <mesh position={[0, -0.35, 0.04]} castShadow>
               <boxGeometry args={[0.1, 0.06, 0.16]} />
-              <meshStandardMaterial color={SHOE} roughness={0.9} />
+              <meshStandardMaterial color={look.shoes} roughness={0.9} />
             </mesh>
           </group>
         </group>
       </group>
+
+      {/* Activity prop (desk, TV, phone, beer, etc.) */}
+      <ActivityProp prop={activity.prop} sub={activity.sub} />
 
       {/* vulnerability glow */}
       {agent.vulnerability > 0.45 && (
@@ -580,7 +803,7 @@ export function AgentAvatar({
       )}
       {isHovered && !isSelected && (
         <Html position={[0, 2.2, 0]} center distanceFactor={15} style={{ pointerEvents: 'none' }}>
-          <HoverTooltip agent={agent} />
+          <HoverTooltip agent={agent} activityLabel={activity.label} />
         </Html>
       )}
       {interactionPartner && (
@@ -626,18 +849,18 @@ function ConflictVFX({ color }: { color: string }) {
 }
 
 // ─── UI bubbles ──────────────────────────────────────────────
-function HoverTooltip({ agent }: { agent: AgentState }) {
+function HoverTooltip({ agent, activityLabel }: { agent: AgentState; activityLabel: string }) {
   const ec = getEmotionColor(agent.valence, agent.arousal, agent.vulnerability);
   return (
-    <div style={{ background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(8px)', borderRadius: 8, padding: '6px 10px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', fontSize: 11, fontFamily: 'Inter, system-ui', color: '#1a1a2e', whiteSpace: 'nowrap', lineHeight: 1.4, minWidth: 130 }}>
+    <div style={{ background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(8px)', borderRadius: 8, padding: '6px 10px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', fontSize: 11, fontFamily: 'Inter, system-ui', color: '#1a1a2e', lineHeight: 1.4, minWidth: 130, maxWidth: 200 }}>
       <div style={{ fontWeight: 600, fontSize: 12 }}>{agent.name}</div>
-      <div style={{ color: '#64748b', fontSize: 10 }}>{agent.action.replace(/_/g, ' ')} at {agent.location}</div>
+      <div style={{ color: '#475569', fontSize: 10 }}>{activityLabel}</div>
       <div style={{ marginTop: 2, display: 'flex', gap: 6, fontSize: 10 }}>
         <span style={{ color: ec }}>{agent.surface}</span>
         {agent.divergence > 0.2 && <span style={{ color: '#94a3b8' }}>(actually {agent.internal})</span>}
       </div>
       <div style={{ marginTop: 3, fontSize: 9, color: '#94a3b8', fontStyle: 'italic' }}>
-        {truncate(agent.primary_concern, 45)}
+        {truncate(agent.primary_concern, 50)}
       </div>
     </div>
   );

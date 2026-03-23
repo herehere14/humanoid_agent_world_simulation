@@ -210,6 +210,15 @@ def _agent_export(world: World, agent_id: str, agent_meta: dict[str, dict]) -> d
         "role": agent_meta.get(agent_id, {}).get("role", "unknown"),
         "location": agent.location,
         "action": agent.last_action,
+        "llm_salience": round(agent.llm_salience, 3),
+        "llm_salience_level": agent.llm_salience_level,
+        "llm_active": agent.llm_active,
+        "llm_candidate_rank": agent.llm_candidate_rank,
+        "llm_salience_reasons": list(agent.llm_salience_reasons),
+        "llm_salience_factors": {
+            key: round(value, 3) for key, value in agent.llm_salience_factors.items()
+        },
+        "llm_packet_preview": agent.llm_packet_preview,
         "heart": {
             "arousal": round(agent.heart.arousal, 3),
             "valence": round(agent.heart.valence, 3),
@@ -290,6 +299,7 @@ def run_diagnostic(
     llm_samples: int,
     llm_model: str,
     scenario: str,
+    external_information: list[str] | None = None,
 ) -> dict:
     if scenario not in SCENARIO_BUILDERS:
         raise ValueError(f"Unknown scenario: {scenario}")
@@ -321,6 +331,9 @@ def run_diagnostic(
     world.initialize()
     event_engine = DynamicEventEngine()
     world.event_engine = event_engine  # expose for reporting helpers
+    injected_signals = []
+    for info in external_information or []:
+        injected_signals.append(world.ingest_information(info))
 
     total_ticks = days * 24
     start = time.time()
@@ -555,6 +568,8 @@ def run_diagnostic(
         "meta": {
             "scenario": scenario,
             "scenario_label": SCENARIO_LABELS.get(scenario, scenario),
+            "external_information": list(external_information or []),
+            "injected_signals": injected_signals,
             "days": days,
             "ticks": total_ticks,
             "runtime_seconds": round(elapsed, 2),
@@ -727,6 +742,40 @@ def run_diagnostic(
     for item in lacks:
         lines.append(f"- {item}")
 
+    # Add macro metrics to report
+    macro_summary = world.get_macro_summary()
+    shock_impact = world.get_shock_impact_report()
+    info_spread = world.get_info_spread_report()
+
+    report["macro_summary"] = macro_summary
+    report["shock_impact"] = shock_impact
+    report["info_spread"] = info_spread
+
+    # Add macro section to markdown
+    lines.append("")
+    lines.append("## Macro Outcomes")
+    if "current" in macro_summary:
+        current = macro_summary["current"]
+        deltas = macro_summary.get("deltas", {})
+        lines.append(f"- Consumer Confidence: {current.get('consumer_confidence', 0):.3f} (delta: {deltas.get('consumer_confidence', 0):+.4f})")
+        lines.append(f"- Social Cohesion: {current.get('social_cohesion', 0):.3f} (delta: {deltas.get('social_cohesion', 0):+.4f})")
+        lines.append(f"- Institutional Trust: {current.get('institutional_trust', 0):.3f} (delta: {deltas.get('institutional_trust', 0):+.4f})")
+        lines.append(f"- Civil Unrest Potential: {current.get('civil_unrest_potential', 0):.3f} (delta: {deltas.get('civil_unrest_potential', 0):+.4f})")
+        lines.append(f"- Market Pressure: {current.get('market_pressure', 0):.3f} (delta: {deltas.get('market_pressure', 0):+.4f})")
+        lines.append(f"- Population Mood: {current.get('population_mood', 0):+.3f} (delta: {deltas.get('population_mood', 0):+.4f})")
+        awareness = current.get("information_awareness", {})
+        if awareness:
+            lines.append("- Information Awareness:")
+            for label, pct in awareness.items():
+                lines.append(f"  - {label}: {pct * 100:.1f}% of population")
+
+    if "impact" in shock_impact:
+        lines.append("")
+        lines.append("### Shock Impact Analysis")
+        lines.append(f"- Shock onset: {shock_impact.get('shock_onset_time', 'unknown')}")
+        for metric, vals in shock_impact["impact"].items():
+            lines.append(f"- {metric}: {vals['pre']:.3f} → {vals['post']:.3f} ({vals['pct_change']:+.1f}%)")
+
     output_md_path = Path(output_md)
     output_json_path = Path(output_json)
     output_md_path.parent.mkdir(parents=True, exist_ok=True)
@@ -750,6 +799,7 @@ def main() -> None:
     )
     parser.add_argument("--llm-samples", type=int, default=20)
     parser.add_argument("--llm-model", default="gpt-5-mini")
+    parser.add_argument("--inject", action="append", default=[], help="External information shock to inject before the run")
     args = parser.parse_args()
 
     report = run_diagnostic(
@@ -759,6 +809,7 @@ def main() -> None:
         llm_samples=args.llm_samples,
         llm_model=args.llm_model,
         scenario=args.scenario,
+        external_information=args.inject,
     )
 
     print(f"\n{'=' * 78}")
