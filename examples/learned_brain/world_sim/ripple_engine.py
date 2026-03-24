@@ -254,20 +254,23 @@ class RippleEngine:
 
             resolution.chains_started += 1
 
-            # --- Manager/employer under pressure → cuts workers ---
+            # --- Manager/employer under pressure → cuts worker income ---
             if role in ("manager", "office_professional") and debt_spike > 0.06:
                 employees = [l for l in dependents if l.link_type == "employs"]
                 if employees:
-                    # Pick 1-3 workers to affect
                     targets = self.rng.sample(employees, min(3, len(employees)))
                     for link in targets:
                         if link.to_id not in world.agents:
                             continue
                         target = world.agents[link.to_id]
-                        income_cut = debt_spike * 0.4 * link.strength
-                        target.debt_pressure = _clamp(target.debt_pressure + income_cut)
-                        target.heart.tension = _clamp(target.heart.tension + income_cut * 0.3)
-                        affected_ids.add(link.to_id)
+                        # Reduce income (not additive debt) — cuts don't stack infinitely
+                        if target.income_level > 0.15:
+                            income_cut = min(0.1, target.income_level * 0.15 * link.strength)
+                            target.income_level = max(0.1, target.income_level - income_cut)
+                            debt_bump = income_cut * 0.25
+                            target.debt_pressure = _clamp(target.debt_pressure + debt_bump)
+                            target.heart.tension = _clamp(target.heart.tension + debt_bump * 0.3)
+                            affected_ids.add(link.to_id)
 
                         event = RippleEvent(
                             tick=tick,
@@ -290,13 +293,13 @@ class RippleEngine:
             if role == "market_vendor" and debt_spike > 0.05:
                 customers = [l for l in dependents if l.link_type == "supplies"]
                 if customers:
-                    price_hike = debt_spike * 0.3
+                    price_hike = debt_spike * 0.15  # reduced from 0.3 — prices don't double overnight
                     targets = self.rng.sample(customers, min(6, len(customers)))
                     for link in targets:
                         if link.to_id not in world.agents:
                             continue
                         target = world.agents[link.to_id]
-                        cost_increase = price_hike * link.strength * 0.5
+                        cost_increase = price_hike * link.strength * 0.3  # reduced from 0.5
                         target.debt_pressure = _clamp(target.debt_pressure + cost_increase)
                         affected_ids.add(link.to_id)
 

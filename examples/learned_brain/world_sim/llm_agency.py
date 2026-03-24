@@ -319,15 +319,18 @@ def _apply_decision(
 
     if decision.decision == "CUT_WORKERS":
         employees = [l for l in dependents if l.link_type == "employs"]
-        n_cut = max(1, int(len(employees) * mag * 0.4))
+        # Only lay off employed workers
+        employed_links = [l for l in employees if l.to_id in world.agents and world.agents[l.to_id].employed]
+        n_cut = max(1, int(len(employed_links) * mag * 0.3))
         import random
-        targets = random.sample(employees, min(n_cut, len(employees)))
+        targets = random.sample(employed_links, min(n_cut, len(employed_links))) if employed_links else []
         for link in targets:
-            if link.to_id not in world.agents: continue
             target = world.agents[link.to_id]
-            target.debt_pressure = _clamp(target.debt_pressure + 0.25 * mag)
-            target.dread_pressure = _clamp(target.dread_pressure + 0.1 * mag)
-            target.heart.wounds.append((0.06 * mag, 0.995))
+            target.employed = False
+            target.income_level = 0.05  # near zero income
+            target.debt_pressure = _clamp(target.debt_pressure + 0.12 * mag)
+            target.dread_pressure = _clamp(target.dread_pressure + 0.08 * mag)
+            target.heart.wounds.append((0.04 * mag, 0.995))
             target.add_memory(tick, f"{agent.personality.name} laid me off — income gone")
             events.append(RippleEvent(
                 tick=tick, actor_id=agent.agent_id, actor_name=agent.personality.name,
@@ -347,23 +350,31 @@ def _apply_decision(
         for link in employees:
             if link.to_id not in world.agents: continue
             target = world.agents[link.to_id]
-            cut = 0.08 * mag
-            target.debt_pressure = _clamp(target.debt_pressure + cut)
-            target.add_memory(tick, f"{agent.personality.name} cut hours — paycheck shrinking")
-            events.append(RippleEvent(
-                tick=tick, actor_id=agent.agent_id, actor_name=agent.personality.name,
-                target_id=link.to_id, target_name=target.personality.name,
-                action=f"cut hours (LLM decision)",
-                consequence=f"reduced income, debt+{cut:.3f}",
-                mechanism="LLM:employs", debt_delta=cut,
-            ))
+            # Only apply if not already at reduced income
+            # CUT_HOURS reduces income_level, which creates ONGOING lower recovery
+            # instead of additive debt stacking every tick
+            if target.income_level > 0.15:
+                income_cut = min(0.15, target.income_level * 0.2 * mag)
+                target.income_level = max(0.1, target.income_level - income_cut)
+                # Small one-time debt bump (missed income this period)
+                debt_bump = income_cut * 0.3
+                target.debt_pressure = _clamp(target.debt_pressure + debt_bump)
+                target.add_memory(tick, f"{agent.personality.name} cut hours — paycheck shrinking")
+                events.append(RippleEvent(
+                    tick=tick, actor_id=agent.agent_id, actor_name=agent.personality.name,
+                    target_id=link.to_id, target_name=target.personality.name,
+                    action=f"cut hours (LLM decision)",
+                    consequence=f"income reduced {income_cut:.2f}, debt+{debt_bump:.3f}",
+                    mechanism="LLM:employs", debt_delta=debt_bump,
+                ))
 
     elif decision.decision == "RAISE_PRICES":
         customers = [l for l in dependents if l.link_type == "supplies"]
         for link in customers:
             if link.to_id not in world.agents: continue
             target = world.agents[link.to_id]
-            hike = 0.04 * mag * link.strength
+            # Realistic price hike: 2-5% cost increase, not 4-8%
+            hike = 0.015 * mag * link.strength
             target.debt_pressure = _clamp(target.debt_pressure + hike)
             target.add_memory(tick, f"Prices up at {agent.personality.name}'s — costs climbing")
             events.append(RippleEvent(

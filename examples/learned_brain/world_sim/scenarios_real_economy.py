@@ -408,6 +408,9 @@ def build_real_economy(seed: int = 42) -> tuple[World, dict, OrganizationalFabri
                 social_role=social_role,
                 debt_pressure=rng.uniform(0.02, 0.12),
                 ambition=rng.uniform(0.5, 0.9),
+                savings_buffer=rng.uniform(0.5, 0.9),  # executives have good savings
+                credit_access=rng.uniform(0.6, 0.95),
+                income_level=rng.uniform(0.7, 0.95),
             )
 
             world.add_agent(agent)
@@ -446,6 +449,9 @@ def build_real_economy(seed: int = 42) -> tuple[World, dict, OrganizationalFabri
                 schedule=schedule,
                 social_role="office_worker" if org.sector != "retail" else "retail_worker",
                 debt_pressure=rng.uniform(0.05, 0.25),
+                savings_buffer=rng.uniform(0.3, 0.7),
+                credit_access=rng.uniform(0.3, 0.7),
+                income_level=rng.uniform(0.4, 0.7),
             )
             world.add_agent(agent)
             company_agents[org.name].append(emp_id)
@@ -485,6 +491,26 @@ def build_real_economy(seed: int = 42) -> tuple[World, dict, OrganizationalFabri
             for h in range(22, 24):
                 schedule[h] = seg["home"]
 
+            # Savings/credit/income vary by segment (realistic inequality)
+            savings_map = {
+                "tech_worker": (0.4, 0.8), "factory_worker": (0.15, 0.45),
+                "retail_worker": (0.1, 0.35), "healthcare_worker": (0.3, 0.6),
+                "gig_worker": (0.05, 0.25), "student": (0.05, 0.2),
+                "retiree": (0.2, 0.6), "small_business_owner": (0.1, 0.4),
+            }
+            income_map = {
+                "tech_worker": (0.5, 0.8), "factory_worker": (0.3, 0.5),
+                "retail_worker": (0.2, 0.4), "healthcare_worker": (0.4, 0.7),
+                "gig_worker": (0.15, 0.35), "student": (0.1, 0.25),
+                "retiree": (0.2, 0.4), "small_business_owner": (0.3, 0.6),
+            }
+            credit_map = {
+                "tech_worker": (0.5, 0.8), "factory_worker": (0.2, 0.5),
+                "retail_worker": (0.15, 0.4), "healthcare_worker": (0.4, 0.7),
+                "gig_worker": (0.1, 0.3), "student": (0.1, 0.3),
+                "retiree": (0.3, 0.6), "small_business_owner": (0.2, 0.5),
+            }
+            sr = seg["role"]
             agent = WorldAgent(
                 agent_id=agent_id,
                 personality=personality,
@@ -492,6 +518,9 @@ def build_real_economy(seed: int = 42) -> tuple[World, dict, OrganizationalFabri
                 social_role=seg["role"],
                 debt_pressure=rng.uniform(*seg["debt_range"]),
                 ambition=rng.uniform(*seg["ambition_range"]),
+                savings_buffer=rng.uniform(*savings_map.get(sr, (0.2, 0.5))),
+                credit_access=rng.uniform(*credit_map.get(sr, (0.2, 0.5))),
+                income_level=rng.uniform(*income_map.get(sr, (0.3, 0.5))),
             )
             assign_human_profile(personality, seg["role"], rng)
             world.add_agent(agent)

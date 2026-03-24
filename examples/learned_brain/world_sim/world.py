@@ -34,6 +34,7 @@ from .economic_actions import resolve_economic_actions, update_expectations
 from .institutional_actions import resolve_institutional_decisions
 from .persistent_conditions import apply_persistent_conditions, register_persistent_condition
 from .ripple_engine import RippleEngine, build_organizational_fabric
+from .market_model import apply_savings_mechanics
 
 
 @dataclass
@@ -198,6 +199,9 @@ class World:
                 if loc:
                     routine_emb = self.brain.encode(loc.default_activity)
                     update_heart(agent.heart, routine_emb, self.brain, agent.personality)
+
+        # Phase 3a: Savings mechanics — buffers absorb debt before it hurts
+        apply_savings_mechanics(self.agents, self.tick_count)
 
         # Phase 3b: Apply persistent pressure to heart state
         # Agents with high pressure feel ongoing emotional drag.

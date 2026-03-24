@@ -509,10 +509,16 @@ class WorldAgent:
     private_burden: str = ""
     debt_pressure: float = 0.0
     secret_pressure: float = 0.0
-    dread_pressure: float = 0.0  # non-economic persistent stress: health fear, existential threat, moral injury
+    dread_pressure: float = 0.0  # non-economic persistent stress
     expectation_pessimism: float = 0.0  # forward-looking: 0 = optimistic, 1 = expects disaster
     _prev_total_pressure: float = 0.0  # used by expectations update
     ambition: float = 0.0
+    # Economic buffers — prevent instant unemployment cascade
+    savings_buffer: float = 0.5  # 0 = broke, 1 = flush. Absorbs debt_pressure before it hurts.
+    credit_access: float = 0.5   # 0 = no credit, 1 = full access. Second line of defense.
+    income_level: float = 0.5    # 0 = no income, 1 = high income. Determines recovery rate.
+    employed: bool = True         # explicit employment status (not just debt proxy)
+    _econ_baseline_pressure: float | None = None  # used by economic actions
     llm_salience: float = 0.0
     llm_salience_level: str = "low"
     llm_active: bool = False
