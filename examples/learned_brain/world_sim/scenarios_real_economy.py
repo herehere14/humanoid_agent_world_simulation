@@ -576,6 +576,11 @@ def build_real_economy(seed: int = 42) -> tuple[World, dict, OrganizationalFabri
     # Seed basic relationships
     _seed_basic_relationships(world, company_agents, rng)
 
+    # Apply calibrated savings distribution (research-based)
+    from .calibrated_economy import calibrate_agent_savings
+    for agent in world.agents.values():
+        calibrate_agent_savings(agent, rng)
+
     return world, agent_meta, fabric
 
 

@@ -35,6 +35,7 @@ from .institutional_actions import resolve_institutional_decisions
 from .persistent_conditions import apply_persistent_conditions, register_persistent_condition
 from .ripple_engine import RippleEngine, build_organizational_fabric
 from .market_model import apply_savings_mechanics
+from .calibrated_economy import calibrated_economic_tick, apply_spending_behavior
 
 
 @dataclass
@@ -101,6 +102,13 @@ class World:
         """Translate external information into town-level effects."""
         plan = interpret_external_information(text, self, start_tick=start_tick)
         result = apply_external_information(self, plan)
+        # Mark shock tick for stimulus timing
+        if not hasattr(self, "_shock_tick") or self._shock_tick == 0:
+            self._shock_tick = self.tick_count
+        # Set price pressure for gradual pass-through
+        if not hasattr(self, "_price_pressure"):
+            self._price_pressure = 0.0
+        self._price_pressure = max(self._price_pressure, plan.severity * 0.3)
         # Register persistent condition so it stays active every tick
         register_persistent_condition(self, plan.kind, plan.severity)
         # Register with info propagation engine so it spreads through social network
@@ -200,8 +208,10 @@ class World:
                     routine_emb = self.brain.encode(loc.default_activity)
                     update_heart(agent.heart, routine_emb, self.brain, agent.personality)
 
-        # Phase 3a: Savings mechanics — buffers absorb debt before it hurts
-        apply_savings_mechanics(self.agents, self.tick_count)
+        # Phase 3a: Calibrated economic mechanics (savings, UI, re-employment, spending)
+        econ_stats = calibrated_economic_tick(self, self.tick_count)
+        apply_spending_behavior(self.agents, self.tick_count)
+        summary["calibrated_economy"] = econ_stats
 
         # Phase 3b: Apply persistent pressure to heart state
         # Agents with high pressure feel ongoing emotional drag.
