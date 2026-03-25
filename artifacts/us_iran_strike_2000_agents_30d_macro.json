@@ -1,0 +1,4452 @@
+{
+  "military_only": {
+    "meta": {
+      "scenario": "military_only",
+      "agents": 2000,
+      "days": 30,
+      "runtime_seconds": 164.4,
+      "mode": "macro-focused 2000-agent approximation",
+      "shocks": [
+        "US launches airstrikes on Iranian military sites; regional war fears spread and markets fear escalation"
+      ]
+    },
+    "baseline": {
+      "consumer_confidence": 12.743333333333334,
+      "market_pressure": 0.8596666666666667,
+      "unemployment_rate": 0.0,
+      "price_pressure": 0.7828297874475036
+    },
+    "peaks": {
+      "worst_consumer_confidence": {
+        "day": 2,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.885,
+        "institutional_trust": 0.153,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.7814747497590055,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.741,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      "peak_market_pressure": {
+        "day": 4,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.076,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.6765229735081867,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      "peak_unemployment": {
+        "day": 1,
+        "consumer_confidence": 18.23,
+        "market_pressure": 0.802,
+        "institutional_trust": 0.24,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.255,
+        "population_mood": -1.0,
+        "price_pressure": 0.839906902936215,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.704,
+          "white_collar": 0.606,
+          "education": 0.702,
+          "services": 0.692,
+          "public_sector": 0.664,
+          "healthcare": 0.715,
+          "community": 0.762
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      "peak_civil_unrest": {
+        "day": 2,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.885,
+        "institutional_trust": 0.153,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.7814747497590055,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.741,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      "peak_price_pressure": {
+        "day": 1,
+        "consumer_confidence": 18.23,
+        "market_pressure": 0.802,
+        "institutional_trust": 0.24,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.255,
+        "population_mood": -1.0,
+        "price_pressure": 0.839906902936215,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.704,
+          "white_collar": 0.606,
+          "education": 0.702,
+          "services": 0.692,
+          "public_sector": 0.664,
+          "healthcare": 0.715,
+          "community": 0.762
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      }
+    },
+    "final": {
+      "day": 30,
+      "consumer_confidence": 10.0,
+      "market_pressure": 0.893,
+      "institutional_trust": 0.02,
+      "social_cohesion": 0.65,
+      "civil_unrest_potential": 0.295,
+      "population_mood": -1.0,
+      "price_pressure": 0.10376749565669745,
+      "unemployment_rate": 0.0,
+      "sector_unemployment": {
+        "industrial": 0.0,
+        "white_collar": 0.0,
+        "education": 0.0,
+        "services": 0.0,
+        "public_sector": 0.0,
+        "healthcare": 0.0,
+        "community": 0.0
+      },
+      "sector_stress": {
+        "industrial": 0.785,
+        "white_collar": 0.785,
+        "education": 0.785,
+        "services": 0.785,
+        "public_sector": 0.785,
+        "healthcare": 0.785,
+        "community": 0.785
+      },
+      "top_concerns": [
+        [
+          "keep things steady",
+          1.0
+        ]
+      ],
+      "info_awareness": {
+        "Military/nuclear crisis": 1.0
+      }
+    },
+    "final_sector_stress_ranking": [
+      [
+        "industrial",
+        0.785
+      ],
+      [
+        "white_collar",
+        0.785
+      ],
+      [
+        "education",
+        0.785
+      ],
+      [
+        "services",
+        0.785
+      ],
+      [
+        "public_sector",
+        0.785
+      ],
+      [
+        "healthcare",
+        0.785
+      ],
+      [
+        "community",
+        0.785
+      ]
+    ],
+    "final_sector_unemployment_ranking": [
+      [
+        "industrial",
+        0.0
+      ],
+      [
+        "white_collar",
+        0.0
+      ],
+      [
+        "education",
+        0.0
+      ],
+      [
+        "services",
+        0.0
+      ],
+      [
+        "public_sector",
+        0.0
+      ],
+      [
+        "healthcare",
+        0.0
+      ],
+      [
+        "community",
+        0.0
+      ]
+    ],
+    "info_spread": {
+      "active_information": [
+        {
+          "label": "Military/nuclear crisis",
+          "kind": "military_crisis",
+          "origin_tick": 1,
+          "severity": 3.0,
+          "total_aware": 2000,
+          "pct_aware": 1.0,
+          "source_breakdown": {
+            "direct": 2000
+          },
+          "avg_distortion": 0.0
+        }
+      ],
+      "total_agents": 2000
+    },
+    "daily": [
+      {
+        "day": 1,
+        "consumer_confidence": 18.23,
+        "market_pressure": 0.802,
+        "institutional_trust": 0.24,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.255,
+        "population_mood": -1.0,
+        "price_pressure": 0.839906902936215,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.704,
+          "white_collar": 0.606,
+          "education": 0.702,
+          "services": 0.692,
+          "public_sector": 0.664,
+          "healthcare": 0.715,
+          "community": 0.762
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 2,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.885,
+        "institutional_trust": 0.153,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.7814747497590055,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.741,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 3,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.892,
+        "institutional_trust": 0.115,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.7271077096472903,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.782,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 4,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.076,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.6765229735081867,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 5,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.039,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.6294574072201412,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 6,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.5856661828491592,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 7,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.5449215050910429,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 8,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.5070114263147846,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 9,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.47173874404315097,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 10,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.4389199751353222,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 11,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.40838440133543435,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 12,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.3799731812221174,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 13,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.35353852393952506,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 14,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.3289429204117283,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 15,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.30605842804136807,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 16,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.2847660051716785,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 17,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.2649548918498522,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 18,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.2465220336705722,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 19,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.22937154570263374,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 20,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.21341421371008146,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 21,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.1985670300732919,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 22,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.18475276199593185,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 23,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.17189954975167115,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 24,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.15994053288079088,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 25,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.14881350239221705,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 26,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.1384605771617889,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 27,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.12882790284343426,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 28,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.11986537172703282,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 29,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.11152636208571184,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      },
+      {
+        "day": 30,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.10376749565669745,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0
+        }
+      }
+    ]
+  },
+  "oil_only": {
+    "meta": {
+      "scenario": "oil_only",
+      "agents": 2000,
+      "days": 30,
+      "runtime_seconds": 158.3,
+      "mode": "macro-focused 2000-agent approximation",
+      "shocks": [
+        "Oil prices surge 60% as fears of Strait of Hormuz disruption spread"
+      ]
+    },
+    "baseline": {
+      "consumer_confidence": 34.30733333333333,
+      "market_pressure": 0.6883333333333334,
+      "unemployment_rate": 0.0,
+      "price_pressure": 0.7306411349510036
+    },
+    "peaks": {
+      "worst_consumer_confidence": {
+        "day": 14,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.858,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.3070133923842797,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.719,
+          "white_collar": 0.709,
+          "education": 0.713,
+          "services": 0.719,
+          "public_sector": 0.708,
+          "healthcare": 0.709,
+          "community": 0.719
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      "peak_market_pressure": {
+        "day": 22,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.1724359111962031,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      "peak_unemployment": {
+        "day": 1,
+        "consumer_confidence": 53.738,
+        "market_pressure": 0.46,
+        "institutional_trust": 0.421,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.122,
+        "population_mood": -0.401,
+        "price_pressure": 0.7839131094071342,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.432,
+          "white_collar": 0.228,
+          "education": 0.257,
+          "services": 0.43,
+          "public_sector": 0.132,
+          "healthcare": 0.185,
+          "community": 0.398
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      "peak_civil_unrest": {
+        "day": 2,
+        "consumer_confidence": 26.839,
+        "market_pressure": 0.8,
+        "institutional_trust": 0.18,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -0.917,
+        "price_pressure": 0.7293764331084053,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.604,
+          "white_collar": 0.594,
+          "education": 0.598,
+          "services": 0.604,
+          "public_sector": 0.593,
+          "healthcare": 0.593,
+          "community": 0.604
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      "peak_price_pressure": {
+        "day": 1,
+        "consumer_confidence": 53.738,
+        "market_pressure": 0.46,
+        "institutional_trust": 0.421,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.122,
+        "population_mood": -0.401,
+        "price_pressure": 0.7839131094071342,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.432,
+          "white_collar": 0.228,
+          "education": 0.257,
+          "services": 0.43,
+          "public_sector": 0.132,
+          "healthcare": 0.185,
+          "community": 0.398
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      }
+    },
+    "final": {
+      "day": 30,
+      "consumer_confidence": 10.0,
+      "market_pressure": 0.891,
+      "institutional_trust": 0.02,
+      "social_cohesion": 0.65,
+      "civil_unrest_potential": 0.295,
+      "population_mood": -1.0,
+      "price_pressure": 0.09684966261291775,
+      "unemployment_rate": 0.0,
+      "sector_unemployment": {
+        "industrial": 0.0,
+        "white_collar": 0.0,
+        "education": 0.0,
+        "services": 0.0,
+        "public_sector": 0.0,
+        "healthcare": 0.0,
+        "community": 0.0
+      },
+      "sector_stress": {
+        "industrial": 0.783,
+        "white_collar": 0.784,
+        "education": 0.784,
+        "services": 0.784,
+        "public_sector": 0.784,
+        "healthcare": 0.785,
+        "community": 0.784
+      },
+      "top_concerns": [
+        [
+          "keep things steady",
+          1.0
+        ]
+      ],
+      "info_awareness": {
+        "Oil price surge": 1.0
+      }
+    },
+    "final_sector_stress_ranking": [
+      [
+        "healthcare",
+        0.785
+      ],
+      [
+        "white_collar",
+        0.784
+      ],
+      [
+        "education",
+        0.784
+      ],
+      [
+        "services",
+        0.784
+      ],
+      [
+        "public_sector",
+        0.784
+      ],
+      [
+        "community",
+        0.784
+      ],
+      [
+        "industrial",
+        0.783
+      ]
+    ],
+    "final_sector_unemployment_ranking": [
+      [
+        "industrial",
+        0.0
+      ],
+      [
+        "white_collar",
+        0.0
+      ],
+      [
+        "education",
+        0.0
+      ],
+      [
+        "services",
+        0.0
+      ],
+      [
+        "public_sector",
+        0.0
+      ],
+      [
+        "healthcare",
+        0.0
+      ],
+      [
+        "community",
+        0.0
+      ]
+    ],
+    "info_spread": {
+      "active_information": [
+        {
+          "label": "Oil price surge",
+          "kind": "oil_price_surge",
+          "origin_tick": 1,
+          "severity": 2.8,
+          "total_aware": 2000,
+          "pct_aware": 1.0,
+          "source_breakdown": {
+            "direct": 2000
+          },
+          "avg_distortion": 0.0
+        }
+      ],
+      "total_agents": 2000
+    },
+    "daily": [
+      {
+        "day": 1,
+        "consumer_confidence": 53.738,
+        "market_pressure": 0.46,
+        "institutional_trust": 0.421,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.122,
+        "population_mood": -0.401,
+        "price_pressure": 0.7839131094071342,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.432,
+          "white_collar": 0.228,
+          "education": 0.257,
+          "services": 0.43,
+          "public_sector": 0.132,
+          "healthcare": 0.185,
+          "community": 0.398
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 2,
+        "consumer_confidence": 26.839,
+        "market_pressure": 0.8,
+        "institutional_trust": 0.18,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -0.917,
+        "price_pressure": 0.7293764331084053,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.604,
+          "white_collar": 0.594,
+          "education": 0.598,
+          "services": 0.604,
+          "public_sector": 0.593,
+          "healthcare": 0.593,
+          "community": 0.604
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 3,
+        "consumer_confidence": 22.345,
+        "market_pressure": 0.805,
+        "institutional_trust": 0.142,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -0.977,
+        "price_pressure": 0.6786338623374711,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.613,
+          "white_collar": 0.603,
+          "education": 0.607,
+          "services": 0.613,
+          "public_sector": 0.603,
+          "healthcare": 0.603,
+          "community": 0.613
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 4,
+        "consumer_confidence": 18.713,
+        "market_pressure": 0.81,
+        "institutional_trust": 0.103,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.6314214419409742,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.623,
+          "white_collar": 0.613,
+          "education": 0.617,
+          "services": 0.623,
+          "public_sector": 0.612,
+          "healthcare": 0.613,
+          "community": 0.623
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 5,
+        "consumer_confidence": 16.953,
+        "market_pressure": 0.815,
+        "institutional_trust": 0.065,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.5874935800721313,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.633,
+          "white_collar": 0.623,
+          "education": 0.627,
+          "services": 0.633,
+          "public_sector": 0.622,
+          "healthcare": 0.622,
+          "community": 0.632
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 6,
+        "consumer_confidence": 15.741,
+        "market_pressure": 0.819,
+        "institutional_trust": 0.026,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.546621770659215,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.642,
+          "white_collar": 0.632,
+          "education": 0.636,
+          "services": 0.642,
+          "public_sector": 0.632,
+          "healthcare": 0.632,
+          "community": 0.642
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 7,
+        "consumer_confidence": 15.067,
+        "market_pressure": 0.824,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.5085934047516398,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.652,
+          "white_collar": 0.642,
+          "education": 0.646,
+          "services": 0.652,
+          "public_sector": 0.641,
+          "healthcare": 0.641,
+          "community": 0.652
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 8,
+        "consumer_confidence": 14.258,
+        "market_pressure": 0.829,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.4732106645604652,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.661,
+          "white_collar": 0.651,
+          "education": 0.655,
+          "services": 0.661,
+          "public_sector": 0.651,
+          "healthcare": 0.651,
+          "community": 0.661
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 9,
+        "consumer_confidence": 13.458,
+        "market_pressure": 0.834,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.44028949444027393,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.671,
+          "white_collar": 0.661,
+          "education": 0.665,
+          "services": 0.671,
+          "public_sector": 0.66,
+          "healthcare": 0.661,
+          "community": 0.671
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 10,
+        "consumer_confidence": 12.662,
+        "market_pressure": 0.839,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.4096586434596339,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.681,
+          "white_collar": 0.671,
+          "education": 0.675,
+          "services": 0.681,
+          "public_sector": 0.67,
+          "healthcare": 0.67,
+          "community": 0.68
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 11,
+        "consumer_confidence": 11.868,
+        "market_pressure": 0.843,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.3811587745797385,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.69,
+          "white_collar": 0.68,
+          "education": 0.684,
+          "services": 0.69,
+          "public_sector": 0.68,
+          "healthcare": 0.68,
+          "community": 0.69
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 12,
+        "consumer_confidence": 11.074,
+        "market_pressure": 0.848,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.35464163580730934,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.7,
+          "white_collar": 0.69,
+          "education": 0.694,
+          "services": 0.7,
+          "public_sector": 0.689,
+          "healthcare": 0.689,
+          "community": 0.7
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 13,
+        "consumer_confidence": 10.38,
+        "market_pressure": 0.853,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.32996928901022327,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.709,
+          "white_collar": 0.699,
+          "education": 0.703,
+          "services": 0.709,
+          "public_sector": 0.699,
+          "healthcare": 0.699,
+          "community": 0.709
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 14,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.858,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.3070133923842797,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.719,
+          "white_collar": 0.709,
+          "education": 0.713,
+          "services": 0.719,
+          "public_sector": 0.708,
+          "healthcare": 0.709,
+          "community": 0.719
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 15,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.863,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.28565453283861025,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.729,
+          "white_collar": 0.719,
+          "education": 0.723,
+          "services": 0.729,
+          "public_sector": 0.718,
+          "healthcare": 0.718,
+          "community": 0.728
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 16,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.867,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.2657816048269,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.738,
+          "white_collar": 0.728,
+          "education": 0.732,
+          "services": 0.738,
+          "public_sector": 0.728,
+          "healthcare": 0.728,
+          "community": 0.738
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 17,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.872,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.2472912323931955,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.748,
+          "white_collar": 0.738,
+          "education": 0.742,
+          "services": 0.748,
+          "public_sector": 0.737,
+          "healthcare": 0.737,
+          "community": 0.748
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 18,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.877,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.23008723142586748,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.757,
+          "white_collar": 0.747,
+          "education": 0.751,
+          "services": 0.757,
+          "public_sector": 0.747,
+          "healthcare": 0.747,
+          "community": 0.757
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 19,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.882,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.21408010932245816,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.767,
+          "white_collar": 0.757,
+          "education": 0.761,
+          "services": 0.767,
+          "public_sector": 0.756,
+          "healthcare": 0.757,
+          "community": 0.767
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 20,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.887,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.19918659946274272,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.777,
+          "white_collar": 0.767,
+          "education": 0.771,
+          "services": 0.777,
+          "public_sector": 0.766,
+          "healthcare": 0.766,
+          "community": 0.776
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 21,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.891,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.18532922806840582,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.776,
+          "education": 0.78,
+          "services": 0.785,
+          "public_sector": 0.776,
+          "healthcare": 0.776,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 22,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.1724359111962031,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 23,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.16043957976822648,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 24,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.14927783068873834,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 25,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.13889260223273606,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 26,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.1292298720176699,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 27,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.12023937598720547,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 28,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.892,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.11187434694523075,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 29,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.891,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.10409127127999782,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.784,
+          "white_collar": 0.784,
+          "education": 0.784,
+          "services": 0.784,
+          "public_sector": 0.784,
+          "healthcare": 0.783,
+          "community": 0.784
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 30,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.891,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.09684966261291775,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.783,
+          "white_collar": 0.784,
+          "education": 0.784,
+          "services": 0.784,
+          "public_sector": 0.784,
+          "healthcare": 0.785,
+          "community": 0.784
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Oil price surge": 1.0
+        }
+      }
+    ]
+  },
+  "combined": {
+    "meta": {
+      "scenario": "combined",
+      "agents": 2000,
+      "days": 30,
+      "runtime_seconds": 142.2,
+      "mode": "macro-focused 2000-agent approximation",
+      "shocks": [
+        "US launches airstrikes on Iranian military sites; regional war fears spread and markets fear escalation",
+        "Oil prices surge 60% as fears of Strait of Hormuz disruption spread after US bombing Iran"
+      ]
+    },
+    "baseline": {
+      "consumer_confidence": 10.0,
+      "market_pressure": 0.8806666666666667,
+      "unemployment_rate": 0.0,
+      "price_pressure": 0.7828297874475036
+    },
+    "peaks": {
+      "worst_consumer_confidence": {
+        "day": 1,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.864,
+        "institutional_trust": 0.174,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.839906902936215,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.75,
+          "white_collar": 0.69,
+          "education": 0.75,
+          "services": 0.743,
+          "public_sector": 0.721,
+          "healthcare": 0.753,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      "peak_market_pressure": {
+        "day": 4,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.059,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.6765229735081867,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      "peak_unemployment": {
+        "day": 1,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.864,
+        "institutional_trust": 0.174,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.839906902936215,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.75,
+          "white_collar": 0.69,
+          "education": 0.75,
+          "services": 0.743,
+          "public_sector": 0.721,
+          "healthcare": 0.753,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      "peak_civil_unrest": {
+        "day": 1,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.864,
+        "institutional_trust": 0.174,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.839906902936215,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.75,
+          "white_collar": 0.69,
+          "education": 0.75,
+          "services": 0.743,
+          "public_sector": 0.721,
+          "healthcare": 0.753,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      "peak_price_pressure": {
+        "day": 1,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.864,
+        "institutional_trust": 0.174,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.839906902936215,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.75,
+          "white_collar": 0.69,
+          "education": 0.75,
+          "services": 0.743,
+          "public_sector": 0.721,
+          "healthcare": 0.753,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      }
+    },
+    "final": {
+      "day": 30,
+      "consumer_confidence": 10.0,
+      "market_pressure": 0.889,
+      "institutional_trust": 0.02,
+      "social_cohesion": 0.65,
+      "civil_unrest_potential": 0.295,
+      "population_mood": -1.0,
+      "price_pressure": 0.10376749565669745,
+      "unemployment_rate": 0.0,
+      "sector_unemployment": {
+        "industrial": 0.0,
+        "white_collar": 0.0,
+        "education": 0.0,
+        "services": 0.0,
+        "public_sector": 0.0,
+        "healthcare": 0.0,
+        "community": 0.0
+      },
+      "sector_stress": {
+        "industrial": 0.783,
+        "white_collar": 0.783,
+        "education": 0.783,
+        "services": 0.783,
+        "public_sector": 0.782,
+        "healthcare": 0.782,
+        "community": 0.783
+      },
+      "top_concerns": [
+        [
+          "keep things steady",
+          1.0
+        ]
+      ],
+      "info_awareness": {
+        "Military/nuclear crisis": 1.0,
+        "Oil price surge": 1.0
+      }
+    },
+    "final_sector_stress_ranking": [
+      [
+        "industrial",
+        0.783
+      ],
+      [
+        "white_collar",
+        0.783
+      ],
+      [
+        "education",
+        0.783
+      ],
+      [
+        "services",
+        0.783
+      ],
+      [
+        "community",
+        0.783
+      ],
+      [
+        "public_sector",
+        0.782
+      ],
+      [
+        "healthcare",
+        0.782
+      ]
+    ],
+    "final_sector_unemployment_ranking": [
+      [
+        "industrial",
+        0.0
+      ],
+      [
+        "white_collar",
+        0.0
+      ],
+      [
+        "education",
+        0.0
+      ],
+      [
+        "services",
+        0.0
+      ],
+      [
+        "public_sector",
+        0.0
+      ],
+      [
+        "healthcare",
+        0.0
+      ],
+      [
+        "community",
+        0.0
+      ]
+    ],
+    "info_spread": {
+      "active_information": [
+        {
+          "label": "Military/nuclear crisis",
+          "kind": "military_crisis",
+          "origin_tick": 1,
+          "severity": 3.0,
+          "total_aware": 2000,
+          "pct_aware": 1.0,
+          "source_breakdown": {
+            "direct": 2000
+          },
+          "avg_distortion": 0.0
+        },
+        {
+          "label": "Oil price surge",
+          "kind": "oil_price_surge",
+          "origin_tick": 1,
+          "severity": 2.8,
+          "total_aware": 2000,
+          "pct_aware": 1.0,
+          "source_breakdown": {
+            "direct": 2000
+          },
+          "avg_distortion": 0.0
+        }
+      ],
+      "total_agents": 2000
+    },
+    "daily": [
+      {
+        "day": 1,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.864,
+        "institutional_trust": 0.174,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.839906902936215,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.75,
+          "white_collar": 0.69,
+          "education": 0.75,
+          "services": 0.743,
+          "public_sector": 0.721,
+          "healthcare": 0.753,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 2,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.886,
+        "institutional_trust": 0.136,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.7814747497590055,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.745,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 3,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.892,
+        "institutional_trust": 0.097,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.7271077096472903,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.783,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 4,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.059,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.6765229735081867,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 5,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.026,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.6294574072201412,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 6,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.5856661828491592,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 7,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.5449215050910429,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 8,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.5070114263147846,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 9,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.47173874404315097,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 10,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.4389199751353222,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 11,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.40838440133543435,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 12,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.3799731812221174,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 13,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.35353852393952506,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 14,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.3289429204117283,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 15,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.30605842804136807,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 16,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.2847660051716785,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 17,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.2649548918498522,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 18,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.2465220336705722,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 19,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.893,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.22937154570263374,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.785,
+          "white_collar": 0.785,
+          "education": 0.785,
+          "services": 0.785,
+          "public_sector": 0.785,
+          "healthcare": 0.785,
+          "community": 0.785
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 20,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.891,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.21341421371008146,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.784,
+          "white_collar": 0.784,
+          "education": 0.784,
+          "services": 0.784,
+          "public_sector": 0.784,
+          "healthcare": 0.783,
+          "community": 0.784
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 21,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.889,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.1985670300732919,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.783,
+          "white_collar": 0.783,
+          "education": 0.783,
+          "services": 0.783,
+          "public_sector": 0.783,
+          "healthcare": 0.783,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 22,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.889,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.18475276199593185,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.783,
+          "white_collar": 0.783,
+          "education": 0.783,
+          "services": 0.783,
+          "public_sector": 0.783,
+          "healthcare": 0.783,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 23,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.889,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.17189954975167115,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.783,
+          "white_collar": 0.783,
+          "education": 0.783,
+          "services": 0.783,
+          "public_sector": 0.783,
+          "healthcare": 0.783,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 24,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.889,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.15994053288079088,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.783,
+          "white_collar": 0.783,
+          "education": 0.783,
+          "services": 0.783,
+          "public_sector": 0.783,
+          "healthcare": 0.783,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 25,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.889,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.14881350239221705,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.783,
+          "white_collar": 0.783,
+          "education": 0.783,
+          "services": 0.783,
+          "public_sector": 0.783,
+          "healthcare": 0.783,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 26,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.889,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.1384605771617889,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.783,
+          "white_collar": 0.783,
+          "education": 0.783,
+          "services": 0.783,
+          "public_sector": 0.783,
+          "healthcare": 0.783,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 27,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.889,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.12882790284343426,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.783,
+          "white_collar": 0.783,
+          "education": 0.783,
+          "services": 0.783,
+          "public_sector": 0.783,
+          "healthcare": 0.783,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 28,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.889,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.11986537172703282,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.783,
+          "white_collar": 0.783,
+          "education": 0.783,
+          "services": 0.783,
+          "public_sector": 0.783,
+          "healthcare": 0.783,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 29,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.889,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.11152636208571184,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.783,
+          "white_collar": 0.783,
+          "education": 0.783,
+          "services": 0.783,
+          "public_sector": 0.783,
+          "healthcare": 0.783,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      },
+      {
+        "day": 30,
+        "consumer_confidence": 10.0,
+        "market_pressure": 0.889,
+        "institutional_trust": 0.02,
+        "social_cohesion": 0.65,
+        "civil_unrest_potential": 0.295,
+        "population_mood": -1.0,
+        "price_pressure": 0.10376749565669745,
+        "unemployment_rate": 0.0,
+        "sector_unemployment": {
+          "industrial": 0.0,
+          "white_collar": 0.0,
+          "education": 0.0,
+          "services": 0.0,
+          "public_sector": 0.0,
+          "healthcare": 0.0,
+          "community": 0.0
+        },
+        "sector_stress": {
+          "industrial": 0.783,
+          "white_collar": 0.783,
+          "education": 0.783,
+          "services": 0.783,
+          "public_sector": 0.782,
+          "healthcare": 0.782,
+          "community": 0.783
+        },
+        "top_concerns": [
+          [
+            "keep things steady",
+            1.0
+          ]
+        ],
+        "info_awareness": {
+          "Military/nuclear crisis": 1.0,
+          "Oil price surge": 1.0
+        }
+      }
+    ]
+  }
+}
