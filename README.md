@@ -1,11 +1,11 @@
-# AI Agents World Simulator
+# AI Agents World Simulator / we priortise scale, with our heart and ripple engine, we are able to simulate a huge world / economy with less than $1 token cost per run (about 20000 agents)
 
 [中文说明](README.zh-CN.md)
 
-> **Inject a real-world shock. Watch 817 named AI agents — CEOs, workers, retirees, gig drivers — make individual decisions that cascade through companies, governments, and households. See what happens to the economy.**
+> **Inject a real-world shock. Watch 10000 named AI agents — CEOs, workers, retirees, gig drivers etc — make individual decisions that cascade through companies, governments, and households. See what happens to the economy.**
 
 ```
->>> Oil prices surge 100%
+>>> Financial crises hit
 
   [Day 3] Darren Foster (PetroMax CEO): CUT_HOURS
     "To avoid layoffs, we're reducing shifts across the board."
@@ -23,9 +23,12 @@
     → 15 customers pay more for essentials
 
   CCI: 81 → 45 (-44%)  |  Real 2008 CCI: -42%  |  Match: 95%
+  unemployment rate: 3% to 14% | Real 2008 unemployment rate: 10% peak crises| over 70% match
 ```
 
-**Every decision is made by a named individual with a specific personality, and every decision has concrete consequences for other named individuals.**
+**Every decision is made by a named individual with a specific personality, and every decision has concrete consequences for other named individuals. These LLM agents will
+influence non-LLM agents through our heart and ripple engine, broaden the effects in the world**
+
 
 ---
 
@@ -33,12 +36,12 @@
 
 | Feature | This Project | Typical Agent Sims |
 |---------|:---:|:---:|
-| Agents have persistent psychology | Heart engine with wounds, coping, attachment | Stateless or simple mood |
-| Decisions create named ripple chains | Gavin raises prices → Rosa pays more → she cuts spending | Aggregate "pressure" numbers |
-| LLM agents make REAL decisions | Jensen Huang decides to invest; that actually hires workers | LLM generates dialogue nobody reads |
+| Agents have persistent psychology | Heart engine with wounds, coping, attachment | Stateless or shifting mood depends on their actions |
+| Decisions create named ripple chains | Gavin raises prices → Rosa pays more → she cuts spending -> butterfly effects | Aggregate "pressure" numbers |
+| LLM agents make REAL decisions | Jensen Huang decides to invest; that actually hires workers | LLM generates dialogue other LLM reads and interacts with |
 | Household agents control their own money | Each person decides: cut spending, tap savings, find second job | Top-down income assignment |
 | Calibrated from real economic data | BLS, FRED, NBER, IMF — every parameter has a source | Guessed parameters |
-| Named companies and institutions | NovaTech, Federal Reserve, CostPlus, FirstBank | "company_1", "gov_agent_3" |
+| Named companies and institutions | NovaTech, Federal Reserve, CostPlus, FirstBank etc | "company_1", "gov_agent_3" |
 
 ---
 
@@ -91,21 +94,22 @@ In a blind test, a judge model correctly identified which agent said what 75% of
 
 ### 1. Government
 
-Named officials make policy decisions via LLM:
+Named officials examples make policy decisions via LLM:
 - **Jerome Mitchell** (Fed Chair, fears chaos, needs control) → approves emergency liquidity
 - **Janet Morrison** (Treasury Secretary, fears scarcity, needs usefulness) → deploys emergency funds
 - **Rep. Williams** (Budget Chair, fears scarcity, needs justice) → overcomes fiscal hawkishness to vote for relief
 - **Dr. Mandy Cohen** (CDC Director, fears chaos, needs truth) → organizes mutual aid
 
+
 ### 2. Firms
 
-Named executives at named companies make business decisions via LLM:
+Named executives examples at named companies make business decisions via LLM:
 - **Jensen Huang** (NovaTech CEO) → doubles down on AI investment during downturn
 - **Jamie Stone** (FirstBank CEO) → hoards capital, demands government support
 - **Ron Vachris** (CostPlus CEO) → holds prices as long as possible to protect customers
 - **Daniel Pinto** (FirstBank Co-President) → absorbs losses to protect his team
 
-### 3. Individuals (Households)
+### 3. Individuals (Households) examples
 
 Every worker/consumer makes personal finance decisions via LLM:
 - **Olivia** (gig worker): *"Picked up extra rides, cancelled Netflix"* → `SEEK_SECOND_JOB`
