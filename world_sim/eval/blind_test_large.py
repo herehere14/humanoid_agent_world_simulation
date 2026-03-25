@@ -478,7 +478,7 @@ def run_test(api_key: str, model: str = "gpt-5-mini"):
         "judgments": [asdict(j) for j in judgments],
     }
 
-    output_path = Path(__file__).parent.parent.parent.parent / "artifacts" / "blind_test_large_300agents.json"
+    output_path = Path(__file__).parent.parent.parent / "artifacts" / "blind_test_large_300agents.json"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(result, indent=2))
     print(f"\nResults saved to: {output_path}")

@@ -167,12 +167,9 @@ Use the same stack to create NPCs with memory, fear, exhaustion, debt pressure, 
 ```text
 api_server.py                                    FastAPI + SSE backend for the UI
 frontend/                                        React/Vite frontend and 3D world-viewer
-src/prompt_forest/                               Adaptive routing, evaluation, memory, orchestration
-
-examples/learned_brain/world_sim/
+world_sim/                                       Core world simulation package
   world.py                                       Core tick loop (10 phases per tick)
   world_agent.py                                 Agent model (heart, personality, savings, income)
-  heart_engine.py                                SBERT-based emotional state engine
   scenarios_real_economy.py                      817-agent real-world economy (NVIDIA, Apple, Fed, etc.)
   scenarios_heatwave_harbor.py                   300-1000 agent town crisis scenario
   ripple_engine.py                               Named agent-to-agent cause-and-effect chains
@@ -199,6 +196,8 @@ examples/learned_brain/world_sim/
     blind_test_large.py                          Agent distinguishability test
     character_identity_blind_test.py             Character identity evaluation
 
+examples/learned_brain/                          Learned-brain research code + SBERT heart engine
+src/prompt_forest/                               Adaptive routing, evaluation, memory, orchestration
 examples/artifacts/                              Historical validation outputs
 artifacts/                                       Runtime reports and experiment logs
 docs/architecture.md                             Architecture notes
@@ -229,7 +228,7 @@ Frontend: `http://localhost:3000`
 ### Inspect the real-economy builder
 
 ```bash
-PYTHONPATH=examples/learned_brain python - <<'PY'
+python - <<'PY'
 from world_sim.scenarios_real_economy import build_real_economy
 
 world, agent_meta, fabric = build_real_economy(seed=42)
@@ -241,15 +240,15 @@ PY
 ### Run historical validation
 
 ```bash
-PYTHONPATH=examples/learned_brain python examples/learned_brain/world_sim/eval/historical_validation.py
-PYTHONPATH=examples/learned_brain python examples/learned_brain/world_sim/eval/real_data_validation.py
+python -m world_sim.eval.historical_validation
+python -m world_sim.eval.real_data_validation
 ```
 
 ### Run the legacy large-town narrative sim
 
 ```bash
 export OPENAI_API_KEY="your_key_here"
-PYTHONPATH=src python examples/learned_brain/world_sim/run_large_narrative.py
+python -m world_sim.run_large_narrative
 ```
 
 ## Accuracy Journey (This Session)

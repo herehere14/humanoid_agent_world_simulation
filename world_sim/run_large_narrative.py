@@ -10,7 +10,7 @@ Features beyond run_narrative.py:
   - Cross-district encounter highlights
 
 Usage:
-    python -m learned_brain.world_sim.run_large_narrative [--days 10] [--output city_narrative.md]
+    python -m world_sim.run_large_narrative [--days 10] [--output city_narrative.md]
 """
 
 from __future__ import annotations

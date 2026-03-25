@@ -9,7 +9,7 @@ At each moment, generates paired outputs:
 Saves results for judging.
 
 Usage:
-    python -m learned_brain.world_sim.eval.eval_heart_vs_llm
+    python -m world_sim.eval.eval_heart_vs_llm
 """
 
 from __future__ import annotations

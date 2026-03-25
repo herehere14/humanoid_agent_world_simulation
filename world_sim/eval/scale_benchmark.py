@@ -8,7 +8,7 @@ Tests:
 4. LLM spot-check: sample 30 agents at 10 moments, compare heart vs pure-LLM
 
 Usage:
-    python -m learned_brain.world_sim.eval.scale_benchmark [--agents 1000] [--skip-llm]
+    python -m world_sim.eval.scale_benchmark [--agents 1000] [--skip-llm]
 """
 
 from __future__ import annotations

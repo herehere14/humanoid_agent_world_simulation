@@ -2,7 +2,7 @@
 """Run the full evaluation pipeline.
 
 Usage:
-    python -m learned_brain.world_sim.eval.run_all [--skip-scale-llm]
+    python -m world_sim.eval.run_all [--skip-scale-llm]
 
 Steps:
     1. Scale benchmark (1000 agents, performance + variance) — $0 without LLM, ~$1 with

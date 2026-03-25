@@ -475,7 +475,7 @@ def _build_world_snapshot_payload(
 ) -> dict:
     import sys
 
-    sys.path.insert(0, str(Path(__file__).parent / "examples" / "learned_brain"))
+    sys.path.insert(0, str(Path(__file__).parent))
     from world_sim.scenarios import build_small_town
     from world_sim.scenarios_large import build_large_town
     from world_sim.scenarios_heatwave_harbor import build_heatwave_harbor
@@ -616,7 +616,7 @@ async def get_world_snapshot():
             status_code=404,
             detail=(
                 "No world snapshot found. Run: "
-                "python -m examples.learned_brain.world_sim.export_snapshot "
+                "python -m world_sim.export_snapshot "
                 "or generate frontend/public/mock_snapshot.json"
             ),
         )
@@ -670,7 +670,7 @@ async def stream_world_simulation(
     async def generate():
         try:
             import sys
-            sys.path.insert(0, str(Path(__file__).parent / "examples" / "learned_brain"))
+            sys.path.insert(0, str(Path(__file__).parent))
             from world_sim.scenarios import build_small_town
             from world_sim.world import World
 
@@ -765,7 +765,7 @@ async def run_world_what_if(req: WorldWhatIfRequest):
     """Run a what-if simulation with injected external information."""
     try:
         import sys
-        sys.path.insert(0, str(Path(__file__).parent / "examples" / "learned_brain"))
+        sys.path.insert(0, str(Path(__file__).parent))
         from world_sim.run_large_diagnostic import run_diagnostic
 
         slug = "".join(ch if ch.isalnum() else "_" for ch in req.information.lower())[:48].strip("_") or "shock"

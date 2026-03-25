@@ -28,7 +28,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from statistics import mean
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from world_sim.scenarios_heatwave_harbor import build_heatwave_harbor
 from world_sim.dynamic_events import DynamicEventEngine
@@ -692,7 +692,7 @@ def run_validation():
     print(f"\n  Time: {total_time:.1f}s ({total_time / len(ALL_EVENTS):.1f}s per event)")
 
     # Save results
-    output_path = Path(__file__).parent.parent.parent.parent / "artifacts" / "real_data_validation.json"
+    output_path = Path(__file__).parent.parent.parent / "artifacts" / "real_data_validation.json"
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     report = {

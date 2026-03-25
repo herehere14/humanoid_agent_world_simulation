@@ -5,7 +5,7 @@ Every interaction, event reaction, and solo emotional moment gets
 dialogue/narration from gpt-4o-mini. Outputs a rich Markdown narrative.
 
 Usage:
-    python -m learned_brain.world_sim.run_narrative [--days 15] [--output narrative.md]
+    python -m world_sim.run_narrative [--days 15] [--output narrative.md]
 """
 
 from __future__ import annotations

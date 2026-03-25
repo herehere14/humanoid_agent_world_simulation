@@ -22,7 +22,7 @@ To generate a snapshot from the actual simulation (requires SBERT model):
 
 ```bash
 # From the project root:
-python -m examples.learned_brain.world_sim.export_snapshot --ticks 360
+python -m world_sim.export_snapshot --ticks 360
 ```
 
 This writes `artifacts/world_snapshot.json`. Start the API server to serve it:

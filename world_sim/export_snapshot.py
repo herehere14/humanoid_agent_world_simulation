@@ -4,7 +4,7 @@ Runs the small-town scenario and writes per-tick state to a JSON file
 that the frontend can load for playback.
 
 Usage:
-    python -m examples.learned_brain.world_sim.export_snapshot [--ticks 360] [--out artifacts/world_snapshot.json]
+    python -m world_sim.export_snapshot [--ticks 360] [--out artifacts/world_snapshot.json]
 """
 
 from __future__ import annotations
@@ -124,7 +124,7 @@ def export_world_snapshot(max_ticks: int = 360, out_path: str | None = None) -> 
     }
 
     if out_path is None:
-        out_path = str(Path(__file__).parent.parent.parent.parent / "artifacts" / "world_snapshot.json")
+        out_path = str(Path(__file__).parent.parent / "artifacts" / "world_snapshot.json")
 
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w") as f:

@@ -15,7 +15,7 @@ This script validates the full pipeline:
 
 Usage:
     cd openclaw_closedsourcemodel_RL
-    python -m examples.learned_brain.world_sim.test_macro_integration
+    python -m world_sim.test_macro_integration
 """
 
 from __future__ import annotations
@@ -232,7 +232,7 @@ def run_test():
     print(f"\n  Result: {checks_passed}/{checks_total} checks passed")
 
     # Save results
-    output_path = Path(__file__).parent.parent.parent.parent / "artifacts" / "macro_integration_test.json"
+    output_path = Path(__file__).parent.parent / "artifacts" / "macro_integration_test.json"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     test_result = {
         "baseline_macro": baseline_current,

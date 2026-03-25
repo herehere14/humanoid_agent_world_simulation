@@ -16,7 +16,7 @@ import time
 from pathlib import Path
 from statistics import mean
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from world_sim.scenarios_heatwave_harbor import build_heatwave_harbor
 from world_sim.dynamic_events import DynamicEventEngine
@@ -406,7 +406,7 @@ def run_validation(api_key: str, model: str = "gpt-5-mini"):
     print(f"  Total time: {total_time:.0f}s ({total_time / 60:.1f}min)")
 
     # Save
-    output_path = Path(__file__).parent.parent.parent.parent / "artifacts" / "real_data_validation_large.json"
+    output_path = Path(__file__).parent.parent.parent / "artifacts" / "real_data_validation_large.json"
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     report = {

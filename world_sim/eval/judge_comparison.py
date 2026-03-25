@@ -5,7 +5,7 @@ GPT-4o reads event history + both outputs (randomized A/B order),
 scores on 4 dimensions, picks a winner.
 
 Usage:
-    python -m learned_brain.world_sim.eval.judge_comparison [--samples eval_samples.json]
+    python -m world_sim.eval.judge_comparison [--samples eval_samples.json]
 """
 
 from __future__ import annotations

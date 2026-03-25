@@ -2,12 +2,12 @@
 """Run the world simulation — Small Town, Bad News.
 
 Usage:
-    python -m learned_brain.world_sim.run_sim [--days N] [--verbose] [--agent AGENT_ID]
+    python -m world_sim.run_sim [--days N] [--verbose] [--agent AGENT_ID]
 
 Examples:
-    python -m learned_brain.world_sim.run_sim --days 15
-    python -m learned_brain.world_sim.run_sim --days 15 --verbose
-    python -m learned_brain.world_sim.run_sim --days 15 --agent marcus
+    python -m world_sim.run_sim --days 15
+    python -m world_sim.run_sim --days 15 --verbose
+    python -m world_sim.run_sim --days 15 --agent marcus
 """
 
 from __future__ import annotations

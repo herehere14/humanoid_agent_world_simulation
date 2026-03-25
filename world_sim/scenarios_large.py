@@ -11,7 +11,7 @@ join worker protests, market vendors lose customers, healthcare
 workers see contamination patients.
 
 Usage:
-    from learned_brain.world_sim.scenarios_large import build_large_town
+    from world_sim.scenarios_large import build_large_town
     world, meta = build_large_town()
 """
 
