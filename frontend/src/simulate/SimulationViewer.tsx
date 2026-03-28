@@ -375,11 +375,23 @@ export default function SimulationViewer() {
         }
       }
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Unknown error');
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('ERR_CONNECTION_REFUSED')) {
+        setError(
+          `Could not connect to backend at ${backendUrl}. ` +
+          `The simulation runs on YOUR computer — you need to start the backend server first.\n\n` +
+          `1. Clone the repo: git clone https://github.com/herehere14/Cascade-An-AI-Agent-World-Simulator.git\n` +
+          `2. Install: cd Cascade-An-AI-Agent-World-Simulator && pip install -r requirements.txt\n` +
+          `3. Start: OPENAI_API_KEY="${apiKey.slice(0, 12)}..." python api_server.py\n` +
+          `4. Then come back here and hit Simulate again.`
+        );
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
-  }, [prediction]);
+  }, [prediction, apiKey, backendUrl]);
 
   return (
     <div className="min-h-screen bg-[#f8f9fb] relative">
@@ -423,12 +435,17 @@ export default function SimulationViewer() {
             className="max-w-2xl mx-auto"
           >
             <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_2px_8px_rgba(0,0,0,0.04)] p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-slate-800">Setup</h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-semibold text-slate-800">Connect to your local backend</h3>
                 {apiKey && (
                   <button onClick={() => setShowSetup(false)} className="text-xs text-slate-400 hover:text-slate-600">Hide</button>
                 )}
               </div>
+              <p className="text-[12px] text-slate-400 mb-4">
+                The simulation runs entirely on <strong className="text-slate-600">your computer</strong> using your CPU/GPU.
+                You need to clone the repo and start the backend server first.
+                <a href="#/setup" className="text-blue-500 hover:underline ml-1">Setup guide &rarr;</a>
+              </p>
 
               <div className="space-y-4">
                 {/* API Key */}
@@ -541,7 +558,15 @@ export default function SimulationViewer() {
 
       {error && (
         <div className="max-w-2xl mx-auto px-6 mb-6">
-          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">{error}</div>
+          <div className="p-5 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-900">
+            <div className="font-semibold mb-2 flex items-center gap-2">
+              <svg viewBox="0 0 20 20" className="w-4 h-4 text-amber-500" fill="currentColor">
+                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.345 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+              </svg>
+              Backend not running
+            </div>
+            <pre className="whitespace-pre-wrap text-[13px] leading-relaxed text-amber-800 font-mono">{error}</pre>
+          </div>
         </div>
       )}
 
