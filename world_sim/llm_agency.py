@@ -1,24 +1,23 @@
-"""LLM Agency — LLM agents make REAL decisions that drive the simulation.
+"""LLM Agency — LLM agents make FREEFORM decisions and communicate with each other.
 
-This replaces the old llm_chooser.py which treated the LLM as a narrator.
-Now the LLM is the decision-maker for key agents in every organization:
+Agents are NOT given a menu of options. They describe what they do in their
+own words, specify who they're talking to, and define the concrete consequences.
 
-  MANAGERS decide: raise prices, cut staff, invest, absorb losses, lobby government
-  GOVERNMENT WORKERS decide: approve stimulus, impose restrictions, investigate, do nothing
-  VENDORS decide: raise prices, find new suppliers, close shop, extend credit to loyal customers
-  WORKERS decide: organize, accept cuts, quit, side-hustle, confront management
-  COMMUNITY LEADERS decide: call mutual aid, organize protest, lobby officials, stockpile
+The engine extracts structured impacts from the freeform response and applies
+them through the ripple engine. Agents can also send messages to specific other
+agents — those messages arrive in the recipient's inbox and become part of their
+context on their next decision tick.
 
-The LLM's decision feeds directly into the ripple engine — when the LLM decides
-"cut 3 workers", those specific workers lose income, reduce spending, vendors
-lose revenue, and the cascade continues.
+This creates genuinely emergent behavior: agents invent actions nobody coded for,
+coordinate with each other, form alliances, make threats, negotiate deals,
+leak information, or do anything a real person would do.
 
 Architecture:
-  - Each org-role gets a DECISION PROMPT with their real situation
-  - The LLM returns a structured decision with CONCRETE CONSEQUENCES
-  - The consequences are applied directly to connected agents via org links
+  - Each agent gets their REAL situation + inbox of messages from other agents
+  - The LLM returns a FREEFORM action + structured consequences + messages to others
+  - Consequences are applied directly to connected agents via org links
+  - Messages are delivered to recipients' inboxes for their next decision
   - The deterministic system handles agents who aren't LLM-promoted
-  - LLM decisions are BOUNDED — they can't invent money or break physics
 """
 
 from __future__ import annotations
@@ -43,69 +42,22 @@ def _clamp(v: float, lo: float = 0.0, hi: float = 1.0) -> float:
 # Decision schemas per organizational role
 # ---------------------------------------------------------------------------
 
-MANAGER_DECISIONS = [
-    "CUT_WORKERS",      # lay off N workers → they lose income, spend less
-    "CUT_HOURS",        # reduce hours → workers lose partial income
-    "RAISE_PRICES",     # pass costs to customers → customers pay more
-    "ABSORB_LOSSES",    # eat the cost → own debt_pressure rises, no cascade
-    "LOBBY_GOVERNMENT", # pressure government for relief → may trigger policy response
-    "INVEST_DESPITE",   # double down / hire → costs now but builds long-term
-    "HOLD_STEADY",      # do nothing, wait and see
-]
 
-VENDOR_DECISIONS = [
-    "RAISE_PRICES",       # pass costs to customers
-    "FIND_NEW_SUPPLIER",  # absorb short-term cost for better margin later
-    "EXTEND_CREDIT",      # give loyal customers credit → builds trust, takes risk
-    "REDUCE_INVENTORY",   # stock less → fewer choices for customers
-    "CLOSE_TEMPORARILY",  # shut down until conditions improve → workers idle
-    "HOLD_STEADY",
-]
-
-GOVERNMENT_DECISIONS = [
-    "APPROVE_STIMULUS",      # distribute relief → reduces debt for many, costs budget
-    "IMPOSE_RESTRICTIONS",   # lockdowns/regulations → controls crisis but hurts economy
-    "INVESTIGATE_COMPANIES", # accountability → builds public trust, spooks businesses
-    "PUBLIC_REASSURANCE",    # messaging only → small trust boost, no material change
-    "EMERGENCY_FUND",        # targeted aid to most distressed → helps few a lot
-    "DO_NOTHING",            # bureaucratic inaction → trust erodes
-]
-
-WORKER_DECISIONS = [
-    "ORGANIZE_UNION",     # build collective power → costs time, builds alliance
-    "ACCEPT_CUTS",        # comply → less conflict, more debt
-    "CONFRONT_MANAGEMENT",# demand better terms → may backfire or succeed
-    "SIDE_HUSTLE",        # find alternate income → reduces dependence
-    "QUIT",               # leave → lose income now, free later
-    "HOLD_STEADY",
-]
-
-COMMUNITY_DECISIONS = [
-    "ORGANIZE_MUTUAL_AID",  # pool resources → helps neighborhood, costs organizer
-    "ORGANIZE_PROTEST",     # public action → draws attention, creates conflict
-    "LOBBY_OFFICIALS",      # work channels → may trigger government response
-    "STOCKPILE",            # hoard resources → helps self, hurts others
-    "SUPPORT_NEIGHBORS",    # direct help → builds bonds
-    "HOLD_STEADY",
-]
-
+# Legacy menus kept for backwards compat — no longer used in freeform mode
+MANAGER_DECISIONS = ["CUT_WORKERS", "CUT_HOURS", "RAISE_PRICES", "ABSORB_LOSSES", "LOBBY_GOVERNMENT", "INVEST_DESPITE", "HOLD_STEADY"]
+VENDOR_DECISIONS = ["RAISE_PRICES", "FIND_NEW_SUPPLIER", "EXTEND_CREDIT", "REDUCE_INVENTORY", "CLOSE_TEMPORARILY", "HOLD_STEADY"]
+GOVERNMENT_DECISIONS = ["APPROVE_STIMULUS", "IMPOSE_RESTRICTIONS", "INVESTIGATE_COMPANIES", "PUBLIC_REASSURANCE", "EMERGENCY_FUND", "DO_NOTHING"]
+WORKER_DECISIONS = ["ORGANIZE_UNION", "ACCEPT_CUTS", "CONFRONT_MANAGEMENT", "SIDE_HUSTLE", "QUIT", "HOLD_STEADY"]
+COMMUNITY_DECISIONS = ["ORGANIZE_MUTUAL_AID", "ORGANIZE_PROTEST", "LOBBY_OFFICIALS", "STOCKPILE", "SUPPORT_NEIGHBORS", "HOLD_STEADY"]
 
 def _get_decision_menu(role: str) -> list[str]:
-    return {
-        "manager": MANAGER_DECISIONS,
-        "office_professional": MANAGER_DECISIONS,
-        "market_vendor": VENDOR_DECISIONS,
-        "bartender": VENDOR_DECISIONS,
-        "government_worker": GOVERNMENT_DECISIONS,
-        "factory_worker": WORKER_DECISIONS,
-        "dock_worker": WORKER_DECISIONS,
-        "office_worker": WORKER_DECISIONS,
-        "community": COMMUNITY_DECISIONS,
-        "student": WORKER_DECISIONS,
-        "teacher": COMMUNITY_DECISIONS,
-        "healthcare": COMMUNITY_DECISIONS,
-        "retiree": COMMUNITY_DECISIONS,
-    }.get(role, ["HOLD_STEADY"])
+    return {"manager": MANAGER_DECISIONS, "office_professional": MANAGER_DECISIONS,
+            "market_vendor": VENDOR_DECISIONS, "bartender": VENDOR_DECISIONS,
+            "government_worker": GOVERNMENT_DECISIONS, "factory_worker": WORKER_DECISIONS,
+            "dock_worker": WORKER_DECISIONS, "office_worker": WORKER_DECISIONS,
+            "community": COMMUNITY_DECISIONS, "student": WORKER_DECISIONS,
+            "teacher": COMMUNITY_DECISIONS, "healthcare": COMMUNITY_DECISIONS,
+            "retiree": COMMUNITY_DECISIONS}.get(role, ["HOLD_STEADY"])
 
 
 # ---------------------------------------------------------------------------
@@ -124,7 +76,10 @@ class AgentSituation:
     emotional_state: str
     recent_events: str
     people_affected: str  # who depends on this agent
-    decision_options: list[str] = field(default_factory=list)
+    decision_options: list[str] = field(default_factory=list)  # legacy menu
+    _depends_on: str = ""  # who this agent depends on
+    _inbox: str = ""  # messages from other agents
+    _nearby: str = ""  # who is at the same location
 
 
 def _build_situation(agent: "WorldAgent", fabric: "OrganizationalFabric", world: "World") -> AgentSituation:
@@ -143,9 +98,37 @@ def _build_situation(agent: "WorldAgent", fabric: "OrganizationalFabric", world:
                 f"their debt={other.debt_pressure:.2f}, tension={other.heart.tension:.2f}"
             )
 
+    # Who does this agent depend on?
+    dependencies = fabric.get_dependencies(agent.agent_id)
+    dep_on_lines = []
+    for link in dependencies[:5]:
+        if link.from_id in world.agents:
+            other = world.agents[link.from_id]
+            dep_on_lines.append(
+                f"  - {other.personality.name} ({other.social_role}): "
+                f"they {link.link_type} you"
+            )
+
     # Recent memories
     memories = agent.get_recent_memories(5)
     mem_text = "\n".join(f"  - {m.description}" for m in memories) if memories else "Nothing notable."
+
+    # Inbox: messages from other agents
+    inbox = getattr(agent, "_inbox", [])
+    inbox_text = ""
+    if inbox:
+        inbox_text = "\n".join(
+            f"  - From {msg['from']}: \"{msg['message']}\""
+            for msg in inbox[-5:]
+        )
+
+    # Nearby people at same location
+    nearby_lines = []
+    for aid, other in world.agents.items():
+        if other.location == agent.location and aid != agent.agent_id:
+            nearby_lines.append(f"{other.personality.name} ({other.social_role})")
+            if len(nearby_lines) >= 6:
+                break
 
     return AgentSituation(
         agent_id=agent.agent_id,
@@ -162,6 +145,7 @@ def _build_situation(agent: "WorldAgent", fabric: "OrganizationalFabric", world:
         financial_state=(
             f"Debt pressure: {agent.debt_pressure:.2f}/1.0 "
             f"({'critical' if agent.debt_pressure > 0.6 else 'high' if agent.debt_pressure > 0.3 else 'manageable'}). "
+            f"Savings: {agent.savings_buffer:.2f}. Income: {agent.income_level:.2f}. "
             f"Dread: {agent.dread_pressure:.2f}. "
             f"Expectations: {'pessimistic' if getattr(agent, 'expectation_pessimism', 0) > 0.2 else 'cautious' if getattr(agent, 'expectation_pessimism', 0) > 0.1 else 'neutral'}."
         ),
@@ -172,11 +156,93 @@ def _build_situation(agent: "WorldAgent", fabric: "OrganizationalFabric", world:
         ),
         recent_events=mem_text,
         people_affected="\n".join(dep_lines) if dep_lines else "Nobody directly depends on your decisions.",
-        decision_options=_get_decision_menu(agent.social_role),
+        decision_options=_get_decision_menu(agent.social_role),  # kept for legacy
+        # New freeform fields
+        _depends_on="\n".join(dep_on_lines) if dep_on_lines else "Nobody.",
+        _inbox=inbox_text,
+        _nearby=", ".join(nearby_lines) if nearby_lines else "Nobody nearby.",
     )
 
 
+def _build_freeform_prompt(situation: AgentSituation, world: "World") -> str:
+    """Build a freeform decision prompt — no menu, the agent decides what to do."""
+
+    # Gather names the agent knows about for the messages section
+    known_names = set()
+    for line in situation.people_affected.split("\n"):
+        if " - " in line:
+            name = line.split(" - ")[1].split(" (")[0].strip()
+            known_names.add(name)
+    for line in getattr(situation, "_depends_on", "").split("\n"):
+        if " - " in line:
+            name = line.split(" - ")[1].split(" (")[0].strip()
+            known_names.add(name)
+
+    inbox_section = ""
+    inbox_text = getattr(situation, "_inbox", "")
+    if inbox_text:
+        inbox_section = f"""
+MESSAGES YOU RECEIVED FROM OTHER PEOPLE:
+{inbox_text}
+You may respond to these messages or ignore them.
+"""
+
+    return f"""You are {situation.name}, a {situation.role}.
+Background: {situation.background}
+Personality: {situation.personality_summary}
+
+YOUR SITUATION RIGHT NOW:
+Financial: {situation.financial_state}
+Emotional: {situation.emotional_state}
+
+RECENT EVENTS IN YOUR LIFE:
+{situation.recent_events}
+
+PEOPLE WHO DEPEND ON YOUR DECISIONS:
+{situation.people_affected}
+
+PEOPLE YOU DEPEND ON:
+{getattr(situation, '_depends_on', 'Nobody.')}
+
+PEOPLE NEAR YOU RIGHT NOW:
+{getattr(situation, '_nearby', 'Nobody.')}
+{inbox_section}
+You are a real person in this situation. What do you ACTUALLY DO right now?
+
+There is NO menu of options. Do whatever a real person in your position would do.
+You can: negotiate, threaten, help, organize, cut costs, raise prices, hire, fire,
+call someone, send a message, leak information, make a deal, protest, comfort someone,
+stockpile, flee, confront, investigate, cooperate, betray, or anything else.
+
+Be SPECIFIC and CONCRETE. Not "I help people" — WHO do you help, HOW, and what does it COST you?
+
+Return ONLY valid JSON:
+{{
+  "action": "<1-2 sentences: what you specifically do right now>",
+  "reasoning": "<2-3 sentences: WHY — what you're protecting, what you fear>",
+  "consequences": [
+    {{
+      "target_name": "<name of a specific person affected>",
+      "effect": "<what happens to them: loses income, gets help, feels pressure, etc.>",
+      "debt_impact": <-0.15 to 0.15, negative=relief positive=pressure>,
+      "tension_impact": <-0.1 to 0.1>,
+      "dread_impact": <-0.1 to 0.1>,
+      "relationship_change": "<trust+, trust-, warmth+, warmth-, rivalry+, alliance+, or none>"
+    }}
+  ],
+  "messages": [
+    {{
+      "to": "<name of person you're communicating with>",
+      "message": "<what you actually say or write to them, in your own voice>"
+    }}
+  ],
+  "what_you_say_publicly": "<what you say out loud for everyone to hear, or nothing>",
+  "what_you_think_privately": "<your internal monologue — fears, calculations, regrets>"
+}}"""
+
+
 def _build_decision_prompt(situation: AgentSituation) -> str:
+    """Legacy menu-based prompt — kept for backwards compatibility."""
     options_text = "\n".join(f"  - {opt}" for opt in situation.decision_options)
 
     return f"""You are {situation.name}, a {situation.role}.
@@ -193,26 +259,20 @@ RECENT EVENTS IN YOUR LIFE:
 PEOPLE WHO DEPEND ON YOUR DECISIONS:
 {situation.people_affected}
 
-You must make a CONCRETE DECISION about what to do. This is not hypothetical — your choice will directly affect the people listed above.
+You must make a CONCRETE DECISION about what to do.
 
 YOUR OPTIONS:
 {options_text}
-
-Think about:
-- Your personality and coping style
-- Your financial pressure vs. the impact on people who depend on you
-- Whether you protect yourself or protect others
-- Your self-story: are you a {situation.personality_summary.split('Self-story: ')[1].split('.')[0]}?
 
 Return ONLY valid JSON:
 {{
   "decision": "<one of the options above>",
   "magnitude": <0.1 to 1.0, how aggressively you act>,
-  "reasoning": "<2-3 sentences: WHY you chose this, what you're protecting>",
-  "who_you_help": "<name of someone you're trying to protect, or 'myself'>",
-  "who_gets_hurt": "<name of someone who will suffer from this, or 'nobody'>",
-  "what_you_say": "<what you actually say out loud to the people around you>",
-  "what_you_think": "<what you're really thinking but not saying>"
+  "reasoning": "<2-3 sentences>",
+  "who_you_help": "<name or 'myself'>",
+  "who_gets_hurt": "<name or 'nobody'>",
+  "what_you_say": "<what you say out loud>",
+  "what_you_think": "<what you're really thinking>"
 }}"""
 
 
@@ -222,6 +282,7 @@ Return ONLY valid JSON:
 
 @dataclass
 class LLMAgentDecision:
+    """Legacy menu-based decision."""
     agent_id: str
     agent_name: str
     role: str
@@ -234,6 +295,219 @@ class LLMAgentDecision:
     private_thought: str = ""
     valid: bool = True
     latency_ms: int = 0
+
+
+@dataclass
+class FreeformDecision:
+    """A freeform decision with self-described consequences and messages."""
+    agent_id: str
+    agent_name: str
+    role: str
+    action: str = ""
+    reasoning: str = ""
+    consequences: list[dict] = field(default_factory=list)
+    messages: list[dict] = field(default_factory=list)
+    public_speech: str = ""
+    private_thought: str = ""
+    valid: bool = True
+    latency_ms: int = 0
+
+
+def _parse_freeform_decision(raw: str, agent_id: str, agent_name: str, role: str) -> FreeformDecision:
+    """Parse a freeform LLM response into a FreeformDecision."""
+    d = FreeformDecision(agent_id=agent_id, agent_name=agent_name, role=role)
+    text = raw.strip()
+
+    # Extract JSON
+    start = text.find("{")
+    if start == -1:
+        d.valid = False
+        return d
+    end = text.rfind("}")
+    json_str = text[start:end + 1] if end > start else text[start:]
+
+    try:
+        data = json.loads(json_str)
+    except json.JSONDecodeError:
+        # Aggressively repair truncated JSON
+        repaired = json_str.rstrip()
+        # Close any open strings
+        open_quotes = repaired.count('"') % 2
+        if open_quotes:
+            repaired += '"'
+        # Close open arrays/objects
+        open_brackets = repaired.count('[') - repaired.count(']')
+        open_braces = repaired.count('{') - repaired.count('}')
+        repaired = repaired.rstrip(',').rstrip()
+        repaired += ']' * max(0, open_brackets)
+        repaired += '}' * max(0, open_braces)
+        try:
+            data = json.loads(repaired)
+        except json.JSONDecodeError:
+            # Last resort: try to extract just action and reasoning
+            import re
+            action_match = re.search(r'"action"\s*:\s*"([^"]*)"', json_str)
+            if action_match:
+                d.action = action_match.group(1)[:300]
+                reason_match = re.search(r'"reasoning"\s*:\s*"([^"]*)"', json_str)
+                if reason_match:
+                    d.reasoning = reason_match.group(1)[:500]
+                return d  # valid=True with partial data
+            d.valid = False
+            return d
+
+    d.action = str(data.get("action", ""))[:300]
+    d.reasoning = str(data.get("reasoning", ""))[:500]
+    d.public_speech = str(data.get("what_you_say_publicly", ""))[:300]
+    d.private_thought = str(data.get("what_you_think_privately", ""))[:300]
+
+    # Parse consequences
+    for cons in data.get("consequences", []):
+        if isinstance(cons, dict) and cons.get("target_name"):
+            d.consequences.append({
+                "target_name": str(cons["target_name"]),
+                "effect": str(cons.get("effect", ""))[:200],
+                "debt_impact": max(-0.15, min(0.15, float(cons.get("debt_impact", 0)))),
+                "tension_impact": max(-0.1, min(0.1, float(cons.get("tension_impact", 0)))),
+                "dread_impact": max(-0.1, min(0.1, float(cons.get("dread_impact", 0)))),
+                "relationship_change": str(cons.get("relationship_change", "none")),
+            })
+
+    # Parse messages
+    for msg in data.get("messages", []):
+        if isinstance(msg, dict) and msg.get("to") and msg.get("message"):
+            d.messages.append({
+                "to": str(msg["to"]),
+                "message": str(msg["message"])[:300],
+            })
+
+    if not d.action:
+        d.valid = False
+    return d
+
+
+def _apply_freeform_decision(
+    decision: FreeformDecision,
+    agent: "WorldAgent",
+    fabric: "OrganizationalFabric",
+    world: "World",
+) -> list["RippleEvent"]:
+    """Apply a freeform decision's self-described consequences to the world."""
+    from .ripple_engine import RippleEvent
+
+    events: list[RippleEvent] = []
+    tick = world.tick_count
+
+    # Record the action in agent memory
+    agent.last_speech = decision.public_speech
+    agent.add_memory(tick, f"[freeform] {decision.action[:100]}")
+    if agent.memory and decision.private_thought:
+        agent.memory[-1].interpretation = decision.private_thought[:150]
+
+    # Build name→agent_id lookup for this world
+    name_to_id: dict[str, str] = {}
+    for aid, ag in world.agents.items():
+        name_to_id[ag.personality.name] = aid
+        # Also index by first name for fuzzy matching
+        first = ag.personality.name.split("_")[0].split(" ")[0]
+        if first not in name_to_id:
+            name_to_id[first] = aid
+
+    # Apply each consequence
+    for cons in decision.consequences:
+        target_name = cons["target_name"]
+        target_id = name_to_id.get(target_name)
+
+        # Fuzzy match: try partial name matching
+        if not target_id:
+            for name, aid in name_to_id.items():
+                if target_name.lower() in name.lower() or name.lower() in target_name.lower():
+                    target_id = aid
+                    break
+
+        if not target_id or target_id not in world.agents:
+            continue
+
+        target = world.agents[target_id]
+
+        # Apply bounded impacts
+        debt_d = cons.get("debt_impact", 0)
+        tension_d = cons.get("tension_impact", 0)
+        dread_d = cons.get("dread_impact", 0)
+
+        if debt_d != 0:
+            target.debt_pressure = _clamp(target.debt_pressure + debt_d)
+        if tension_d != 0:
+            target.heart.tension = _clamp(target.heart.tension + tension_d)
+        if dread_d != 0:
+            target.dread_pressure = _clamp(target.dread_pressure + dread_d)
+
+        # Apply relationship changes — handle both structured and freeform descriptions
+        rel_change = cons.get("relationship_change", "none").lower()
+        if rel_change and rel_change != "none":
+            rel = world.relationships.get_or_create(agent.agent_id, target_id)
+            # Positive relationship signals
+            if any(w in rel_change for w in ("trust+", "strengthen", "improve", "build", "warm", "support",
+                                              "empower", "reassur", "solidif", "positive", "bond", "connect")):
+                rel.trust = min(1.0, rel.trust + 0.05)
+                rel.warmth = min(1.0, rel.warmth + 0.03)
+            # Negative relationship signals
+            if any(w in rel_change for w in ("trust-", "damage", "worsen", "betray", "hostile", "resent",
+                                              "threaten", "undermine", "weaken", "erode", "distrust")):
+                rel.trust = max(-1.0, rel.trust - 0.05)
+                rel.warmth = max(-1.0, rel.warmth - 0.03)
+            if any(w in rel_change for w in ("rivalry+", "rival", "compet", "oppose", "antagoni")):
+                rel.rivalry = min(1.0, rel.rivalry + 0.05)
+            if any(w in rel_change for w in ("alliance+", "alli", "coalit", "solidar", "unite")):
+                rel.alliance_strength = min(1.0, rel.alliance_strength + 0.05)
+
+        # Add wound for significant negative impact
+        if debt_d > 0.08 or dread_d > 0.05:
+            target.heart.wounds.append((abs(debt_d) * 0.3, 0.996))
+
+        # Memory for target
+        target.add_memory(tick, f"{agent.personality.name}: {cons['effect'][:80]}")
+
+        events.append(RippleEvent(
+            tick=tick,
+            actor_id=agent.agent_id,
+            actor_name=agent.personality.name,
+            target_id=target_id,
+            target_name=target.personality.name,
+            action=decision.action[:80],
+            consequence=cons["effect"][:80],
+            mechanism="freeform",
+            debt_delta=debt_d,
+            tension_delta=tension_d,
+            dread_delta=dread_d,
+        ))
+
+    # Deliver messages to recipients' inboxes
+    for msg in decision.messages:
+        recipient_name = msg["to"]
+        recipient_id = name_to_id.get(recipient_name)
+        if not recipient_id:
+            for name, aid in name_to_id.items():
+                if recipient_name.lower() in name.lower() or name.lower() in recipient_name.lower():
+                    recipient_id = aid
+                    break
+
+        if recipient_id and recipient_id in world.agents:
+            recipient = world.agents[recipient_id]
+            if not hasattr(recipient, "_inbox"):
+                recipient._inbox = []
+            recipient._inbox.append({
+                "from": agent.personality.name,
+                "message": msg["message"],
+                "tick": tick,
+            })
+            # Cap inbox size
+            if len(recipient._inbox) > 10:
+                recipient._inbox = recipient._inbox[-10:]
+            # Also add as memory
+            recipient.add_memory(tick, f"Message from {agent.personality.name}: {msg['message'][:60]}")
+
+    return events
 
 
 def _parse_decision(raw: str, agent_id: str, agent_name: str, role: str, allowed: list[str]) -> LLMAgentDecision:
@@ -553,14 +827,26 @@ def _apply_decision(
 # ---------------------------------------------------------------------------
 
 class LLMAgencyEngine:
-    """Makes LLM calls for key agents and applies their decisions to the world.
+    """Reactive cascade LLM agents — decisions trigger immediate reactions.
 
-    Unlike the old LLM chooser, this:
-    - Calls the LLM for agents in EVERY organization/role, not just top-salience
-    - Gives role-specific decision menus (managers get different options than workers)
-    - Wires decisions directly into the ripple engine
-    - Spaces calls out (not every tick) to manage API costs
+    When Agent A makes a decision that hits Agent B hard enough, Agent B
+    gets an IMMEDIATE reactive LLM call in the same tick. B's reaction may
+    cascade to C, who reacts to D, etc. — up to MAX_CASCADE_DEPTH levels.
+
+    Agents at the same location can have multi-turn conversations within
+    a single tick (up to CONVERSATION_MAX_TURNS exchanges).
+
+    This creates real butterfly effects: one decision spirals through the
+    network in ways nobody predicted.
     """
+
+    # Tuning constants
+    REACTIVE_THRESHOLD = 0.06      # min impact (debt+tension+dread) to trigger reactive call
+    MAX_CASCADE_DEPTH = 6          # prevent infinite loops
+    MAX_REACTIVE_PER_TICK = 12     # max reactive LLM calls per tick (cost control)
+    CONVERSATION_MAX_TURNS = 3     # max back-and-forth exchanges per pair per tick
+    SCHEDULED_COOLDOWN = 8         # ticks between scheduled decisions (8 hours, not 24)
+    REACTIVE_COOLDOWN = 4          # ticks before same agent can react again
 
     def __init__(self, api_key: str, model: str = "gpt-5-mini", fabric: "OrganizationalFabric" = None):
         from openai import OpenAI
@@ -569,16 +855,25 @@ class LLMAgencyEngine:
         self.fabric = fabric
         self.total_calls = 0
         self.total_decisions = 0
+        self.total_reactive = 0
+        self.total_messages_sent = 0
+        self.total_conversations = 0
+        self.max_cascade_depth_reached = 0
         self.decision_log: list[dict] = []
+        self.cascade_chains: list[list[dict]] = []  # full chains for analysis
         self._last_decision_tick: dict[str, int] = {}
+        self._conversation_pairs: dict[tuple, int] = {}  # (a,b) → turns this tick
+        self._current_tick_reactive_count = 0
 
     def tick(self, world: "World", max_calls: int = 5) -> list["RippleEvent"]:
-        """Select key agents, get LLM decisions, apply to world.
+        """Run one tick: scheduled decisions → reactive cascades → conversations.
 
-        Called every tick but only actually calls the LLM for agents who:
-        1. Are in a position of influence (have dependents in org fabric)
-        2. Are under significant pressure (state changed recently)
-        3. Haven't made a decision in the last 24 ticks
+        Flow:
+          1. Select top agents by pressure for SCHEDULED decisions
+          2. For each decision, apply consequences
+          3. Check if any consequence triggers a REACTIVE decision (immediate)
+          4. Reactive decisions may trigger more reactive decisions (cascade)
+          5. Messages trigger multi-turn CONVERSATIONS at same location
         """
         if self.fabric is None:
             return []
@@ -586,83 +881,274 @@ class LLMAgencyEngine:
         from .ripple_engine import RippleEvent
 
         tick = world.tick_count
-        candidates = []
+        self._current_tick_reactive_count = 0
+        self._conversation_pairs = {}
+        all_events: list[RippleEvent] = []
 
-        for agent_id, agent in world.agents.items():
-            # Cooldown: 24 ticks (1 day) between decisions per agent
-            if self._last_decision_tick.get(agent_id, 0) + 24 > tick:
-                continue
-
-            # Must have people who depend on them
-            dependents = self.fabric.get_dependents(agent_id)
-            if not dependents:
-                continue
-
-            # Must be under meaningful pressure
-            pressure = agent.debt_pressure + agent.dread_pressure + agent.heart.tension
-            if pressure < 0.4:
-                continue
-
-            # Priority: most dependents × most pressure
-            priority = len(dependents) * pressure
-            candidates.append((priority, agent_id))
-
-        # Sort by priority, take top N
+        # ── Phase 1: Scheduled decisions ──
+        candidates = self._get_scheduled_candidates(world, tick)
         candidates.sort(reverse=True)
         selected = candidates[:max_calls]
 
-        all_events: list[RippleEvent] = []
-
         for _, agent_id in selected:
-            agent = world.agents[agent_id]
-            situation = _build_situation(agent, self.fabric, world)
-            prompt = _build_decision_prompt(situation)
-
-            t0 = time.time()
-            try:
-                resp = self.client.responses.create(
-                    model=self.model,
-                    input=prompt,
-                    max_output_tokens=500,
-                    reasoning={"effort": "low"},
+            decision, ripple_events = self._execute_decision(agent_id, world, tick, trigger="scheduled")
+            if decision:
+                all_events.extend(ripple_events)
+                # Phase 2: Check for reactive cascades from this decision
+                cascade_events = self._process_reactive_cascade(
+                    ripple_events, decision, world, tick, depth=0,
                 )
-                raw = (resp.output_text or "").strip()
-                latency = int((time.time() - t0) * 1000)
-            except Exception as e:
+                all_events.extend(cascade_events)
+
+        # ── Phase 3: Process any remaining inbox messages as conversations ──
+        conversation_events = self._process_conversations(world, tick)
+        all_events.extend(conversation_events)
+
+        return all_events
+
+    def _get_scheduled_candidates(self, world, tick):
+        """Find agents due for a scheduled decision."""
+        candidates = []
+        for agent_id, agent in world.agents.items():
+            if self._last_decision_tick.get(agent_id, 0) + self.SCHEDULED_COOLDOWN > tick:
                 continue
 
-            self.total_calls += 1
-            decision = _parse_decision(
-                raw, agent_id, agent.personality.name,
-                agent.social_role, situation.decision_options,
+            dependents = self.fabric.get_dependents(agent_id)
+            dependencies = self.fabric.get_dependencies(agent_id)
+            has_inbox = bool(getattr(agent, "_inbox", []))
+
+            if not dependents and not dependencies and not has_inbox:
+                continue
+
+            pressure = agent.debt_pressure + agent.dread_pressure + agent.heart.tension
+            if pressure < 0.2 and not has_inbox:
+                continue
+
+            n_connections = len(dependents) + len(dependencies)
+            inbox_bonus = 3.0 if has_inbox else 0.0
+            priority = max(1, n_connections) * pressure + inbox_bonus
+            candidates.append((priority, agent_id))
+
+        return candidates
+
+    def _execute_decision(self, agent_id, world, tick, trigger="scheduled", cascade_context=""):
+        """Execute one freeform LLM decision for an agent. Returns (decision, ripple_events)."""
+        if agent_id not in world.agents:
+            return None, []
+
+        agent = world.agents[agent_id]
+        situation = _build_situation(agent, self.fabric, world)
+
+        # Add cascade context if this is a reactive decision
+        prompt = _build_freeform_prompt(situation, world)
+        if cascade_context:
+            prompt += f"\n\nIMPORTANT CONTEXT — THIS JUST HAPPENED TO YOU:\n{cascade_context}\nYou must react to this RIGHT NOW."
+
+        t0 = time.time()
+        try:
+            resp = self.client.responses.create(
+                model=self.model,
+                input=prompt,
+                max_output_tokens=2000,
+                reasoning={"effort": "low"},
             )
-            decision.latency_ms = latency
+            raw = (resp.output_text or "").strip()
+            latency = int((time.time() - t0) * 1000)
+        except Exception:
+            return None, []
 
-            if not decision.valid:
+        self.total_calls += 1
+
+        decision = _parse_freeform_decision(raw, agent_id, agent.personality.name, agent.social_role)
+        if not decision.valid:
+            return None, []
+
+        self.total_decisions += 1
+        if trigger == "reactive":
+            self.total_reactive += 1
+        self._last_decision_tick[agent_id] = tick
+
+        # Clear inbox
+        if hasattr(agent, "_inbox"):
+            agent._inbox = []
+
+        # Apply decision
+        ripple_events = _apply_freeform_decision(decision, agent, self.fabric, world)
+        self.total_messages_sent += len(decision.messages)
+
+        self.decision_log.append({
+            "tick": tick,
+            "time": world.time_str,
+            "agent": decision.agent_name,
+            "role": decision.role,
+            "action": decision.action[:150],
+            "reasoning": decision.reasoning[:150],
+            "speech": decision.public_speech[:120],
+            "thought": decision.private_thought[:120],
+            "consequences": len(decision.consequences),
+            "messages_sent": len(decision.messages),
+            "message_recipients": [m["to"] for m in decision.messages],
+            "ripple_count": len(ripple_events),
+            "latency_ms": latency,
+            "trigger": trigger,
+            "cascade_depth": 0,  # updated by cascade processor
+        })
+
+        return decision, ripple_events
+
+    def _process_reactive_cascade(self, ripple_events, source_decision, world, tick, depth=0):
+        """Check if any ripple event should trigger an immediate reactive decision.
+
+        This is where butterfly effects happen:
+          Source decision → consequence hits Target → Target reacts → Target's
+          reaction hits another person → they react → cascade continues.
+        """
+        if depth >= self.MAX_CASCADE_DEPTH:
+            self.max_cascade_depth_reached = max(self.max_cascade_depth_reached, depth)
+            return []
+        if self._current_tick_reactive_count >= self.MAX_REACTIVE_PER_TICK:
+            return []
+
+        all_cascade_events = []
+        reactive_queue = []
+
+        for event in ripple_events:
+            target_id = event.target_id
+            if target_id not in world.agents:
                 continue
 
-            self.total_decisions += 1
-            self._last_decision_tick[agent_id] = tick
+            # Check if this agent can react (cooldown)
+            if self._last_decision_tick.get(target_id, 0) + self.REACTIVE_COOLDOWN > tick:
+                continue
 
-            # Apply decision → get ripple events
-            ripple_events = _apply_decision(decision, agent, self.fabric, world)
-            all_events.extend(ripple_events)
+            # Calculate total impact magnitude
+            impact = abs(event.debt_delta) + abs(event.tension_delta) + abs(event.dread_delta)
 
-            self.decision_log.append({
-                "tick": tick,
-                "time": world.time_str,
-                "agent": decision.agent_name,
-                "role": decision.role,
-                "decision": decision.decision,
-                "magnitude": round(decision.magnitude, 2),
-                "reasoning": decision.reasoning[:100],
-                "who_helps": decision.who_helps,
-                "who_hurts": decision.who_hurts,
-                "speech": decision.speech[:100],
-                "thought": decision.private_thought[:100],
-                "ripple_count": len(ripple_events),
-                "latency_ms": latency,
-            })
+            # Also check if agent received a message (messages always trigger reaction)
+            has_new_message = bool(getattr(world.agents[target_id], "_inbox", []))
+
+            if impact >= self.REACTIVE_THRESHOLD or has_new_message:
+                # Build context about what just happened to them
+                context = (
+                    f"{event.actor_name} just did this: {event.action[:100]}. "
+                    f"The effect on you: {event.consequence[:100]}."
+                )
+                if has_new_message:
+                    msgs = getattr(world.agents[target_id], "_inbox", [])
+                    latest = msgs[-1] if msgs else {}
+                    context += f"\nMessage from {latest.get('from','?')}: \"{latest.get('message','')[:100]}\""
+
+                reactive_queue.append((impact, target_id, context))
+
+        # Sort by impact severity — react to biggest hits first
+        reactive_queue.sort(reverse=True)
+
+        for _, target_id, context in reactive_queue:
+            if self._current_tick_reactive_count >= self.MAX_REACTIVE_PER_TICK:
+                break
+
+            self._current_tick_reactive_count += 1
+
+            decision, new_ripple_events = self._execute_decision(
+                target_id, world, tick,
+                trigger="reactive",
+                cascade_context=context,
+            )
+
+            if decision:
+                # Update the log entry with cascade depth
+                if self.decision_log:
+                    self.decision_log[-1]["cascade_depth"] = depth + 1
+                    self.decision_log[-1]["trigger"] = f"reactive (depth {depth + 1})"
+                    self.decision_log[-1]["triggered_by"] = source_decision.agent_name if source_decision else "?"
+
+                all_cascade_events.extend(new_ripple_events)
+
+                # Track cascade chain
+                chain_entry = {
+                    "depth": depth + 1,
+                    "source": source_decision.agent_name if source_decision else "?",
+                    "reactor": decision.agent_name,
+                    "action": decision.action[:100],
+                    "triggered_by_impact": context[:100],
+                }
+
+                # Recurse: this reactive decision may trigger MORE reactions
+                deeper_events = self._process_reactive_cascade(
+                    new_ripple_events, decision, world, tick, depth=depth + 1,
+                )
+                all_cascade_events.extend(deeper_events)
+
+        self.max_cascade_depth_reached = max(self.max_cascade_depth_reached, depth)
+        return all_cascade_events
+
+    def _process_conversations(self, world, tick):
+        """Process multi-turn conversations for agents who received messages.
+
+        When Agent A messages Agent B and they're at the same location,
+        allow up to CONVERSATION_MAX_TURNS back-and-forth exchanges.
+        """
+        all_events = []
+
+        for agent_id, agent in world.agents.items():
+            inbox = getattr(agent, "_inbox", [])
+            if not inbox:
+                continue
+            if self._current_tick_reactive_count >= self.MAX_REACTIVE_PER_TICK:
+                break
+
+            # Check if any message sender is at the same location (face-to-face)
+            for msg in inbox:
+                sender_name = msg.get("from", "")
+                # Find sender agent_id
+                sender_id = None
+                for aid, ag in world.agents.items():
+                    if ag.personality.name == sender_name:
+                        sender_id = aid
+                        break
+
+                if not sender_id or sender_id not in world.agents:
+                    continue
+
+                sender = world.agents[sender_id]
+
+                # Same location = face-to-face conversation possible
+                if sender.location != agent.location:
+                    continue
+
+                pair = tuple(sorted([agent_id, sender_id]))
+                turns = self._conversation_pairs.get(pair, 0)
+                if turns >= self.CONVERSATION_MAX_TURNS:
+                    continue
+
+                # Agent responds to the message
+                context = f"{sender_name} is right here and just said to you: \"{msg['message'][:150]}\"\nYou must respond directly to them."
+
+                self._current_tick_reactive_count += 1
+                decision, ripple_events = self._execute_decision(
+                    agent_id, world, tick,
+                    trigger="conversation",
+                    cascade_context=context,
+                )
+
+                if decision:
+                    self.total_conversations += 1
+                    self._conversation_pairs[pair] = turns + 1
+
+                    if self.decision_log:
+                        self.decision_log[-1]["trigger"] = f"conversation (turn {turns + 1})"
+                        self.decision_log[-1]["conversation_with"] = sender_name
+
+                    all_events.extend(ripple_events)
+
+                    # Conversation response may trigger cascades too
+                    cascade_events = self._process_reactive_cascade(
+                        ripple_events, decision, world, tick, depth=0,
+                    )
+                    all_events.extend(cascade_events)
+
+                if self._current_tick_reactive_count >= self.MAX_REACTIVE_PER_TICK:
+                    break
 
         return all_events
 
@@ -670,5 +1156,9 @@ class LLMAgencyEngine:
         return {
             "total_calls": self.total_calls,
             "total_decisions": self.total_decisions,
+            "total_reactive": self.total_reactive,
+            "total_conversations": self.total_conversations,
+            "total_messages_sent": self.total_messages_sent,
+            "max_cascade_depth": self.max_cascade_depth_reached,
             "recent_decisions": self.decision_log[-10:],
         }

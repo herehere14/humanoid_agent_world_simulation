@@ -14,3 +14,16 @@ artifacts/*.log
 artifacts/empathetic_dialogues/
 artifacts/ethics_dataset/
 *.Rhistory
+
+# Simulation artifacts (cached specs, not source)
+artifacts/*.json
+!artifacts/.gitkeep
+
+# Frontend build
+frontend/dist/
+frontend/node_modules/
+
+# Environment
+venv/
+.env
+*.env.local
