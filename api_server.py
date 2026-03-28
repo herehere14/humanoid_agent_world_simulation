@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import AsyncGenerator, Optional, Any
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -70,7 +70,7 @@ app = FastAPI(title="Prompt Forest API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3001", "http://127.0.0.1:3001"],
+    allow_origins=["*"],  # Allow any origin — users run from their own machines or ripplesim.com
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -851,23 +851,25 @@ def _run_prediction_simulation(req_prediction: str, req_ticks: int, req_model: s
 
 
 @app.post("/api/world/predict/stream")
-async def stream_prediction_endpoint(req: PredictionRequest):
+async def stream_prediction_endpoint(req: PredictionRequest, request: Request):
     """SSE stream — runs prediction simulation and emits events in real-time.
 
-    Events:
-      - status: progress messages
-      - setup: key figures and policies found
-      - decision: each LLM agent decision as it happens
-      - event: narrative events
-      - day_summary: end-of-day narrative + macro metrics
-      - insight: non-obvious insights
-      - complete: final full report
+    Accepts API key via X-OpenAI-Key header or falls back to server env var.
     """
+    # Get API key from header or env
+    client_api_key = request.headers.get("x-openai-key", "")
+    if not client_api_key:
+        client_api_key = os.environ.get("OPENAI_API_KEY", "")
+
     async def generate():
         try:
             import sys
             sys.path.insert(0, str(Path(__file__).parent))
             from world_sim.run_prediction_stream import stream_prediction
+
+            # Set the API key for this simulation run
+            if client_api_key:
+                os.environ["OPENAI_API_KEY"] = client_api_key
 
             loop = asyncio.get_event_loop()
 

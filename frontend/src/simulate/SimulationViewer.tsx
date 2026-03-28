@@ -264,6 +264,9 @@ function LiveEventCard({ event }: { event: LiveEvent }) {
 
 export default function SimulationViewer() {
   const [prediction, setPrediction] = useState('');
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('ripplesim_api_key') ?? '');
+  const [backendUrl, setBackendUrl] = useState(() => localStorage.getItem('ripplesim_backend') ?? 'http://localhost:8000');
+  const [showSetup, setShowSetup] = useState(true);
   const [report, setReport] = useState<SimulationReport | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -272,8 +275,20 @@ export default function SimulationViewer() {
   const [dayNarratives, setDayNarratives] = useState<Array<{ day: number; narrative: string; macro: Record<string, number> }>>([]);
   const [stats, setStats] = useState({ agents: 0, decisions: 0, day: 0, ripples: 0 });
 
+  // Save settings to localStorage
+  const saveSettings = useCallback(() => {
+    localStorage.setItem('ripplesim_api_key', apiKey);
+    localStorage.setItem('ripplesim_backend', backendUrl);
+    setShowSetup(false);
+  }, [apiKey, backendUrl]);
+
   const runSimulation = useCallback(async () => {
     if (!prediction.trim()) return;
+    if (!apiKey.trim()) {
+      setError('Please enter your OpenAI API key in the settings above.');
+      setShowSetup(true);
+      return;
+    }
     setLoading(true);
     setError(null);
     setReport(null);
@@ -282,10 +297,15 @@ export default function SimulationViewer() {
     setActiveTab('live');
     setStats({ agents: 0, decisions: 0, day: 0, ripples: 0 });
 
+    const base = backendUrl.replace(/\/+$/, '');
+
     try {
-      const res = await fetch(`${API_BASE}/world/predict/stream`, {
+      const res = await fetch(`${base}/api/world/predict/stream`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-OpenAI-Key': apiKey.trim(),
+        },
         body: JSON.stringify({
           prediction: prediction.trim(),
           ticks: 168,
@@ -394,16 +414,89 @@ export default function SimulationViewer() {
         </div>
       </header>
 
+      {/* ═══ Setup Panel ═══ */}
+      {showSetup && (
+        <div className="max-w-[1440px] mx-auto px-6 pt-8 pb-2">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl mx-auto"
+          >
+            <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_2px_8px_rgba(0,0,0,0.04)] p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-slate-800">Setup</h3>
+                {apiKey && (
+                  <button onClick={() => setShowSetup(false)} className="text-xs text-slate-400 hover:text-slate-600">Hide</button>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                {/* API Key */}
+                <div>
+                  <label className="block text-[12px] font-medium text-slate-500 mb-1.5">OpenAI API Key</label>
+                  <input
+                    type="password"
+                    value={apiKey}
+                    onChange={e => setApiKey(e.target.value)}
+                    placeholder="sk-proj-..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-black/[0.08] bg-slate-50 text-[13px] text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 font-mono transition-all"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1.5">
+                    Your key is stored in your browser only and sent directly to your local backend. Never shared with us.
+                  </p>
+                </div>
+
+                {/* Backend URL */}
+                <div>
+                  <label className="block text-[12px] font-medium text-slate-500 mb-1.5">Backend URL</label>
+                  <input
+                    type="text"
+                    value={backendUrl}
+                    onChange={e => setBackendUrl(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-black/[0.08] bg-slate-50 text-[13px] text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 transition-all"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1.5">
+                    The simulation runs on YOUR computer. Start the backend with: <code className="bg-slate-100 px-1 py-0.5 rounded text-blue-600">OPENAI_API_KEY=sk-... python api_server.py</code>
+                  </p>
+                </div>
+
+                <button
+                  onClick={saveSettings}
+                  className="w-full py-2.5 rounded-xl text-[13px] font-medium text-white bg-blue-600 hover:bg-blue-500 transition-colors"
+                >
+                  Save Settings
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       {/* ═══ Input ═══ */}
       <div className="relative">
-        <div className="max-w-[1440px] mx-auto px-6 pt-12 pb-8">
+        <div className="max-w-[1440px] mx-auto px-6 pt-8 pb-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto text-center">
             <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">
               What happens if<span className="gradient-text">...</span>
             </h1>
-            <p className="text-sm text-slate-500 mb-6 max-w-lg mx-auto leading-relaxed">
+            <p className="text-sm text-slate-500 mb-4 max-w-lg mx-auto leading-relaxed">
               Real people. Freeform decisions. Reactive cascades. Live streaming.
             </p>
+
+            {/* Settings toggle */}
+            {!showSetup && (
+              <button
+                onClick={() => setShowSetup(true)}
+                className="text-[11px] text-slate-400 hover:text-slate-600 mb-4 inline-flex items-center gap-1.5 transition-colors"
+              >
+                <svg viewBox="0 0 16 16" className="w-3 h-3" fill="currentColor">
+                  <path fillRule="evenodd" d="M7.429 1.525a3.5 3.5 0 011.142 0l.706.209a.75.75 0 00.863-.392l.35-.632a3.5 3.5 0 01.808.808l-.632.35a.75.75 0 00-.392.863l.209.706a3.5 3.5 0 010 1.142l-.209.706a.75.75 0 00.392.863l.632.35a3.5 3.5 0 01-.808.808l-.35-.632a.75.75 0 00-.863-.392l-.706.209a3.5 3.5 0 01-1.142 0l-.706-.209a.75.75 0 00-.863.392l-.35.632a3.5 3.5 0 01-.808-.808l.632-.35a.75.75 0 00.392-.863l-.209-.706a3.5 3.5 0 010-1.142l.209-.706a.75.75 0 00-.392-.863l-.632-.35a3.5 3.5 0 01.808-.808l.35.632a.75.75 0 00.863.392l.706-.209zM8 10a2 2 0 100-4 2 2 0 000 4z" />
+                </svg>
+                {apiKey ? `API key set (${apiKey.slice(0, 8)}...)` : 'Configure API key'}
+                {' '}&middot; {backendUrl}
+              </button>
+            )}
+
             <div className="relative">
               <input
                 type="text"
