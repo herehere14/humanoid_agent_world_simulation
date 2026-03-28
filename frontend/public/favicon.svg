@@ -1,33 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3b82f6"/>
-      <stop offset="50%" style="stop-color:#8b5cf6"/>
-      <stop offset="100%" style="stop-color:#ec4899"/>
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
-  <!-- Central node -->
-  <circle cx="256" cy="170" r="38" fill="white"/>
-  <!-- Left child -->
-  <circle cx="148" cy="320" r="30" fill="white" opacity="0.85"/>
-  <!-- Right child -->
-  <circle cx="364" cy="320" r="30" fill="white" opacity="0.85"/>
-  <!-- Grandchildren -->
-  <circle cx="96" cy="420" r="22" fill="white" opacity="0.6"/>
-  <circle cx="200" cy="420" r="22" fill="white" opacity="0.6"/>
-  <circle cx="312" cy="420" r="22" fill="white" opacity="0.6"/>
-  <circle cx="416" cy="420" r="22" fill="white" opacity="0.6"/>
-  <!-- Cascade lines top to middle -->
-  <line x1="238" y1="204" x2="164" y2="294" stroke="white" stroke-width="5" opacity="0.7" stroke-linecap="round"/>
-  <line x1="274" y1="204" x2="348" y2="294" stroke="white" stroke-width="5" opacity="0.7" stroke-linecap="round"/>
-  <!-- Cascade lines middle to bottom -->
-  <line x1="132" y1="346" x2="104" y2="402" stroke="white" stroke-width="4" opacity="0.5" stroke-linecap="round"/>
-  <line x1="164" y1="346" x2="192" y2="402" stroke="white" stroke-width="4" opacity="0.5" stroke-linecap="round"/>
-  <line x1="348" y1="346" x2="320" y2="402" stroke="white" stroke-width="4" opacity="0.5" stroke-linecap="round"/>
-  <line x1="380" y1="346" x2="408" y2="402" stroke="white" stroke-width="4" opacity="0.5" stroke-linecap="round"/>
+  <rect width="512" height="512" rx="96" fill="#0a0a0a"/>
   <!-- Ripple rings -->
-  <circle cx="256" cy="170" r="58" fill="none" stroke="white" stroke-width="2.5" opacity="0.3"/>
-  <circle cx="256" cy="170" r="84" fill="none" stroke="white" stroke-width="1.8" opacity="0.18"/>
-  <circle cx="256" cy="170" r="114" fill="none" stroke="white" stroke-width="1.2" opacity="0.08"/>
+  <circle cx="256" cy="220" r="40" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity="0.8"/>
+  <circle cx="256" cy="220" r="72" fill="none" stroke="#3b82f6" stroke-width="1.2" opacity="0.4"/>
+  <circle cx="256" cy="220" r="110" fill="none" stroke="#3b82f6" stroke-width="0.8" opacity="0.2"/>
+  <circle cx="256" cy="220" r="155" fill="none" stroke="#3b82f6" stroke-width="0.6" opacity="0.1"/>
+  <!-- Central dot -->
+  <circle cx="256" cy="220" r="8" fill="#3b82f6"/>
+  <!-- Cascade nodes emanating outward -->
+  <circle cx="200" cy="310" r="6" fill="#60a5fa" opacity="0.7"/>
+  <circle cx="312" cy="310" r="6" fill="#60a5fa" opacity="0.7"/>
+  <circle cx="152" cy="380" r="5" fill="#93c5fd" opacity="0.5"/>
+  <circle cx="248" cy="380" r="5" fill="#93c5fd" opacity="0.5"/>
+  <circle cx="312" cy="390" r="5" fill="#93c5fd" opacity="0.5"/>
+  <circle cx="380" cy="370" r="5" fill="#93c5fd" opacity="0.5"/>
+  <!-- Cascade lines -->
+  <line x1="248" y1="240" x2="205" y2="305" stroke="#3b82f6" stroke-width="1" opacity="0.35"/>
+  <line x1="264" y1="240" x2="308" y2="305" stroke="#3b82f6" stroke-width="1" opacity="0.35"/>
+  <line x1="196" y1="316" x2="156" y2="375" stroke="#60a5fa" stroke-width="0.8" opacity="0.25"/>
+  <line x1="206" y1="316" x2="244" y2="375" stroke="#60a5fa" stroke-width="0.8" opacity="0.25"/>
+  <line x1="308" y1="316" x2="308" y2="385" stroke="#60a5fa" stroke-width="0.8" opacity="0.25"/>
+  <line x1="316" y1="316" x2="376" y2="365" stroke="#60a5fa" stroke-width="0.8" opacity="0.25"/>
 </svg>

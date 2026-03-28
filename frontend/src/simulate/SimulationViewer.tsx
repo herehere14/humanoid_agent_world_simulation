@@ -376,7 +376,7 @@ export default function SimulationViewer() {
                 <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 2.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM5.5 9a2.5 2.5 0 015 0v.5a.5.5 0 01-.5.5h-4a.5.5 0 01-.5-.5V9z"/>
               </svg>
             </div>
-            <span className="text-[13px] font-semibold text-slate-800">World Simulation</span>
+            <span className="text-[13px] font-semibold text-slate-800">RippleSim</span>
           </div>
           {(loading || report) && (
             <div className="ml-auto flex items-center gap-4 text-[11px] text-slate-400">
