@@ -183,14 +183,7 @@ export default function CascadeLanding() {
             transition={{ duration: 0.5 }}
             className="inline-flex items-center gap-3 mb-8"
           >
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <svg viewBox="0 0 24 24" className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="5" r="3" />
-                <circle cx="5" cy="19" r="3" />
-                <circle cx="19" cy="19" r="3" />
-                <path d="M12 8v3M8.5 17L10.5 12.5M15.5 17L13.5 12.5" />
-              </svg>
-            </div>
+            <img src="./favicon.svg" alt="Cascade" className="w-12 h-12 rounded-2xl shadow-lg shadow-blue-500/20" />
             <span className="text-3xl font-black tracking-tight text-slate-900">Cascade</span>
           </motion.div>
 
@@ -487,14 +480,7 @@ report = run_prediction(
       <footer className="py-12 border-t border-black/[0.04] bg-white">
         <div className="max-w-5xl mx-auto px-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="12" cy="5" r="3" />
-                <circle cx="5" cy="19" r="3" />
-                <circle cx="19" cy="19" r="3" />
-                <path d="M12 8v3M8.5 17L10.5 12.5M15.5 17L13.5 12.5" />
-              </svg>
-            </div>
+            <img src="./favicon.svg" alt="Cascade" className="w-6 h-6 rounded-lg" />
             <span className="text-sm font-bold text-slate-900">Cascade</span>
           </div>
           <p className="text-xs text-slate-400">

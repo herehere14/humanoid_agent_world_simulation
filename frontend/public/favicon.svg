@@ -1,7 +1,33 @@
-<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" rx="8" fill="#060a14"/>
-  <circle cx="16" cy="16" r="14" stroke="#00d4ff" stroke-width="1" stroke-opacity="0.4"/>
-  <path d="M16 4 L20 12 L24 10 L18 20 L22 18 L14 28 L6 18 L10 20 L4 10 L8 12 Z" fill="#00d4ff" fill-opacity="0.2" stroke="#00d4ff" stroke-width="1.2"/>
-  <circle cx="16" cy="16" r="3.5" fill="#00d4ff" fill-opacity="0.9"/>
-  <circle cx="16" cy="16" r="1.5" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="50%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#ec4899"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <!-- Central node -->
+  <circle cx="256" cy="170" r="38" fill="white"/>
+  <!-- Left child -->
+  <circle cx="148" cy="320" r="30" fill="white" opacity="0.85"/>
+  <!-- Right child -->
+  <circle cx="364" cy="320" r="30" fill="white" opacity="0.85"/>
+  <!-- Grandchildren -->
+  <circle cx="96" cy="420" r="22" fill="white" opacity="0.6"/>
+  <circle cx="200" cy="420" r="22" fill="white" opacity="0.6"/>
+  <circle cx="312" cy="420" r="22" fill="white" opacity="0.6"/>
+  <circle cx="416" cy="420" r="22" fill="white" opacity="0.6"/>
+  <!-- Cascade lines top to middle -->
+  <line x1="238" y1="204" x2="164" y2="294" stroke="white" stroke-width="5" opacity="0.7" stroke-linecap="round"/>
+  <line x1="274" y1="204" x2="348" y2="294" stroke="white" stroke-width="5" opacity="0.7" stroke-linecap="round"/>
+  <!-- Cascade lines middle to bottom -->
+  <line x1="132" y1="346" x2="104" y2="402" stroke="white" stroke-width="4" opacity="0.5" stroke-linecap="round"/>
+  <line x1="164" y1="346" x2="192" y2="402" stroke="white" stroke-width="4" opacity="0.5" stroke-linecap="round"/>
+  <line x1="348" y1="346" x2="320" y2="402" stroke="white" stroke-width="4" opacity="0.5" stroke-linecap="round"/>
+  <line x1="380" y1="346" x2="408" y2="402" stroke="white" stroke-width="4" opacity="0.5" stroke-linecap="round"/>
+  <!-- Ripple rings -->
+  <circle cx="256" cy="170" r="58" fill="none" stroke="white" stroke-width="2.5" opacity="0.3"/>
+  <circle cx="256" cy="170" r="84" fill="none" stroke="white" stroke-width="1.8" opacity="0.18"/>
+  <circle cx="256" cy="170" r="114" fill="none" stroke="white" stroke-width="1.2" opacity="0.08"/>
 </svg>
