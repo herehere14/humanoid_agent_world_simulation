@@ -176,6 +176,7 @@ export default function CascadeLanding() {
               <a href="#how" className="hover:text-white transition-colors">How it works</a>
               <a href="#capabilities" className="hover:text-white transition-colors">Capabilities</a>
               <a href="#scenarios" className="hover:text-white transition-colors">Scenarios</a>
+              <a href="#roadmap" className="hover:text-white transition-colors">Roadmap</a>
               <a href="#setup" className="hover:text-white transition-colors">Run locally</a>
             </nav>
             <a href="#/simulate" className="text-[13px] font-medium text-white bg-white/[0.08] hover:bg-white/[0.14] px-4 py-2 rounded-lg transition-colors border border-white/[0.08]">
@@ -209,18 +210,18 @@ export default function CascadeLanding() {
             className="text-5xl md:text-7xl font-bold tracking-[-0.03em] leading-[1.05] mb-6"
           >
             One decision.<br />
-            <span className="text-white/40">A thousand consequences.</span>
+            <span className="text-white/60">A thousand consequences.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="text-lg md:text-xl text-white/40 max-w-2xl mx-auto mb-12 leading-relaxed"
+            className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-12 leading-relaxed"
           >
-            RippleSim builds a world of AI agents from any scenario you describe.
-            They make freeform decisions, communicate with each other, and create
-            butterfly effects that no one predicted.
+            The world's first simulation engine where AI agents think freely,
+            talk to each other, and create chain reactions no human could predict.
+            From a single "what if" to a thousand emergent consequences.
           </motion.p>
 
           <motion.div
@@ -276,7 +277,7 @@ export default function CascadeLanding() {
                 <div className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-2">
                   <AnimatedNumber value={stat.value} suffix={stat.suffix} />
                 </div>
-                <div className="text-[13px] text-white/30 uppercase tracking-wider">{stat.label}</div>
+                <div className="text-[13px] text-white/55 uppercase tracking-wider">{stat.label}</div>
               </Reveal>
             ))}
           </div>
@@ -301,9 +302,9 @@ export default function CascadeLanding() {
             ].map((step, i) => (
               <Reveal key={i} delay={i * 0.1}>
                 <div className="bg-[#0c0c10] p-8 h-full">
-                  <div className="text-blue-500/40 text-[13px] font-mono mb-4">{step.num}</div>
+                  <div className="text-blue-500/70 text-[13px] font-mono mb-4">{step.num}</div>
                   <h3 className="text-lg font-semibold mb-3">{step.title}</h3>
-                  <p className="text-[14px] text-white/35 leading-relaxed">{step.desc}</p>
+                  <p className="text-[14px] text-white/60 leading-relaxed">{step.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -318,7 +319,7 @@ export default function CascadeLanding() {
           <Reveal>
             <div className="text-[13px] text-blue-400/60 uppercase tracking-[0.15em] mb-4">Capabilities</div>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Not a prediction engine.</h2>
-            <p className="text-xl text-white/30 mb-16 max-w-xl">A discovery engine. It finds what you didn't expect.</p>
+            <p className="text-xl text-white/55 mb-16 max-w-xl">A discovery engine. It finds what you didn't expect.</p>
           </Reveal>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -332,9 +333,9 @@ export default function CascadeLanding() {
             ].map((cap, i) => (
               <Reveal key={i} delay={i * 0.08}>
                 <div className="border border-white/[0.06] rounded-xl p-6 hover:border-white/[0.12] transition-colors group h-full">
-                  <div className="text-[11px] text-blue-400/50 uppercase tracking-wider mb-3">{cap.tag}</div>
+                  <div className="text-[11px] text-blue-400/70 uppercase tracking-wider mb-3">{cap.tag}</div>
                   <h3 className="text-[15px] font-semibold mb-3 group-hover:text-blue-400 transition-colors">{cap.title}</h3>
-                  <p className="text-[13px] text-white/30 leading-relaxed">{cap.desc}</p>
+                  <p className="text-[13px] text-white/55 leading-relaxed">{cap.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -379,7 +380,7 @@ export default function CascadeLanding() {
                   <div className="flex flex-col md:flex-row md:items-start gap-6">
                     <div className="md:w-1/3">
                       <h3 className="text-[16px] font-semibold mb-3">{scenario.title}</h3>
-                      <div className="flex gap-3 text-[12px] text-white/25 font-mono">
+                      <div className="flex gap-3 text-[12px] text-white/50 font-mono">
                         <span>{scenario.agents}</span>
                         <span className="text-white/10">|</span>
                         <span>{scenario.decisions}</span>
@@ -388,8 +389,8 @@ export default function CascadeLanding() {
                       </div>
                     </div>
                     <div className="md:w-2/3">
-                      <div className="text-[11px] text-blue-400/40 uppercase tracking-wider mb-2">Non-obvious finding</div>
-                      <p className="text-[14px] text-white/40 leading-relaxed">{scenario.finding}</p>
+                      <div className="text-[11px] text-blue-400/70 uppercase tracking-wider mb-2">Non-obvious finding</div>
+                      <p className="text-[14px] text-white/60 leading-relaxed">{scenario.finding}</p>
                     </div>
                   </div>
                 </div>
@@ -409,7 +410,7 @@ export default function CascadeLanding() {
           </Reveal>
 
           <Reveal delay={0.2}>
-            <div className="border border-white/[0.06] rounded-xl p-8 font-mono text-[13px] text-white/30 leading-relaxed overflow-x-auto">
+            <div className="border border-white/[0.06] rounded-xl p-8 font-mono text-[13px] text-white/55 leading-relaxed overflow-x-auto">
               <pre>{`User Prediction
      │
      ├─── GPT-5 Research ──── Key figures + personality profiles
@@ -442,6 +443,172 @@ export default function CascadeLanding() {
                              Cascade source/victim identification
                              Compound policy squeeze
                              Counterintuitive resilience`}</pre>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+
+      {/* ═══ Why RippleSim ═══ */}
+      <section className="py-28 border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-6">
+          <Reveal>
+            <div className="text-[13px] text-blue-400/60 uppercase tracking-[0.15em] mb-4">Why RippleSim</div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Every other simulation is a spreadsheet with feelings.</h2>
+            <p className="text-xl text-white/50 mb-16 max-w-2xl">RippleSim is not.</p>
+          </Reveal>
+
+          <div className="grid md:grid-cols-2 gap-px bg-white/[0.04] rounded-xl overflow-hidden">
+            {[
+              {
+                label: 'Traditional agent-based models',
+                points: [
+                  'Agents pick from fixed menus (BUY / SELL / HOLD)',
+                  'Same input → same output, every time',
+                  'No communication between agents',
+                  'Consequences are pre-coded rules',
+                  'Insights are whatever the developer expected',
+                  'Scale means more of the same',
+                ],
+                dim: true,
+              },
+              {
+                label: 'RippleSim',
+                points: [
+                  'Agents do whatever a real person would do — no menu, no constraints',
+                  'Same scenario → different emergent cascades each run',
+                  'Agents message specific people by name and negotiate in real-time',
+                  'Consequences are self-described by the agent and validated by the engine',
+                  'Insights are patterns the system discovers that no one designed for',
+                  'Scale means exponentially more possible cascade paths',
+                ],
+                dim: false,
+              },
+            ].map((col, i) => (
+              <Reveal key={i} delay={i * 0.15}>
+                <div className={`p-8 h-full ${i === 0 ? 'bg-[#0c0c10]' : 'bg-[#0e1018]'}`}>
+                  <div className={`text-[13px] uppercase tracking-wider mb-6 ${col.dim ? 'text-white/30' : 'text-blue-400'}`}>
+                    {col.label}
+                  </div>
+                  <ul className="space-y-4">
+                    {col.points.map((p, j) => (
+                      <li key={j} className="flex items-start gap-3">
+                        <span className={`mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 ${col.dim ? 'bg-white/20' : 'bg-blue-400'}`} />
+                        <span className={`text-[14px] leading-relaxed ${col.dim ? 'text-white/35 line-through decoration-white/15' : 'text-white/70'}`}>{p}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* Scaling advantage */}
+          <Reveal delay={0.3}>
+            <div className="mt-12 border border-white/[0.06] rounded-xl p-8">
+              <div className="text-[13px] text-blue-400/60 uppercase tracking-wider mb-4">Scaling property</div>
+              <h3 className="text-xl font-semibold mb-4">Complexity doesn't grow linearly. It detonates.</h3>
+              <p className="text-[14px] text-white/55 leading-relaxed max-w-3xl">
+                In a traditional simulation, doubling agents doubles compute. In RippleSim, doubling agents
+                creates exponentially more possible cascade paths. 500 agents can produce cascade chains
+                that 100 agents physically cannot — because the network density crosses thresholds where
+                second-order and third-order effects that were previously impossible become inevitable.
+                A manager's decision to cut hours doesn't just hit their workers — it hits the vendor their
+                worker buys from, the landlord the vendor pays, the school that loses the landlord's property tax,
+                and the teacher who gets laid off. That chain only exists if all five nodes are in the network.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+
+      {/* ═══ Future ═══ */}
+      <section id="roadmap" className="py-28 border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-6">
+          <Reveal>
+            <div className="text-[13px] text-blue-400/60 uppercase tracking-[0.15em] mb-4">Roadmap</div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Where this goes</h2>
+            <p className="text-xl text-white/50 mb-16 max-w-2xl">From scenario planning to civilizational infrastructure.</p>
+          </Reveal>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                phase: 'Now',
+                title: 'Scenario Exploration',
+                items: [
+                  'Any prediction → full simulation in minutes',
+                  'Freeform LLM agents with reactive cascades',
+                  'Agent-to-agent communication and negotiation',
+                  'Non-obvious insight detection',
+                  'Real-time SSE streaming of every decision',
+                ],
+                active: true,
+              },
+              {
+                phase: 'Next',
+                title: 'Domain Adapters',
+                items: [
+                  'Financial markets — model contagion between institutions, predict systemic risk before it materializes',
+                  'Geopolitics — simulate alliance fractures, escalation ladders, and off-ramp discovery with real leader personalities',
+                  'Climate policy — model the cascading economic impact of carbon pricing across every sector and household',
+                  'Pandemic response — simulate public health interventions with realistic human behavioral resistance',
+                  'Supply chain — trace how a disruption at one node propagates through the entire global network',
+                ],
+                active: false,
+              },
+              {
+                phase: 'Future',
+                title: 'Civilizational Sandbox',
+                items: [
+                  '10,000+ persistent agents with memory across simulation runs',
+                  'Multi-generation simulations — decisions echo across decades',
+                  'Counterfactual branching — fork the simulation at any point and explore alternate histories',
+                  'Real-time data feeds — agents react to live news, market data, and social media',
+                  'Collaborative simulation — multiple users inject decisions into the same running world',
+                ],
+                active: false,
+              },
+            ].map((phase, i) => (
+              <Reveal key={i} delay={i * 0.1}>
+                <div className={`border rounded-xl p-6 h-full ${phase.active ? 'border-blue-500/30 bg-blue-500/[0.03]' : 'border-white/[0.06]'}`}>
+                  <div className="flex items-center gap-2.5 mb-4">
+                    <span className={`text-[11px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded ${phase.active ? 'bg-blue-500/20 text-blue-400' : 'bg-white/[0.04] text-white/40'}`}>
+                      {phase.phase}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-4">{phase.title}</h3>
+                  <ul className="space-y-3">
+                    {phase.items.map((item, j) => (
+                      <li key={j} className="flex items-start gap-2.5">
+                        <span className={`mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 ${phase.active ? 'bg-blue-400' : 'bg-white/20'}`} />
+                        <span className="text-[13px] text-white/55 leading-relaxed">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* Use cases */}
+          <Reveal delay={0.3}>
+            <div className="mt-16">
+              <div className="text-[13px] text-blue-400/60 uppercase tracking-wider mb-6">Who this is for</div>
+              <div className="grid md:grid-cols-4 gap-4">
+                {[
+                  { role: 'Intelligence Analysts', desc: 'War-game geopolitical scenarios with psychologically accurate leader models. Discover escalation paths and off-ramps that tabletop exercises miss.' },
+                  { role: 'Financial Risk Teams', desc: 'Stress-test portfolios against scenarios where traditional correlations break down. Find the second-order contagion path that your VaR model doesn\'t see.' },
+                  { role: 'Policy Researchers', desc: 'Simulate the downstream effects of legislation before it passes. See which populations get squeezed by compound policy interactions nobody modeled.' },
+                  { role: 'Corporate Strategists', desc: 'Model how competitor decisions cascade through your supply chain. Identify the single-point-of-failure person whose exit collapses three divisions.' },
+                ].map((uc, i) => (
+                  <div key={i} className="border border-white/[0.06] rounded-xl p-5 hover:border-white/[0.12] transition-colors">
+                    <h4 className="text-[14px] font-semibold mb-2">{uc.role}</h4>
+                    <p className="text-[12px] text-white/50 leading-relaxed">{uc.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </Reveal>
         </div>
@@ -504,11 +671,11 @@ report = run_prediction(
                     <span className="text-[13px] font-mono text-blue-500/50">{step.num}</span>
                     <h3 className="text-[15px] font-semibold">{step.title}</h3>
                   </div>
-                  <div className="bg-[#0c0c10] rounded-lg p-4 font-mono text-[13px] text-white/40 overflow-x-auto">
+                  <div className="bg-[#0c0c10] rounded-lg p-4 font-mono text-[13px] text-white/60 overflow-x-auto">
                     <pre>{step.code}</pre>
                   </div>
                   {step.note && (
-                    <p className="text-[12px] text-white/20 mt-3">{step.note}</p>
+                    <p className="text-[12px] text-white/50 mt-3">{step.note}</p>
                   )}
                 </div>
               </Reveal>
@@ -523,9 +690,9 @@ report = run_prediction(
         <div className="max-w-4xl mx-auto px-6 text-center">
           <Reveal>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-              What happens if<span className="text-white/20">...</span>
+              What happens if<span className="text-white/50">...</span>
             </h2>
-            <p className="text-lg text-white/30 mb-10">
+            <p className="text-lg text-white/55 mb-10">
               Type any scenario. Watch the consequences unfold.
             </p>
             <a
@@ -547,7 +714,7 @@ report = run_prediction(
               <img src="./favicon.svg" alt="RippleSim" className="w-5 h-5 rounded" />
               <span className="text-[13px] font-semibold text-white/60">RippleSim</span>
             </div>
-            <div className="flex items-center gap-6 text-[12px] text-white/25">
+            <div className="flex items-center gap-6 text-[12px] text-white/50">
               <a href="https://github.com/herehere14/Cascade-An-AI-Agent-World-Simulator" className="hover:text-white/50 transition-colors" target="_blank" rel="noopener">GitHub</a>
               <a href="#/simulate" className="hover:text-white/50 transition-colors">Simulator</a>
               <a href="#setup" className="hover:text-white/50 transition-colors">Documentation</a>
