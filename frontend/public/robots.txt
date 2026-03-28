@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cascade-world-simulator.vercel.app/sitemap.xml
