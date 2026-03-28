@@ -263,6 +263,7 @@ class RippleEngine:
                         if link.to_id not in world.agents:
                             continue
                         target = world.agents[link.to_id]
+                        income_cut = 0.0
                         # Reduce income (not additive debt) — cuts don't stack infinitely
                         if target.income_level > 0.15:
                             income_cut = min(0.1, target.income_level * 0.15 * link.strength)
@@ -272,22 +273,23 @@ class RippleEngine:
                             target.heart.tension = _clamp(target.heart.tension + debt_bump * 0.3)
                             affected_ids.add(link.to_id)
 
-                        event = RippleEvent(
-                            tick=tick,
-                            actor_id=agent_id,
-                            actor_name=agent.personality.name,
-                            target_id=link.to_id,
-                            target_name=target.personality.name,
-                            action=f"cut hours/overtime due to cost pressure (dp={agent.debt_pressure:.2f})",
-                            consequence=f"lost income, debt_pressure +{income_cut:.3f}",
-                            mechanism="employs",
-                            debt_delta=income_cut,
-                        )
-                        resolution.events.append(event)
-                        self.event_log.append(event)
+                        if income_cut > 0:
+                            event = RippleEvent(
+                                tick=tick,
+                                actor_id=agent_id,
+                                actor_name=agent.personality.name,
+                                target_id=link.to_id,
+                                target_name=target.personality.name,
+                                action=f"cut hours/overtime due to cost pressure (dp={agent.debt_pressure:.2f})",
+                                consequence=f"lost income, debt_pressure +{income_cut:.3f}",
+                                mechanism="employs",
+                                debt_delta=income_cut,
+                            )
+                            resolution.events.append(event)
+                            self.event_log.append(event)
 
-                        target.add_memory(tick,
-                            f"{agent.personality.name} cut my hours — income is shrinking")
+                            target.add_memory(tick,
+                                f"{agent.personality.name} cut my hours — income is shrinking")
 
             # --- Vendor under pressure → raises prices for customers ---
             if role == "market_vendor" and debt_spike > 0.05:

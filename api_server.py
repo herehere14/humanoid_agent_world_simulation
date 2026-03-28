@@ -70,7 +70,7 @@ app = FastAPI(title="Prompt Forest API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3001", "http://127.0.0.1:3001"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -104,6 +104,15 @@ class WorldSnapshotRequest(BaseModel):
     scenario: str = "small_town"
     ticks: int = 240
     information: list[str] = []
+
+
+class PredictionRequest(BaseModel):
+    """Generate a dynamic scenario from any user prediction."""
+    prediction: str  # e.g. "Albanese government loses the Australian election"
+    ticks: int = 336  # 14 days default
+    model: str = "gpt-5-mini"  # OpenAI model for character research
+    seed: int = 42
+    auto_inject_shock: bool = True
 
 
 # ─── SSE Helper ──────────────────────────────────────────────────────────────
@@ -815,6 +824,206 @@ async def run_world_what_if(req: WorldWhatIfRequest):
         if "info_spread" in report:
             result["info_spread"] = report["info_spread"]
 
+        return result
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Dynamic Prediction Endpoint ─────────────────────────────────────────────
+
+def _run_prediction_simulation(req_prediction: str, req_ticks: int, req_model: str, req_seed: int, req_auto_inject: bool) -> dict:
+    """Automated pipeline: prediction → research → simulate → insight report."""
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent))
+    from world_sim.run_prediction import run_prediction
+
+    return run_prediction(
+        req_prediction,
+        days=max(1, req_ticks // 24),
+        model=req_model,
+        seed=req_seed,
+        verbose=True,
+        llm_agents=True,
+        llm_agents_per_tick=4,
+    )
+
+
+
+@app.post("/api/world/predict/stream")
+async def stream_prediction_endpoint(req: PredictionRequest):
+    """SSE stream — runs prediction simulation and emits events in real-time.
+
+    Events:
+      - status: progress messages
+      - setup: key figures and policies found
+      - decision: each LLM agent decision as it happens
+      - event: narrative events
+      - day_summary: end-of-day narrative + macro metrics
+      - insight: non-obvious insights
+      - complete: final full report
+    """
+    async def generate():
+        try:
+            import sys
+            sys.path.insert(0, str(Path(__file__).parent))
+            from world_sim.run_prediction_stream import stream_prediction
+
+            loop = asyncio.get_event_loop()
+
+            # Run the generator in a thread and yield events
+            import queue
+            import threading
+
+            q: queue.Queue = queue.Queue()
+            error_holder: list = []
+
+            def run_sim():
+                try:
+                    for event in stream_prediction(
+                        req.prediction,
+                        days=max(1, req.ticks // 24),
+                        model=req.model,
+                        seed=req.seed,
+                        llm_agents_per_tick=4,
+                    ):
+                        q.put(event)
+                    q.put(None)  # sentinel
+                except Exception as e:
+                    error_holder.append(str(e))
+                    q.put(None)
+
+            thread = threading.Thread(target=run_sim, daemon=True)
+            thread.start()
+
+            while True:
+                # Poll the queue with a timeout so we don't block forever
+                try:
+                    event = await asyncio.wait_for(
+                        loop.run_in_executor(None, lambda: q.get(timeout=1)),
+                        timeout=5,
+                    )
+                except (asyncio.TimeoutError, Exception):
+                    if not thread.is_alive():
+                        break
+                    continue
+
+                if event is None:
+                    break
+
+                yield f"data: {json.dumps(event)}\n\n"
+
+            if error_holder:
+                yield f"data: {json.dumps({'type': 'error', 'data': {'message': error_holder[0]}})}\n\n"
+
+            yield f"data: {json.dumps({'type': 'done', 'data': {}})}\n\n"
+
+        except Exception as e:
+            traceback.print_exc()
+            yield f"data: {json.dumps({'type': 'error', 'data': {'message': str(e)}})}\n\n"
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            "Connection": "keep-alive",
+        },
+    )
+
+
+@app.post("/api/world/predict")
+async def run_prediction_endpoint(req: PredictionRequest):
+    """Generate a dynamic world simulation from any user prediction.
+
+    Pipeline:
+      1. Calls OpenAI to research all key figures for the prediction
+      2. Generates personality profiles for each real person
+      3. Builds world with organizations, population segments, relationships
+      4. Injects the scenario shock
+      5. Runs simulation for the requested number of ticks
+      6. Returns full results with macro metrics, agent states, and reports
+
+    Example:
+        POST /api/world/predict
+        {"prediction": "Australian Albanese government loses the election to Dutton"}
+    """
+    try:
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(
+            None,
+            lambda: _run_prediction_simulation(
+                req.prediction, req.ticks, req.model, req.seed, req.auto_inject_shock,
+            ),
+        )
+        return result
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/world/predict/spec")
+async def generate_prediction_spec(req: PredictionRequest):
+    """Generate ONLY the scenario spec (characters, orgs, locations) without running simulation.
+
+    Useful for:
+      - Inspecting what characters OpenAI generated
+      - Editing the spec before running
+      - Caching specs for repeated runs
+    """
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent))
+        from world_sim.scenario_generator import generate_spec_only
+
+        loop = asyncio.get_event_loop()
+        spec = await loop.run_in_executor(
+            None,
+            lambda: generate_spec_only(req.prediction, model=req.model),
+        )
+        return {"status": "ok", "prediction": req.prediction, "spec": spec}
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/world/predict/from_spec")
+async def run_from_spec(spec: dict, ticks: int = 336, seed: int = 42):
+    """Run a simulation from a previously generated (and optionally edited) spec.
+
+    Use /api/world/predict/spec to generate, edit the JSON, then POST it here.
+    """
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent))
+        from world_sim.scenario_generator import build_world_from_spec, build_shock_from_spec
+        from world_sim.world_information import apply_external_information
+
+        loop = asyncio.get_event_loop()
+
+        def _build_and_run():
+            result = build_world_from_spec(spec, seed=seed)
+            result.world.initialize()
+
+            if spec.get("shock_events"):
+                shock_plan = build_shock_from_spec(spec, start_tick=1)
+                apply_external_information(result.world, shock_plan)
+
+            world = result.world
+            for _ in range(ticks):
+                world.tick()
+
+            return {
+                "status": "ok",
+                "total_agents": len(world.agents),
+                "total_ticks": ticks,
+                "macro_summary": world.get_macro_summary(),
+                "shock_impact": world.get_shock_impact_report(),
+                "info_spread": world.get_info_spread_report(),
+            }
+
+        result = await loop.run_in_executor(None, _build_and_run)
         return result
     except Exception as e:
         traceback.print_exc()
